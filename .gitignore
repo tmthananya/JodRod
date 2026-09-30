@@ -1,0 +1,9 @@
+# Environment configuration (never commit credentials)
+.env
+
+# System files
+.DS_Store
+
+# Local data cache
+data/*.json
+!data/.gitkeep
