@@ -214,6 +214,9 @@
         <div style="font-size: 0.82rem; color: #475569; font-weight: 600;">
           💡 Click anywhere on the map to change the selected coordinates.
         </div>
+        <a href="#my-spaces" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-offer-from-map">
+          🅿️ Offer Space at Selected Location &rarr;
+        </a>
       </div>
     </section>
 
@@ -230,16 +233,86 @@
       </div>
     </section>
 
-    <!-- 3. My Spaces Section -->
+    <!-- 3. My Spaces Section: OFFER PARKING SPACE FORM -->
     <section id="section-my-spaces" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>🅿️</span> My Parking Spaces</h2>
+        <h2 class="section-title"><span>🅿️</span> Offer & Manage Parking Spaces</h2>
         <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">Manage spaces you offer to neighbors during floods.</p>
-      <div class="placeholder-notice">
-        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">🅿️ Space Manager Ready</p>
-        <p>CRUD operations to create, edit, and delete spaces will load here.</p>
+      <p class="section-subtitle">Register your safe elevated space to help neighbors protect their cars from flooding.</p>
+
+      <!-- Offer Parking Space Form Card -->
+      <div class="form-card">
+        <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+          <span>🅿️</span> Offer Parking Space
+        </h3>
+        <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;">
+          Fill in your space details. The location is automatically captured from the interactive map.
+        </p>
+
+        <!-- Dynamic Success & Error Alert Box -->
+        <div id="offer-alert" class="alert-message" role="alert"></div>
+
+        <form id="offer-parking-form" novalidate>
+          
+          <!-- 1. Parking Name -->
+          <div class="form-group">
+            <label for="offer-name" class="form-label">Parking Space Name *</label>
+            <input type="text" id="offer-name" name="name" class="form-input" placeholder="e.g. Elevated Driveway near Nimman Soi 7" required>
+            <div class="form-help">A recognizable landmark or address so drivers can locate it easily.</div>
+          </div>
+
+          <!-- 2. Location from Real Map -->
+          <div class="form-group">
+            <label class="form-label">Location (Selected from Real Map) *</label>
+            <div class="coords-pick-box">
+              <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <span style="font-size: 0.75rem; color: #64748b; font-weight: 700;">Latitude:</span>
+                  <input type="text" id="offer-latitude" name="latitude" class="form-input" style="padding: 6px 10px; font-size: 0.88rem;" readonly required>
+                </div>
+                <div>
+                  <span style="font-size: 0.75rem; color: #64748b; font-weight: 700;">Longitude:</span>
+                  <input type="text" id="offer-longitude" name="longitude" class="form-input" style="padding: 6px 10px; font-size: 0.88rem;" readonly required>
+                </div>
+              </div>
+              <button type="button" id="btn-pick-location" class="pixel-btn pixel-btn-blue coords-pick-btn">
+                🗺️ Select on Map
+              </button>
+            </div>
+            <div class="form-help">Click anywhere on the real map to set new coordinates.</div>
+          </div>
+
+          <!-- 3. Capacity & 4. Available Spaces -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="offer-capacity" class="form-label">Total Capacity *</label>
+              <input type="number" id="offer-capacity" name="capacity" class="form-input" min="1" max="1000" value="5" required>
+              <div class="form-help">Total vehicles the space can hold.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="offer-available-spaces" class="form-label">Available Spaces *</label>
+              <input type="number" id="offer-available-spaces" name="available_spaces" class="form-input" min="0" max="1000" value="5" required>
+              <div class="form-help">Current open spots (must be &le; capacity).</div>
+            </div>
+          </div>
+
+          <!-- 5. Status -->
+          <div class="form-group">
+            <label for="offer-status" class="form-label">Status *</label>
+            <select id="offer-status" name="status" class="form-select" required>
+              <option value="available" selected>Available (Ready for parking)</option>
+              <option value="full">Full (At capacity)</option>
+              <option value="closed">Closed (Temporarily unavailable)</option>
+            </select>
+          </div>
+
+          <button type="submit" id="btn-submit-space" class="pixel-btn pixel-btn-green" style="width: 100%; padding: 14px; font-size: 1.05rem;">
+            <span>🅿️</span> Save & Offer Parking Space
+          </button>
+
+        </form>
       </div>
     </section>
 
@@ -360,6 +433,117 @@
           window.location.hash = '#home';
         });
       });
+
+      // Jump to map to pick location
+      const btnPick = document.getElementById('btn-pick-location');
+      if (btnPick) {
+        btnPick.addEventListener('click', () => {
+          window.location.hash = '#map';
+        });
+      }
+
+      // Handle Offer Parking Space Form Submit
+      const offerForm = document.getElementById('offer-parking-form');
+      const offerAlert = document.getElementById('offer-alert');
+      const btnSubmit = document.getElementById('btn-submit-space');
+
+      function showAlert(type, message) {
+        if (!offerAlert) return;
+        offerAlert.className = `alert-message ${type}`;
+        offerAlert.innerHTML = message;
+        offerAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      if (offerForm) {
+        offerForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const name = document.getElementById('offer-name').value.trim();
+          const latitude = parseFloat(document.getElementById('offer-latitude').value);
+          const longitude = parseFloat(document.getElementById('offer-longitude').value);
+          const capacity = parseInt(document.getElementById('offer-capacity').value, 10);
+          const available_spaces = parseInt(document.getElementById('offer-available-spaces').value, 10);
+          const status = document.getElementById('offer-status').value;
+
+          // Client-side Validation
+          if (!name) {
+            showAlert('error', '⚠️ Please enter a parking space name.');
+            document.getElementById('offer-name').focus();
+            return;
+          }
+
+          if (isNaN(latitude) || isNaN(longitude)) {
+            showAlert('error', '⚠️ Please select a location on the map first.');
+            return;
+          }
+
+          if (isNaN(capacity) || capacity <= 0) {
+            showAlert('error', '⚠️ Total capacity must be greater than 0.');
+            document.getElementById('offer-capacity').focus();
+            return;
+          }
+
+          if (isNaN(available_spaces) || available_spaces < 0) {
+            showAlert('error', '⚠️ Available spaces cannot be negative.');
+            document.getElementById('offer-available-spaces').focus();
+            return;
+          }
+
+          if (available_spaces > capacity) {
+            showAlert('error', '⚠️ Available spaces cannot exceed total capacity (' + capacity + ').');
+            document.getElementById('offer-available-spaces').focus();
+            return;
+          }
+
+          const payload = {
+            name,
+            latitude,
+            longitude,
+            capacity,
+            available_spaces,
+            status
+          };
+
+          // Submit to backend API
+          try {
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = '⏳ Saving Parking Space...';
+
+            const response = await fetch('api/create_parking_space.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+              showAlert('success', `
+                🎉 <strong>Parking Space Offered Successfully!</strong><br>
+                <span>"${result.data.name}" (${result.data.available_spaces}/${result.data.capacity} spots, status: ${result.data.status}) is now active on the map.</span>
+              `);
+
+              // Clear form inputs
+              document.getElementById('offer-name').value = '';
+              document.getElementById('offer-capacity').value = '5';
+              document.getElementById('offer-available-spaces').value = '5';
+              document.getElementById('offer-status').value = 'available';
+
+              // Refresh map pins so newly created space appears immediately
+              if (window.parkingMap) {
+                await window.parkingMap.loadParkingSpaces();
+              }
+            } else {
+              showAlert('error', `❌ <strong>Failed to create space:</strong> ${result.error || 'Server error'}`);
+            }
+          } catch (err) {
+            showAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+          } finally {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = '<span>🅿️</span> Save & Offer Parking Space';
+          }
+        });
+      }
     });
   </script>
 

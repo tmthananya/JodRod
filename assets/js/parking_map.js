@@ -99,11 +99,20 @@ class ParkingMapController {
     const lngEl = document.getElementById('selected-lng');
     const fullEl = document.getElementById('selected-coords-full');
 
-    if (latEl) latEl.textContent = this.selectedCoords.lat.toFixed(5);
-    if (lngEl) lngEl.textContent = this.selectedCoords.lng.toFixed(5);
+    const latStr = this.selectedCoords.lat.toFixed(5);
+    const lngStr = this.selectedCoords.lng.toFixed(5);
+
+    if (latEl) latEl.textContent = latStr;
+    if (lngEl) lngEl.textContent = lngStr;
     if (fullEl) {
-      fullEl.textContent = `${this.selectedCoords.lat.toFixed(5)}, ${this.selectedCoords.lng.toFixed(5)}`;
+      fullEl.textContent = `${latStr}, ${lngStr}`;
     }
+
+    // Sync coordinates to Offer Parking Space form inputs
+    const offerLat = document.getElementById('offer-latitude');
+    const offerLng = document.getElementById('offer-longitude');
+    if (offerLat) offerLat.value = latStr;
+    if (offerLng) offerLng.value = lngStr;
   }
 
   goToCity(cityKey) {
@@ -118,10 +127,63 @@ class ParkingMapController {
     this.handleMapClick(city.lat, city.lng);
   }
 
-  // Count active parking pins on the map (confirms zero data)
+  // Count active parking pins on the map
   getParkingCount() {
     if (!this.parkingLayer) return 0;
     return this.parkingLayer.getLayers().length;
+  }
+
+  // Fetch parking spaces from database/API
+  async loadParkingSpaces() {
+    try {
+      const res = await fetch('api/get_parking_spaces.php');
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        this.renderParkingSpaces(json.data);
+      }
+    } catch (e) {
+      console.warn('Could not load parking spaces:', e);
+    }
+  }
+
+  // Render parking pins on the map
+  renderParkingSpaces(spaces) {
+    if (!this.parkingLayer) return;
+    this.parkingLayer.clearLayers();
+
+    spaces.forEach(s => {
+      const statusClass = s.status === 'available' ? 'status-available' : (s.status === 'full' ? 'status-full' : 'status-closed');
+      const pinIcon = L.divIcon({
+        className: 'custom-parking-pin',
+        html: `
+          <div class="parking-pin-bubble ${statusClass}" title="${s.name}">
+            <span>🅿️</span>
+          </div>
+        `,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+
+      const marker = L.marker([s.latitude, s.longitude], { icon: pinIcon });
+      const popupHtml = `
+        <div style="font-family: inherit; min-width: 170px;">
+          <h4 style="margin: 0 0 6px; font-size: 1rem; color: #0f172a; font-weight: 800;">${s.name}</h4>
+          <p style="margin: 0 0 4px; font-size: 0.85rem; color: #334155;"><strong>Available:</strong> ${s.available_spaces} / ${s.capacity} spots</p>
+          <p style="margin: 0; font-size: 0.82rem; color: #64748b;"><strong>Status:</strong> <span style="font-weight: 700; text-transform: uppercase;">${s.status}</span></p>
+        </div>
+      `;
+      marker.bindPopup(popupHtml);
+      this.parkingLayer.addLayer(marker);
+    });
+
+    this.updateStatusBadge(spaces.length);
+  }
+
+  updateStatusBadge(count) {
+    const badge = document.getElementById('map-status-badge');
+    if (badge) {
+      badge.innerHTML = `<span>🅿️</span> Active Parking Spaces: <strong style="color: #0284c7; margin-left: 4px;">${count}</strong>`;
+    }
   }
 
   // Refresh map canvas size when tab or container is shown
@@ -137,4 +199,5 @@ class ParkingMapController {
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   window.parkingMap = new ParkingMapController('real-map');
+  window.parkingMap.loadParkingSpaces();
 });
