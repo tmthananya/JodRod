@@ -346,13 +346,64 @@
     <!-- 5. Profile Section -->
     <section id="section-profile" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>👤</span> Community Profile</h2>
+        <h2 class="section-title"><span>👤</span> Community Profiles</h2>
         <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">Your profile and roles (Driver & Parking Owner).</p>
-      <div class="placeholder-notice">
-        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">👤 Profile Overview Ready</p>
-        <p>Profile summary and active role status.</p>
+      <p class="section-subtitle">Manage your community member profile (Driver & Parking Owner).</p>
+
+      <!-- Profile Action Alert Box -->
+      <div id="profile-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
+
+      <div class="actions-grid" style="align-items: start; margin-bottom: 24px;">
+        <!-- Left: Create Profile Form -->
+        <div class="form-card">
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span>➕</span> Create Profile
+          </h3>
+          <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 18px;">
+            Add a new member profile to the community.
+          </p>
+
+          <form id="create-profile-form" novalidate>
+            <div class="form-group">
+              <label for="create-profile-name" class="form-label">Full Name or Nickname *</label>
+              <input type="text" id="create-profile-name" name="name" class="form-input" placeholder="e.g. Somsak P." required>
+              <div class="form-help">Your display name for flood parking.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Avatar *</label>
+              <div class="avatar-select-grid" id="create-avatar-picker">
+                <button type="button" class="avatar-opt-btn active" data-avatar="👤">👤</button>
+                <button type="button" class="avatar-opt-btn" data-avatar="🧑‍🌾">🧑‍🌾</button>
+                <button type="button" class="avatar-opt-btn" data-avatar="🧑‍🔧">🧑‍🔧</button>
+                <button type="button" class="avatar-opt-btn" data-avatar="🚗">🚗</button>
+                <button type="button" class="avatar-opt-btn" data-avatar="🚙">🚙</button>
+                <button type="button" class="avatar-opt-btn" data-avatar="🛡️">🛡️</button>
+                <button type="button" class="avatar-opt-btn" data-avatar="🌟">🌟</button>
+              </div>
+              <input type="hidden" id="create-profile-avatar" name="avatar" value="👤">
+            </div>
+
+            <button type="submit" id="btn-submit-profile" class="pixel-btn pixel-btn-green" style="width: 100%; padding: 12px; font-size: 1rem; margin-top: 8px;">
+              <span>💾</span> Save Profile
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Profiles List (View Profile) -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+              <span>👥</span> Community Profiles
+            </h3>
+            <span class="status-pill status-available" id="profile-count-pill">0 Profiles</span>
+          </div>
+
+          <div id="profiles-list-container">
+            <div class="empty-spaces-notice">Loading profiles...</div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -420,6 +471,59 @@
         <div class="modal-actions">
           <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-edit">Cancel</button>
           <button type="submit" class="pixel-btn pixel-btn-green" id="btn-save-edit-space">
+            <span>💾</span> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       EDIT PROFILE MODAL DIALOG
+       Strictly allows editing ONLY:
+       - Name
+       - Avatar
+       Record ID is fixed / non-editable.
+       ======================================================== -->
+  <div id="edit-profile-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-profile-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="edit-profile-modal-title" class="modal-title"><span>✏️</span> Edit Profile</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-edit-profile-modal" title="Close">&times;</button>
+      </div>
+
+      <div id="edit-profile-alert" class="alert-message" role="alert" style="display: none;"></div>
+
+      <form id="edit-profile-form" novalidate>
+        <!-- Record ID (Fixed & Non-editable) -->
+        <input type="hidden" id="edit-profile-id" name="id">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 0.85rem; color: #64748b;">Profile ID (Non-editable)</label>
+          <input type="text" id="edit-profile-id-display" class="form-input" style="background: #f1f5f9; color: #64748b; font-family: monospace; font-size: 0.85rem; cursor: not-allowed;" readonly disabled>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-profile-name" class="form-label">Full Name or Nickname *</label>
+          <input type="text" id="edit-profile-name" name="name" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Avatar</label>
+          <div class="avatar-select-grid" id="edit-avatar-picker">
+            <button type="button" class="avatar-opt-btn" data-avatar="👤">👤</button>
+            <button type="button" class="avatar-opt-btn" data-avatar="🧑‍🌾">🧑‍🌾</button>
+            <button type="button" class="avatar-opt-btn" data-avatar="🧑‍🔧">🧑‍🔧</button>
+            <button type="button" class="avatar-opt-btn" data-avatar="🚗">🚗</button>
+            <button type="button" class="avatar-opt-btn" data-avatar="🚙">🚙</button>
+            <button type="button" class="avatar-opt-btn" data-avatar="🛡️">🛡️</button>
+            <button type="button" class="avatar-opt-btn" data-avatar="🌟">🌟</button>
+          </div>
+          <input type="hidden" id="edit-profile-avatar" name="avatar" value="👤">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-edit-profile">Cancel</button>
+          <button type="submit" class="pixel-btn pixel-btn-green" id="btn-save-edit-profile">
             <span>💾</span> Save Changes
           </button>
         </div>
@@ -727,6 +831,270 @@
           }
         });
       }
+
+      // ========================================================
+      // PROFILE CRUD CONTROLLER
+      // ========================================================
+      let profilesData = {};
+
+      function showProfileAlert(type, message) {
+        const el = document.getElementById('profile-action-alert');
+        if (!el) return;
+        el.className = `alert-message ${type}`;
+        el.innerHTML = message;
+        el.style.display = 'block';
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      async function loadProfiles() {
+        const container = document.getElementById('profiles-list-container');
+        const countPill = document.getElementById('profile-count-pill');
+
+        try {
+          const res = await fetch('api/get_profiles.php');
+          const json = await res.json();
+
+          if (json.success && Array.isArray(json.data)) {
+            profilesData = {};
+            json.data.forEach(p => {
+              profilesData[p.id] = p;
+            });
+
+            if (countPill) {
+              countPill.textContent = `${json.data.length} ${json.data.length === 1 ? 'Profile' : 'Profiles'}`;
+            }
+
+            if (!container) return;
+
+            if (json.data.length === 0) {
+              container.innerHTML = '<div class="empty-spaces-notice">No profiles created yet. Use the form on the left to create one.</div>';
+              return;
+            }
+
+            let html = '';
+            json.data.forEach(p => {
+              html += `
+                <div class="profile-card" id="profile-card-${p.id}">
+                  <div class="profile-card-left">
+                    <div class="profile-avatar-bubble">${p.avatar || '👤'}</div>
+                    <div>
+                      <div class="profile-card-name">${p.name}</div>
+                      <div class="profile-card-id">ID: ${p.id}</div>
+                    </div>
+                  </div>
+                  <div class="profile-card-actions">
+                    <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-profile" data-id="${p.id}">
+                      ✏️ Edit
+                    </button>
+                    <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-profile" data-id="${p.id}" data-name="${p.name}">
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </div>
+              `;
+            });
+            container.innerHTML = html;
+          }
+        } catch (err) {
+          if (container) {
+            container.innerHTML = `<div class="empty-spaces-notice">Failed to load profiles: ${err.message}</div>`;
+          }
+        }
+      }
+
+      loadProfiles();
+
+      // Avatar Picker handlers for Create
+      document.querySelectorAll('#create-avatar-picker .avatar-opt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#create-avatar-picker .avatar-opt-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('create-profile-avatar').value = btn.dataset.avatar;
+        });
+      });
+
+      // Avatar Picker handlers for Edit
+      document.querySelectorAll('#edit-avatar-picker .avatar-opt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#edit-avatar-picker .avatar-opt-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('edit-profile-avatar').value = btn.dataset.avatar;
+        });
+      });
+
+      // Create Profile Submit
+      const createProfileForm = document.getElementById('create-profile-form');
+      if (createProfileForm) {
+        createProfileForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const name = document.getElementById('create-profile-name').value.trim();
+          const avatar = document.getElementById('create-profile-avatar').value || '👤';
+
+          if (!name) {
+            showProfileAlert('error', '⚠️ Please enter a profile name.');
+            document.getElementById('create-profile-name').focus();
+            return;
+          }
+
+          const btn = document.getElementById('btn-submit-profile');
+          try {
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Saving...';
+
+            const res = await fetch('api/create_profile.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, avatar })
+            });
+
+            const json = await res.json();
+            if (res.ok && json.success) {
+              showProfileAlert('success', `🎉 <strong>Profile Created Successfully!</strong> Welcome, ${json.data.name}!`);
+              document.getElementById('create-profile-name').value = '';
+              await loadProfiles();
+            } else {
+              showProfileAlert('error', `❌ <strong>Failed to create profile:</strong> ${json.error || 'Server error'}`);
+            }
+          } catch (err) {
+            showProfileAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>💾</span> Save Profile';
+          }
+        });
+      }
+
+      // Open Edit Profile Modal
+      function openEditProfileModal(id) {
+        const profile = profilesData[id];
+        if (!profile) return;
+
+        document.getElementById('edit-profile-id').value = profile.id;
+        document.getElementById('edit-profile-id-display').value = profile.id;
+        document.getElementById('edit-profile-name').value = profile.name;
+        document.getElementById('edit-profile-avatar').value = profile.avatar || '👤';
+
+        document.querySelectorAll('#edit-avatar-picker .avatar-opt-btn').forEach(b => {
+          if (b.dataset.avatar === (profile.avatar || '👤')) {
+            b.classList.add('active');
+          } else {
+            b.classList.remove('active');
+          }
+        });
+
+        const alertBox = document.getElementById('edit-profile-alert');
+        if (alertBox) alertBox.style.display = 'none';
+
+        const modal = document.getElementById('edit-profile-modal');
+        if (modal) modal.classList.add('active');
+      }
+
+      function closeEditProfileModal() {
+        const modal = document.getElementById('edit-profile-modal');
+        if (modal) modal.classList.remove('active');
+      }
+
+      // Edit Profile Submit
+      const editProfileForm = document.getElementById('edit-profile-form');
+      if (editProfileForm) {
+        editProfileForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const id = document.getElementById('edit-profile-id').value;
+          const name = document.getElementById('edit-profile-name').value.trim();
+          const avatar = document.getElementById('edit-profile-avatar').value || '👤';
+
+          if (!name) {
+            const alertBox = document.getElementById('edit-profile-alert');
+            alertBox.className = 'alert-message error';
+            alertBox.innerHTML = '⚠️ Please enter a profile name.';
+            alertBox.style.display = 'block';
+            return;
+          }
+
+          const btn = document.getElementById('btn-save-edit-profile');
+          try {
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Saving...';
+
+            const res = await fetch('api/update_profile.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id, name, avatar })
+            });
+
+            const json = await res.json();
+            if (res.ok && json.success) {
+              const alertBox = document.getElementById('edit-profile-alert');
+              alertBox.className = 'alert-message success';
+              alertBox.innerHTML = `✅ <strong>Profile Updated!</strong> Changes saved for "${json.data.name}".`;
+              alertBox.style.display = 'block';
+
+              await loadProfiles();
+              setTimeout(() => {
+                closeEditProfileModal();
+              }, 1200);
+            } else {
+              const alertBox = document.getElementById('edit-profile-alert');
+              alertBox.className = 'alert-message error';
+              alertBox.innerHTML = `❌ <strong>Failed to update:</strong> ${json.error || 'Server error'}`;
+              alertBox.style.display = 'block';
+            }
+          } catch (err) {
+            const alertBox = document.getElementById('edit-profile-alert');
+            alertBox.className = 'alert-message error';
+            alertBox.innerHTML = `❌ <strong>Network error:</strong> ${err.message}`;
+            alertBox.style.display = 'block';
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>💾</span> Save Changes';
+          }
+        });
+      }
+
+      // Delete Profile Handler
+      async function deleteProfile(id, name) {
+        if (!id) return;
+        const displayName = name || 'this profile';
+        const confirmed = window.confirm(`Are you sure you want to delete profile "${displayName}"?\n\nThis will permanently delete the record from Supabase.`);
+        if (!confirmed) return;
+
+        try {
+          const res = await fetch('api/delete_profile.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            showProfileAlert('success', `🗑️ <strong>Profile Deleted!</strong> "${displayName}" has been permanently removed from Supabase.`);
+            await loadProfiles();
+          } else {
+            showProfileAlert('error', `❌ <strong>Failed to delete profile:</strong> ${json.error || 'Server error'}`);
+          }
+        } catch (err) {
+          showProfileAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+        }
+      }
+
+      // Delegated events for Edit and Delete buttons on profile cards
+      document.body.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.btn-edit-profile');
+        if (editBtn) {
+          openEditProfileModal(editBtn.dataset.id);
+        }
+
+        const deleteBtn = e.target.closest('.btn-delete-profile');
+        if (deleteBtn) {
+          deleteProfile(deleteBtn.dataset.id, deleteBtn.dataset.name);
+        }
+
+        if (e.target.closest('#btn-close-edit-profile-modal') || e.target.closest('#btn-cancel-edit-profile')) {
+          closeEditProfileModal();
+        }
+      });
     });
   </script>
 

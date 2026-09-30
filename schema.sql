@@ -40,3 +40,38 @@ CREATE POLICY "Allow public delete on parking_spaces"
     ON parking_spaces FOR DELETE 
     TO anon, authenticated 
     USING (true);
+
+-- ==========================================================
+-- 2. Table: profiles
+-- Contains ONLY required columns: id, name, avatar
+-- ==========================================================
+CREATE TABLE IF NOT EXISTS profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    avatar TEXT
+);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Row Level Security Policies for Prototype CRUD Operations
+CREATE POLICY "Allow public select on profiles" 
+    ON profiles FOR SELECT 
+    TO anon, authenticated 
+    USING (true);
+
+CREATE POLICY "Allow public insert on profiles" 
+    ON profiles FOR INSERT 
+    TO anon, authenticated 
+    WITH CHECK (true);
+
+CREATE POLICY "Allow public update on profiles" 
+    ON profiles FOR UPDATE 
+    TO anon, authenticated 
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Allow public delete on profiles" 
+    ON profiles FOR DELETE 
+    TO anon, authenticated 
+    USING (true);
