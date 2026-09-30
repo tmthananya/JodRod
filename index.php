@@ -356,6 +356,75 @@
   </main>
 
   <!-- ========================================================
+       EDIT PARKING SPACE MODAL DIALOG
+       Strictly allows editing ONLY:
+       - Parking name
+       - Capacity
+       - Available spaces
+       - Status
+       Record ID is fixed / non-editable.
+       ======================================================== -->
+  <div id="edit-space-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="edit-modal-title" class="modal-title"><span>✏️</span> Edit Parking Space</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-edit-modal" title="Close">&times;</button>
+      </div>
+
+      <!-- Edit Form Alert Box -->
+      <div id="edit-space-alert" class="alert-message" role="alert" style="display: none;"></div>
+
+      <form id="edit-parking-form" novalidate>
+        <!-- Record ID (Fixed & Non-editable) -->
+        <input type="hidden" id="edit-space-id" name="id">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 0.85rem; color: #64748b;">Record ID (Non-editable)</label>
+          <input type="text" id="edit-space-id-display" class="form-input" style="background: #f1f5f9; color: #64748b; font-family: monospace; font-size: 0.85rem; cursor: not-allowed;" readonly disabled>
+        </div>
+
+        <!-- 1. Parking Name -->
+        <div class="form-group">
+          <label for="edit-space-name" class="form-label">Parking Space Name *</label>
+          <input type="text" id="edit-space-name" name="name" class="form-input" placeholder="e.g. Elevated Driveway near Nimman Soi 7" required>
+          <div class="form-help">A recognizable landmark or address.</div>
+        </div>
+
+        <!-- 2. Capacity & 3. Available Spaces -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-space-capacity" class="form-label">Total Capacity *</label>
+            <input type="number" id="edit-space-capacity" name="capacity" class="form-input" min="1" max="1000" required>
+            <div class="form-help">Total vehicles the space can hold.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-space-available" class="form-label">Available Spaces *</label>
+            <input type="number" id="edit-space-available" name="available_spaces" class="form-input" min="0" max="1000" required>
+            <div class="form-help">Current open spots (&le; capacity).</div>
+          </div>
+        </div>
+
+        <!-- 4. Status -->
+        <div class="form-group">
+          <label for="edit-space-status" class="form-label">Status *</label>
+          <select id="edit-space-status" name="status" class="form-select" required>
+            <option value="available">Available (Ready for parking)</option>
+            <option value="full">Full (At capacity)</option>
+            <option value="closed">Closed (Temporarily unavailable)</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-edit">Cancel</button>
+          <button type="submit" class="pixel-btn pixel-btn-green" id="btn-save-edit-space">
+            <span>💾</span> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
        FOOTER
        ======================================================== -->
   <footer>
@@ -552,6 +621,106 @@
           } finally {
             btnSubmit.disabled = false;
             btnSubmit.innerHTML = '<span>🅿️</span> Save & Offer Parking Space';
+          }
+        });
+      }
+
+      // Handle Edit Parking Space Form Submit
+      const editForm = document.getElementById('edit-parking-form');
+      const editAlert = document.getElementById('edit-space-alert');
+      const btnSaveEdit = document.getElementById('btn-save-edit-space');
+
+      function showEditAlert(type, message) {
+        if (!editAlert) return;
+        editAlert.className = `alert-message ${type}`;
+        editAlert.innerHTML = message;
+        editAlert.style.display = 'block';
+      }
+
+      if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const id = document.getElementById('edit-space-id').value;
+          const name = document.getElementById('edit-space-name').value.trim();
+          const capacity = parseInt(document.getElementById('edit-space-capacity').value, 10);
+          const available_spaces = parseInt(document.getElementById('edit-space-available').value, 10);
+          const status = document.getElementById('edit-space-status').value;
+
+          if (!id) {
+            showEditAlert('error', '⚠️ Missing parking space ID.');
+            return;
+          }
+
+          if (!name) {
+            showEditAlert('error', '⚠️ Please enter a parking space name.');
+            document.getElementById('edit-space-name').focus();
+            return;
+          }
+
+          if (isNaN(capacity) || capacity <= 0) {
+            showEditAlert('error', '⚠️ Total capacity must be greater than 0.');
+            document.getElementById('edit-space-capacity').focus();
+            return;
+          }
+
+          if (isNaN(available_spaces) || available_spaces < 0) {
+            showEditAlert('error', '⚠️ Available spaces cannot be negative.');
+            document.getElementById('edit-space-available').focus();
+            return;
+          }
+
+          if (available_spaces > capacity) {
+            showEditAlert('error', '⚠️ Available spaces cannot exceed total capacity (' + capacity + ').');
+            document.getElementById('edit-space-available').focus();
+            return;
+          }
+
+          const payload = {
+            id,
+            name,
+            capacity,
+            available_spaces,
+            status
+          };
+
+          try {
+            btnSaveEdit.disabled = true;
+            btnSaveEdit.innerHTML = '<span>⏳</span> Saving...';
+
+            const response = await fetch('api/update_parking_space.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+              showEditAlert('success', `
+                ✅ <strong>Parking Space Updated Successfully!</strong><br>
+                <span>Changes saved: "${result.data.name}" (${result.data.available_spaces}/${result.data.capacity} spots, status: ${result.data.status}).</span>
+              `);
+
+              // Refresh displayed data and map information
+              if (window.parkingMap) {
+                await window.parkingMap.loadParkingSpaces();
+              }
+
+              // Auto dismiss modal after short delay so user sees confirmation
+              setTimeout(() => {
+                if (window.parkingMap) {
+                  window.parkingMap.closeEditModal();
+                }
+              }, 1200);
+            } else {
+              showEditAlert('error', `❌ <strong>Failed to update:</strong> ${result.error || 'Server error'}`);
+            }
+          } catch (err) {
+            showEditAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+          } finally {
+            btnSaveEdit.disabled = false;
+            btnSaveEdit.innerHTML = '<span>💾</span> Save Changes';
           }
         });
       }

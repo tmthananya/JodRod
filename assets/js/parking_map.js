@@ -180,7 +180,7 @@ class ParkingMapController {
 
       const marker = L.marker([s.latitude, s.longitude], { icon: pinIcon });
 
-      // Marker Popup displaying ONLY: Parking name, Location, Capacity, Available spaces, Status
+      // Marker Popup displaying ONLY: Parking name, Location, Capacity, Available spaces, Status, plus Edit action
       const popupHtml = `
         <div style="font-family: inherit; min-width: 190px;">
           <h4 style="margin: 0 0 6px; font-size: 1rem; color: #0f172a; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">${s.name}</h4>
@@ -190,12 +190,15 @@ class ParkingMapController {
             <div><strong>Available spaces:</strong> ${s.available_spaces}</div>
             <div><strong>Status:</strong> <span class="status-pill ${statusClass}">${s.status.toUpperCase()}</span></div>
           </div>
+          <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="width: 100%; margin-top: 8px;">
+            ✏️ Edit Space
+          </button>
         </div>
       `;
       marker.bindPopup(popupHtml);
       this.parkingLayer.addLayer(marker);
 
-      // Directory Card displaying strictly the 5 required fields
+      // Directory Card displaying strictly the 5 required fields plus Edit action
       listHtml += `
         <article class="space-card" id="space-card-${idx}">
           <div>
@@ -210,13 +213,22 @@ class ParkingMapController {
               <div><strong>Status:</strong> ${s.status}</div>
             </div>
           </div>
-          <div>
-            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-pin" data-lat="${s.latitude}" data-lng="${s.longitude}" style="width: 100%;">
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-pin" data-lat="${s.latitude}" data-lng="${s.longitude}" style="flex: 1;">
               🗺️ View on Map
+            </button>
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
+              ✏️ Edit
             </button>
           </div>
         </article>
       `;
+    });
+
+    // Cache spaces list for quick lookup by ID
+    this.spacesData = {};
+    spaces.forEach(s => {
+      this.spacesData[s.id] = s;
     });
 
     if (listContainer) {
@@ -242,6 +254,50 @@ class ParkingMapController {
     this.updateStatusBadge(spaces.length);
   }
 
+  // Open Edit Modal for a selected parking space
+  openEditModal(spaceId) {
+    const space = this.spacesData ? this.spacesData[spaceId] : null;
+    if (!space) {
+      console.warn('Parking space not found for edit:', spaceId);
+      return;
+    }
+
+    const modal = document.getElementById('edit-space-modal');
+    const alertBox = document.getElementById('edit-space-alert');
+    if (alertBox) {
+      alertBox.className = 'alert-message';
+      alertBox.innerHTML = '';
+      alertBox.style.display = 'none';
+    }
+
+    // Populate form fields (ID is strictly read-only and non-editable)
+    const idField = document.getElementById('edit-space-id');
+    const idDisplay = document.getElementById('edit-space-id-display');
+    const nameField = document.getElementById('edit-space-name');
+    const capField = document.getElementById('edit-space-capacity');
+    const availField = document.getElementById('edit-space-available');
+    const statusField = document.getElementById('edit-space-status');
+
+    if (idField) idField.value = space.id;
+    if (idDisplay) idDisplay.value = space.id;
+    if (nameField) nameField.value = space.name || '';
+    if (capField) capField.value = space.capacity;
+    if (availField) availField.value = space.available_spaces;
+    if (statusField) statusField.value = space.status || 'available';
+
+    if (modal) {
+      modal.classList.add('active');
+    }
+  }
+
+  // Close Edit Modal
+  closeEditModal() {
+    const modal = document.getElementById('edit-space-modal');
+    if (modal) {
+      modal.classList.remove('active');
+    }
+  }
+
   updateStatusBadge(count) {
     const badge = document.getElementById('map-status-badge');
     if (badge) {
@@ -263,4 +319,37 @@ class ParkingMapController {
 document.addEventListener('DOMContentLoaded', () => {
   window.parkingMap = new ParkingMapController('real-map');
   window.parkingMap.loadParkingSpaces();
+
+  // Delegated click handler for "Edit" buttons (handles both directory cards and Leaflet map popups)
+  document.body.addEventListener('click', (e) => {
+    const editBtn = e.target.closest('.btn-edit-space');
+    if (editBtn && window.parkingMap) {
+      const spaceId = editBtn.dataset.id;
+      if (spaceId) {
+        window.parkingMap.openEditModal(spaceId);
+      }
+    }
+
+    // Close button on modal
+    if (e.target.closest('#btn-close-edit-modal') || e.target.closest('#btn-cancel-edit')) {
+      if (window.parkingMap) {
+        window.parkingMap.closeEditModal();
+      }
+    }
+
+    // Click outside modal dialog to dismiss
+    if (e.target.classList && e.target.classList.contains('modal-overlay')) {
+      if (window.parkingMap) {
+        window.parkingMap.closeEditModal();
+      }
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && window.parkingMap) {
+      window.parkingMap.closeEditModal();
+    }
+  });
 });
+
