@@ -16,8 +16,7 @@ class ParkingMapController {
     // City Coordinates Dictionary
     this.cities = {
       'chiangmai': { name: 'Chiang Mai', lat: 18.7883, lng: 98.9853, zoom: 13 },
-      'bangkok':   { name: 'Bangkok',    lat: 13.7563, lng: 100.5018, zoom: 13 },
-      'sukhothai': { name: 'Sukhothai',  lat: 17.0050, lng: 99.8250, zoom: 13 }
+      'bangkok':   { name: 'Bangkok',    lat: 13.7563, lng: 100.5018, zoom: 13 }
     };
 
     this.initMap();

@@ -193,7 +193,6 @@
           <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">📍 Quick Jump:</span>
           <button type="button" class="city-btn btn-city-jump" data-city="chiangmai">Chiang Mai</button>
           <button type="button" class="city-btn btn-city-jump" data-city="bangkok">Bangkok</button>
-          <button type="button" class="city-btn btn-city-jump" data-city="sukhothai">Sukhothai</button>
         </div>
         <div class="map-status-pill" id="map-status-badge">
           <span>🅿️</span> Active Parking Spaces: <strong style="color: #0284c7; margin-left: 4px;">0 (Zero Data)</strong>
