@@ -464,6 +464,124 @@ footer {
   background: #ffffff;
 }
 
+/* ========================================================
+   REAL INTERACTIVE MAP COMPONENT
+   ======================================================== */
+.map-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.city-jump-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.city-btn {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  background: #ffffff;
+  border: 2px solid var(--border-pixel);
+  cursor: pointer;
+  box-shadow: 2px 2px 0px var(--border-pixel);
+  transition: transform 0.08s ease, background 0.08s ease;
+  border-radius: 3px;
+}
+.city-btn:hover {
+  background: #e0f2fe;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px var(--border-pixel);
+}
+.city-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--border-pixel);
+}
+
+.map-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #f1f5f9;
+  border: 2px solid var(--border-pixel);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.real-map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  border: 4px solid var(--border-pixel);
+  box-shadow: 5px 5px 0px rgba(38, 43, 68, 0.16);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  z-index: 1;
+}
+
+#real-map {
+  width: 100%;
+  height: 100%;
+  background: #e2e8f0;
+}
+
+.coords-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #f8fafc;
+  border: 2px solid var(--border-pixel);
+  padding: 12px 16px;
+  border-radius: 4px;
+  box-shadow: 2px 2px 0px rgba(38, 43, 68, 0.1);
+}
+
+.coords-data {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.coords-label {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #1e293b;
+}
+
+.coords-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.72rem;
+  background: #0284c7;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid #0369a1;
+  letter-spacing: 0.5px;
+}
+
+.crosshair-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  line-height: 1;
+}
+
 /* Responsive */
 @media (max-width: 860px) {
   .navbar {
@@ -479,5 +597,8 @@ footer {
   }
   .hero-title {
     font-size: 1.8rem;
+  }
+  .real-map-wrapper {
+    height: 400px;
   }
 }

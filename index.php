@@ -11,6 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JodRod - Flood Parking Community</title>
   <meta name="description" content="Find and offer safe parking spaces during flood emergencies.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
 </head>
@@ -184,10 +185,36 @@
         <h2 class="section-title"><span>🗺️</span> Real-World Flood Map</h2>
         <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">Interactive map showing available safe parking spaces.</p>
-      <div class="placeholder-notice">
-        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">📍 Map Ready</p>
-        <p>Real-world map view and parking pins will connect here in the next step.</p>
+      <p class="section-subtitle">Explore real geographic flood areas, pan, zoom, or click anywhere to capture GPS coordinates.</p>
+
+      <!-- Map Toolbar: City Jump Shortcuts & Zero Data Status -->
+      <div class="map-toolbar">
+        <div class="city-jump-group">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">📍 Quick Jump:</span>
+          <button type="button" class="city-btn btn-city-jump" data-city="chiangmai">Chiang Mai</button>
+          <button type="button" class="city-btn btn-city-jump" data-city="bangkok">Bangkok</button>
+          <button type="button" class="city-btn btn-city-jump" data-city="sukhothai">Sukhothai</button>
+        </div>
+        <div class="map-status-pill" id="map-status-badge">
+          <span>🅿️</span> Active Parking Spaces: <strong style="color: #0284c7; margin-left: 4px;">0 (Zero Data)</strong>
+        </div>
+      </div>
+
+      <!-- Real Map Canvas Container -->
+      <div class="real-map-wrapper">
+        <div id="real-map"></div>
+      </div>
+
+      <!-- Live Coordinates Panel -->
+      <div class="coords-panel">
+        <div class="coords-data">
+          <span class="coords-label">Selected Location:</span>
+          <span id="selected-coords-full" class="coords-badge">18.78830, 98.98530</span>
+          <span style="font-size: 0.82rem; color: #64748b;">(Lat: <span id="selected-lat">18.78830</span>, Lng: <span id="selected-lng">98.98530</span>)</span>
+        </div>
+        <div style="font-size: 0.82rem; color: #475569; font-weight: 600;">
+          💡 Click anywhere on the map to change the selected coordinates.
+        </div>
       </div>
     </section>
 
@@ -256,6 +283,12 @@
   </footer>
 
   <!-- ========================================================
+       LEAFLET & MAP ENGINE
+       ======================================================== -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="assets/js/parking_map.js"></script>
+
+  <!-- ========================================================
        PERSISTENT NAVIGATION CONTROLLER
        ======================================================== -->
   <script>
@@ -310,6 +343,11 @@
               }
             }
           });
+        }
+
+        // Refresh map dimensions if map section is shown
+        if (hash === '#map' && window.parkingMap) {
+          window.parkingMap.invalidateSize();
         }
       }
 
