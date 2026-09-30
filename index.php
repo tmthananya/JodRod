@@ -5,12 +5,12 @@
  */
 ?>
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JodRod (จอดรถ) - Flood Parking Community | ชุมชนแบ่งปันที่จอดรถพ้นน้ำท่วม</title>
-  <meta name="description" content="ระบบช่วยเหลือที่จอดรถปลอดภัยช่วงอุทกภัย หาที่จอดรถหนีน้ำท่วม และแบ่งปันพื้นที่จอดรถส่วนบุคคล">
+  <title>JodRod - Flood Parking Community</title>
+  <meta name="description" content="Find and offer safe parking spaces during flood emergencies.">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
 </head>
@@ -71,13 +71,12 @@
 
       <!-- Hero Banner -->
       <section class="hero-card">
-        <div class="hero-badge">🌊 Real-World Disaster Relief &bull; Flood Parking Network</div>
+        <div class="hero-badge">🌊 Real-World Flood Relief &bull; Safe Parking Network</div>
         <h1 class="brand-font hero-title">
-          เครือข่ายแบ่งปันที่จอดรถปลอดภัยช่วงน้ำท่วม
+          Safe Parking During Floods
         </h1>
         <p class="hero-desc">
-          เมื่อเกิดอุทกภัย การย้ายรถขึ้นที่สูงอย่างทันท่วงทีช่วยลดความเสียหายมหาศาล 
-          JodRod เชื่อมโยงเจ้าของรถที่ต้องการที่จอดหนีน้ำ กับเพื่อนร่วมชุมชนที่มีพื้นที่จอดรถปลอดภัยพร้อมแบ่งปัน
+          Connect drivers who need safe high ground with neighbors who have available parking space.
         </p>
       </section>
 
@@ -92,21 +91,21 @@
                 <div class="action-card-icon">🔍</div>
                 <div>
                   <span class="action-badge">FOR DRIVERS</span>
-                  <h2 class="action-title">1. Find Parking (หาที่จอดรถ)</h2>
+                  <h2 class="action-title">1. Find Parking</h2>
                 </div>
               </div>
               <p class="action-desc">
-                สำหรับผู้ที่มีรถยนต์และกำลังเผชิญกับความเสี่ยงน้ำท่วม ค้นหาพื้นที่จอดรถที่สูงพ้นน้ำ อาคาร ลานบ้าน หรือพื้นที่ปลอดภัยใกล้คุณ
+                Find safe, elevated parking spaces nearby to protect your vehicle from rising floodwaters.
               </p>
               <ul class="action-points-list">
-                <li>✅ ตรวจสอบพิกัดและพื้นที่จอดรถปลอดภัยบนแผนที่</li>
-                <li>✅ ดูจำนวนช่องจอดที่ว่างจริงในแต่ละจุด</li>
-                <li>✅ ส่งคำขอจอดรถและรับการยืนยันจากเจ้าของพื้นที่</li>
+                <li>✅ View safe parking locations on the real map</li>
+                <li>✅ See live available space counts</li>
+                <li>✅ Request parking with mutual confirmation</li>
               </ul>
             </div>
             <div>
               <a href="#map" class="pixel-btn pixel-btn-blue action-btn" style="width: 100%;" id="btn-action-find">
-                <span>🚗</span> เริ่มต้นค้นหาที่จอดรถ (Find Parking)
+                <span>🚗</span> Find Safe Parking
               </a>
             </div>
           </article>
@@ -118,21 +117,21 @@
                 <div class="action-card-icon">🅿️</div>
                 <div>
                   <span class="action-badge">FOR PARKING OWNERS</span>
-                  <h2 class="action-title">2. Offer Parking Space (แบ่งปันที่จอดรถ)</h2>
+                  <h2 class="action-title">2. Offer Parking Space</h2>
                 </div>
               </div>
               <p class="action-desc">
-                สำหรับผู้ที่มีลานบ้าน เนินสูง ลานธุรกิจ หรือพื้นที่ปลอดภัยที่น้ำไม่ท่วม ร่วมเป็นพลังชุมชนเปิดรับรถของเพื่อนบ้านเข้าจอด
+                Share your elevated driveway, yard, or lot with neighbors whose vehicles are at risk.
               </p>
               <ul class="action-points-list">
-                <li>✅ ระบุตำแหน่งพิกัดและชื่อจุดจอดของคุณ</li>
-                <li>✅ กำหนดจำนวนรถที่สามารถรองรับได้ (Capacity)</li>
-                <li>✅ ตรวจสอบและกดยืนยันคำขอจอดรถจากเพื่อนบ้าน</li>
+                <li>✅ Pin your parking location on the map</li>
+                <li>✅ Set your total vehicle capacity</li>
+                <li>✅ Review and confirm parking requests</li>
               </ul>
             </div>
             <div>
               <a href="#my-spaces" class="pixel-btn pixel-btn-green action-btn" style="width: 100%;" id="btn-action-offer">
-                <span>🅿️</span> ลงทะเบียนแบ่งปันพื้นที่ (Offer Parking)
+                <span>🅿️</span> Offer Parking Space
               </a>
             </div>
           </article>
@@ -143,32 +142,32 @@
       <!-- Realistic Community Concept & Flow -->
       <section class="concept-section">
         <h3 class="section-title">
-          <span>🔄</span> ขั้นตอนการทำงานของชุมชน Flood Parking
+          <span>🔄</span> How Flood Parking Works
         </h3>
         <p class="section-subtitle">
-          ขั้นตอนที่โปร่งใสและสร้างสรรค์ ผ่านระบบการยืนยันร่วมกัน (Mutual Confirmation)
+          A clear, community-driven workflow powered by mutual confirmation.
         </p>
 
         <div class="steps-grid">
           <div class="step-box">
             <div class="step-num">STEP 01</div>
-            <div class="step-heading">ค้นหาหรือลงพื้นที่</div>
-            <div class="step-text">ผู้มีพื้นที่เปิดรับจอดระบุพิกัด ส่วนเจ้าของรถค้นหาจุดที่ปลอดภัยบนแผนที่จริง</div>
+            <div class="step-heading">Find or Offer</div>
+            <div class="step-text">Owners list safe elevated spaces; drivers discover available spots on the real map.</div>
           </div>
           <div class="step-box">
             <div class="step-num">STEP 02</div>
-            <div class="step-heading">ส่งคำขอจอดรถ</div>
-            <div class="step-text">เจ้าของรถส่งคำขอจอดระบุข้อมูลรถ และรอเจ้าของสถานที่กดยอมรับ</div>
+            <div class="step-heading">Request Spot</div>
+            <div class="step-text">The driver sends a parking request with vehicle details to the space owner.</div>
           </div>
           <div class="step-box">
             <div class="step-num">STEP 03</div>
-            <div class="step-heading">ยืนยันการเข้าจอด</div>
-            <div class="step-text">เมื่อนำรถเข้าจอดจริง ทั้งสองฝ่ายทำการยืนยันร่วมกัน (Mutual Confirmation)</div>
+            <div class="step-heading">Mutual Confirm</div>
+            <div class="step-text">Both owner and driver confirm arrival and safe parking in person.</div>
           </div>
           <div class="step-box">
             <div class="step-num">STEP 04</div>
-            <div class="step-heading">รับคะแนนชุมชน</div>
-            <div class="step-text">เมื่อเสร็จสิ้นภารกิจรับคะแนนจิตอาสาเพื่อตอบแทนความช่วยเหลือในชุมชน</div>
+            <div class="step-heading">Earn Points</div>
+            <div class="step-text">Community reward points are granted after successfully completed parking.</div>
           </div>
         </div>
       </section>
@@ -182,13 +181,13 @@
     <!-- 1. Map Section -->
     <section id="section-map" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>🗺️</span> Real-World Flood Parking Map</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; กลับหน้าหลัก</a>
+        <h2 class="section-title"><span>🗺️</span> Real-World Flood Map</h2>
+        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">แผนที่แสดงตำแหน่งพื้นที่จอดรถปลอดภัยช่วงน้ำท่วม</p>
+      <p class="section-subtitle">Interactive map showing available safe parking spaces.</p>
       <div class="placeholder-notice">
-        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">📍 Map Layout Ready</p>
-        <p>การแสดงผลแผนที่จริงและการเชื่อมต่อพิกัดจะถูกผสานในขั้นตอนถัดไปตามลำดับใน BRIEF.md</p>
+        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">📍 Map Ready</p>
+        <p>Real-world map view and parking pins will connect here in the next step.</p>
       </div>
     </section>
 
@@ -196,12 +195,12 @@
     <section id="section-my-car" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h2 class="section-title"><span>🚙</span> My Car & Requests</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; กลับหน้าหลัก</a>
+        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">ข้อมูลยานพาหนะและสถานะคำขอที่จอดรถของคุณ</p>
+      <p class="section-subtitle">Track your vehicle and ongoing parking requests.</p>
       <div class="placeholder-notice">
         <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">🚙 Driver Dashboard Ready</p>
-        <p>ระบบจัดการคำขอจอดรถและการยืนยันเข้าจอดจะพร้อมใช้งานในเฟสคำขอจอดรถ (Phase 2)</p>
+        <p>Parking request status and arrival confirmations will appear here.</p>
       </div>
     </section>
 
@@ -209,12 +208,12 @@
     <section id="section-my-spaces" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h2 class="section-title"><span>🅿️</span> My Parking Spaces</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; กลับหน้าหลัก</a>
+        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">จัดการพื้นที่จอดรถที่คุณเปิดให้เพื่อนบ้านเข้าจอด</p>
+      <p class="section-subtitle">Manage spaces you offer to neighbors during floods.</p>
       <div class="placeholder-notice">
-        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">🅿️ Parking Spaces Manager Ready</p>
-        <p>ระบบ CRUD สำหรับสร้าง แก้ไข และลบพื้นที่จอดรถจะพร้อมทำงานในขั้นตอนการทำ Parking Space CRUD</p>
+        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">🅿️ Space Manager Ready</p>
+        <p>CRUD operations to create, edit, and delete spaces will load here.</p>
       </div>
     </section>
 
@@ -222,12 +221,12 @@
     <section id="section-points" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h2 class="section-title"><span>⭐</span> Community Points</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; กลับหน้าหลัก</a>
+        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">คะแนนจิตอาสาและประวัติการช่วยเหลือเพื่อนร่วมชุมชน</p>
+      <p class="section-subtitle">Your volunteer points and community helper score.</p>
       <div class="placeholder-notice">
-        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">⭐ Points Reward System Ready</p>
-        <p>ระบบสะสมคะแนนจากการช่วยเหลือสำเร็จจะถูกเชื่อมต่อหลังระบบ Mutual Confirmation</p>
+        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">⭐ Points Reward Ready</p>
+        <p>Points will be awarded following verified mutual confirmations.</p>
       </div>
     </section>
 
@@ -235,12 +234,12 @@
     <section id="section-profile" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h2 class="section-title"><span>👤</span> Community Profile</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; กลับหน้าหลัก</a>
+        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">ข้อมูลโปรไฟล์บทบาทในชุมชน (Driver / Parking Owner)</p>
+      <p class="section-subtitle">Your profile and roles (Driver & Parking Owner).</p>
       <div class="placeholder-notice">
         <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">👤 Profile Overview Ready</p>
-        <p>ข้อมูลโปรไฟล์ผู้ใช้งานในชุมชน Flood Parking</p>
+        <p>Profile summary and active role status.</p>
       </div>
     </section>
 
@@ -251,8 +250,8 @@
        ======================================================== -->
   <footer>
     <p>
-      🚗 <strong>JodRod (จอดรถ) — Flood Parking Community</strong> &bull; Civic Disaster Relief Initiative<br>
-      ระบบช่วยเหลือและแบ่งปันที่จอดรถพ้นน้ำท่วมเพื่อความปลอดภัยของทุกคนในชุมชน
+      🚗 <strong>JodRod &bull; Flood Parking Community</strong> &bull; Civic Disaster Relief Initiative<br>
+      Connecting neighbors to keep vehicles safe during flood emergencies.
     </p>
   </footer>
 
