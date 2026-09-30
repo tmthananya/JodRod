@@ -146,13 +146,27 @@ class ParkingMapController {
     }
   }
 
-  // Render parking pins on the map
+  // Render parking pins on the map and populate directory
   renderParkingSpaces(spaces) {
     if (!this.parkingLayer) return;
     this.parkingLayer.clearLayers();
 
-    spaces.forEach(s => {
+    const listContainer = document.getElementById('parking-spaces-list');
+    let listHtml = '';
+
+    if (!spaces || spaces.length === 0) {
+      if (listContainer) {
+        listContainer.innerHTML = '<div class="empty-spaces-notice">No parking spaces registered yet. Use "Offer Parking Space" to add one.</div>';
+      }
+      this.updateStatusBadge(0);
+      return;
+    }
+
+    spaces.forEach((s, idx) => {
       const statusClass = s.status === 'available' ? 'status-available' : (s.status === 'full' ? 'status-full' : 'status-closed');
+      const latFixed = parseFloat(s.latitude).toFixed(5);
+      const lngFixed = parseFloat(s.longitude).toFixed(5);
+
       const pinIcon = L.divIcon({
         className: 'custom-parking-pin',
         html: `
@@ -165,16 +179,65 @@ class ParkingMapController {
       });
 
       const marker = L.marker([s.latitude, s.longitude], { icon: pinIcon });
+
+      // Marker Popup displaying ONLY: Parking name, Location, Capacity, Available spaces, Status
       const popupHtml = `
-        <div style="font-family: inherit; min-width: 170px;">
-          <h4 style="margin: 0 0 6px; font-size: 1rem; color: #0f172a; font-weight: 800;">${s.name}</h4>
-          <p style="margin: 0 0 4px; font-size: 0.85rem; color: #334155;"><strong>Available:</strong> ${s.available_spaces} / ${s.capacity} spots</p>
-          <p style="margin: 0; font-size: 0.82rem; color: #64748b;"><strong>Status:</strong> <span style="font-weight: 700; text-transform: uppercase;">${s.status}</span></p>
+        <div style="font-family: inherit; min-width: 190px;">
+          <h4 style="margin: 0 0 6px; font-size: 1rem; color: #0f172a; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">${s.name}</h4>
+          <div style="font-size: 0.85rem; color: #334155; display: flex; flex-direction: column; gap: 4px;">
+            <div><strong>Location:</strong> <span style="font-family: monospace;">${latFixed}, ${lngFixed}</span></div>
+            <div><strong>Capacity:</strong> ${s.capacity}</div>
+            <div><strong>Available spaces:</strong> ${s.available_spaces}</div>
+            <div><strong>Status:</strong> <span class="status-pill ${statusClass}">${s.status.toUpperCase()}</span></div>
+          </div>
         </div>
       `;
       marker.bindPopup(popupHtml);
       this.parkingLayer.addLayer(marker);
+
+      // Directory Card displaying strictly the 5 required fields
+      listHtml += `
+        <article class="space-card" id="space-card-${idx}">
+          <div>
+            <div class="space-card-header">
+              <h4 class="space-card-title">${s.name}</h4>
+              <span class="status-pill ${statusClass}">${s.status.toUpperCase()}</span>
+            </div>
+            <div class="space-card-body" style="margin-top: 10px;">
+              <div><strong>Location:</strong> <span style="font-family: monospace;">${latFixed}, ${lngFixed}</span></div>
+              <div><strong>Capacity:</strong> ${s.capacity} vehicles</div>
+              <div><strong>Available spaces:</strong> ${s.available_spaces} spots</div>
+              <div><strong>Status:</strong> ${s.status}</div>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-pin" data-lat="${s.latitude}" data-lng="${s.longitude}" style="width: 100%;">
+              🗺️ View on Map
+            </button>
+          </div>
+        </article>
+      `;
     });
+
+    if (listContainer) {
+      listContainer.innerHTML = listHtml;
+
+      // Bind View on Map buttons
+      listContainer.querySelectorAll('.btn-view-pin').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const lat = parseFloat(e.currentTarget.dataset.lat);
+          const lng = parseFloat(e.currentTarget.dataset.lng);
+          this.map.flyTo([lat, lng], 15, { duration: 1.0 });
+
+          // Find marker and open its popup
+          this.parkingLayer.eachLayer(layer => {
+            if (layer.getLatLng && layer.getLatLng().lat === lat && layer.getLatLng().lng === lng) {
+              layer.openPopup();
+            }
+          });
+        });
+      });
+    }
 
     this.updateStatusBadge(spaces.length);
   }

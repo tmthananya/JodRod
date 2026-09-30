@@ -218,6 +218,17 @@
           🅿️ Offer Space at Selected Location &rarr;
         </a>
       </div>
+
+      <!-- Active Parking Spaces Directory (Loaded from Supabase) -->
+      <div style="margin-top: 24px;">
+        <h3 class="section-title">
+          <span>🅿️</span> Active Parking Spaces
+        </h3>
+        <p class="section-subtitle">Retrieved live from the database. Click "View on Map" to locate any space.</p>
+        <div id="parking-spaces-list" class="spaces-list-container">
+          <div class="empty-spaces-notice">Loading parking spaces...</div>
+        </div>
+      </div>
     </section>
 
     <!-- 2. My Car Section -->

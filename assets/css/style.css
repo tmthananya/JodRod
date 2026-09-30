@@ -735,3 +735,80 @@ footer {
   border-color: #64748b;
 }
 
+/* Spaces Directory Cards */
+.spaces-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.space-card {
+  background: #ffffff;
+  border: 3px solid var(--border-pixel);
+  box-shadow: 4px 4px 0px rgba(38, 43, 68, 0.14);
+  border-radius: 4px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.space-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.space-card-title {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #0f172a;
+}
+
+.space-card-body {
+  font-size: 0.88rem;
+  color: #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  border: 1px solid var(--border-pixel);
+}
+.status-pill.status-available {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #15803d;
+}
+.status-pill.status-full {
+  background: #ffedd5;
+  color: #9a3412;
+  border-color: #c2410c;
+}
+.status-pill.status-closed {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #64748b;
+}
+
+.empty-spaces-notice {
+  background: #f8fafc;
+  border: 2px dashed #94a3b8;
+  padding: 24px;
+  text-align: center;
+  border-radius: 4px;
+  color: #64748b;
+  font-size: 0.92rem;
+  grid-column: 1 / -1;
+}
+
+
