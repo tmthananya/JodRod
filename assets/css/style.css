@@ -224,6 +224,18 @@ body {
   background: #f59e0b;
   color: #451a03;
 }
+.pixel-btn-gold:hover {
+  background: #d97706;
+}
+
+.pixel-btn-red {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: var(--border-pixel);
+}
+.pixel-btn-red:hover {
+  background: #dc2626;
+}
 
 /* ========================================================
    HERO / BANNER SECTION

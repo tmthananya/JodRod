@@ -187,6 +187,9 @@
       </div>
       <p class="section-subtitle">Explore real geographic flood areas, pan, zoom, or click anywhere to capture GPS coordinates.</p>
 
+      <!-- Action Feedback Alert Box (for Delete/Update feedback) -->
+      <div id="map-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 16px;"></div>
+
       <!-- Map Toolbar: City Jump Shortcuts & Zero Data Status -->
       <div class="map-toolbar">
         <div class="city-jump-group">

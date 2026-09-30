@@ -190,15 +190,20 @@ class ParkingMapController {
             <div><strong>Available spaces:</strong> ${s.available_spaces}</div>
             <div><strong>Status:</strong> <span class="status-pill ${statusClass}">${s.status.toUpperCase()}</span></div>
           </div>
-          <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="width: 100%; margin-top: 8px;">
-            ✏️ Edit Space
-          </button>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
+              ✏️ Edit
+            </button>
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-space" data-id="${s.id}" data-name="${s.name}" style="flex: 1;">
+              🗑️ Delete
+            </button>
+          </div>
         </div>
       `;
       marker.bindPopup(popupHtml);
       this.parkingLayer.addLayer(marker);
 
-      // Directory Card displaying strictly the 5 required fields plus Edit action
+      // Directory Card displaying strictly the 5 required fields plus Edit and Delete actions
       listHtml += `
         <article class="space-card" id="space-card-${idx}">
           <div>
@@ -219,6 +224,9 @@ class ParkingMapController {
             </button>
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
               ✏️ Edit
+            </button>
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-space" data-id="${s.id}" data-name="${s.name}" style="flex: 1;">
+              🗑️ Delete
             </button>
           </div>
         </article>
@@ -298,6 +306,54 @@ class ParkingMapController {
     }
   }
 
+  // Show Action Alert Notification on Map Section
+  showMapAlert(type, message) {
+    const alertBox = document.getElementById('map-action-alert');
+    if (alertBox) {
+      alertBox.className = `alert-message ${type}`;
+      alertBox.innerHTML = message;
+      alertBox.style.display = 'block';
+      alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // Delete parking space with confirmation
+  async deleteParkingSpace(spaceId, spaceName) {
+    if (!spaceId) return;
+
+    const displayName = spaceName || 'this parking space';
+
+    // 1. Before deleting: Ask for confirmation
+    const confirmed = window.confirm(`Are you sure you want to delete "${displayName}"?\n\nThis will permanently delete the parking space from Supabase.`);
+    if (!confirmed) return;
+
+    // 2. After confirmation: Delete record from Supabase
+    try {
+      const res = await fetch('api/delete_parking_space.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: spaceId })
+      });
+
+      const json = await res.json();
+
+      if (res.ok && json.success) {
+        // Show success message
+        this.showMapAlert('success', `
+          🗑️ <strong>Parking Space Deleted Successfully!</strong><br>
+          <span>"${displayName}" has been permanently removed from Supabase and the map.</span>
+        `);
+
+        // Refresh data: removes it from the website and removes its map marker
+        await this.loadParkingSpaces();
+      } else {
+        this.showMapAlert('error', `❌ <strong>Failed to delete space:</strong> ${json.error || 'Server error'}`);
+      }
+    } catch (err) {
+      this.showMapAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+    }
+  }
+
   updateStatusBadge(count) {
     const badge = document.getElementById('map-status-badge');
     if (badge) {
@@ -320,13 +376,24 @@ document.addEventListener('DOMContentLoaded', () => {
   window.parkingMap = new ParkingMapController('real-map');
   window.parkingMap.loadParkingSpaces();
 
-  // Delegated click handler for "Edit" buttons (handles both directory cards and Leaflet map popups)
+  // Delegated click handler for actions (handles both directory cards and Leaflet map popups)
   document.body.addEventListener('click', (e) => {
+    // Edit action
     const editBtn = e.target.closest('.btn-edit-space');
     if (editBtn && window.parkingMap) {
       const spaceId = editBtn.dataset.id;
       if (spaceId) {
         window.parkingMap.openEditModal(spaceId);
+      }
+    }
+
+    // Delete action
+    const deleteBtn = e.target.closest('.btn-delete-space');
+    if (deleteBtn && window.parkingMap) {
+      const spaceId = deleteBtn.dataset.id;
+      const spaceName = deleteBtn.dataset.name;
+      if (spaceId) {
+        window.parkingMap.deleteParkingSpace(spaceId, spaceName);
       }
     }
 
@@ -352,4 +419,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
 
