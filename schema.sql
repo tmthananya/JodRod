@@ -75,3 +75,32 @@ CREATE POLICY "Allow public delete on profiles"
     ON profiles FOR DELETE 
     TO anon, authenticated 
     USING (true);
+
+-- ==========================================================
+-- 3. Authentication: Auto-Confirm Trigger for Development
+-- If email confirmation is enabled in your Supabase project,
+-- running this script in Supabase SQL Editor allows new sign-ups
+-- to log in immediately with email & password without SMTP verification.
+-- (Alternatively: In Supabase Dashboard -> Authentication -> Providers -> Email -> Turn OFF "Confirm email")
+-- ==========================================================
+CREATE OR REPLACE FUNCTION public.handle_new_auth_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.email_confirmed_at = now();
+  NEW.confirmed_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created_auto_confirm ON auth.users;
+CREATE TRIGGER on_auth_user_created_auto_confirm
+  BEFORE INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_new_auth_user();
+
+-- Auto-confirm any users currently awaiting confirmation
+UPDATE auth.users 
+SET email_confirmed_at = COALESCE(email_confirmed_at, now()), 
+    confirmed_at = COALESCE(confirmed_at, now()) 
+WHERE email_confirmed_at IS NULL;
+

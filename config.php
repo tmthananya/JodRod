@@ -83,14 +83,23 @@ function supabase_request($endpoint, $method = 'GET', $payload = null, $headers 
     $url = rtrim(SUPABASE_URL, '/') . $endpoint;
     $ch = curl_init($url);
 
-    $default_headers = [
-        'apikey: ' . SUPABASE_ANON_KEY,
-        'Authorization: Bearer ' . SUPABASE_ANON_KEY,
-        'Content-Type: application/json',
-        'Prefer: return=representation'
+    $header_map = [
+        'apikey'        => 'apikey: ' . SUPABASE_ANON_KEY,
+        'authorization' => 'Authorization: Bearer ' . SUPABASE_ANON_KEY,
+        'content-type'  => 'Content-Type: application/json',
+        'prefer'        => 'Prefer: return=representation'
     ];
 
-    $all_headers = array_merge($default_headers, $headers);
+    foreach ($headers as $h) {
+        $parts = explode(':', $h, 2);
+        if (count($parts) === 2) {
+            $header_map[strtolower(trim($parts[0]))] = $h;
+        } else {
+            $header_map[] = $h;
+        }
+    }
+
+    $all_headers = array_values($header_map);
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $all_headers);

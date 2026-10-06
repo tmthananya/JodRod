@@ -32,7 +32,7 @@
       </a>
 
       <!-- Strictly: Map, My Car, My Spaces, Points, Profile -->
-      <ul class="nav-links">
+      <ul class="nav-links" id="site-nav-links" style="display: none;">
         <li>
           <a href="#map" class="nav-link" id="nav-map">
             <span>🗺️</span> Map
@@ -59,6 +59,13 @@
           </a>
         </li>
       </ul>
+
+      <!-- User Auth State in Navbar -->
+      <div class="user-auth-badge" id="nav-user-badge" style="display: none;">
+        <span class="user-status-dot"></span>
+        <span class="user-email-text" id="nav-user-email"></span>
+        <button type="button" class="pixel-btn pixel-btn-sm btn-logout" id="btn-logout" title="Sign out of account">🚪 Logout</button>
+      </div>
     </nav>
   </header>
 
@@ -66,6 +73,80 @@
        MAIN CONTENT CONTAINER
        ======================================================== -->
   <main class="container">
+
+    <!-- ========================================================
+         AUTHENTICATION GATE / PROTECTED VIEW
+         Displayed when user is not logged in.
+         ======================================================== -->
+    <section id="auth-gate" class="auth-gate-section" style="display: flex;">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-icon">🛡️</div>
+          <div class="auth-badge">COMMUNITY AUTHENTICATION</div>
+          <h1 class="auth-title">Flood Relief Access</h1>
+          <p class="auth-subtitle">Sign in or create an account to access safe flood parking spaces, coordinate relief, and manage your profile.</p>
+        </div>
+
+        <!-- Auth Tabs: Login vs Sign Up -->
+        <div class="auth-tabs-row">
+          <button type="button" class="auth-tab-btn active" id="tab-auth-login">🔑 Log In</button>
+          <button type="button" class="auth-tab-btn" id="tab-auth-signup">📝 Sign Up</button>
+        </div>
+
+        <!-- Feedback Alert Box -->
+        <div id="auth-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 16px;"></div>
+
+        <!-- Authentication Form -->
+        <form id="auth-form" novalidate>
+          <div class="form-group">
+            <label for="auth-email" class="form-label">
+              <span>📧 Email Address</span>
+            </label>
+            <input 
+              type="email" 
+              id="auth-email" 
+              name="email" 
+              class="form-control" 
+              placeholder="e.g. volunteer@relief.org" 
+              required 
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label for="auth-password" class="form-label">
+              <span>🔒 Password</span>
+            </label>
+            <input 
+              type="password" 
+              id="auth-password" 
+              name="password" 
+              class="form-control" 
+              placeholder="Minimum 6 characters" 
+              minlength="6"
+              required 
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div style="margin-top: 20px;">
+            <button type="submit" class="pixel-btn pixel-btn-blue pixel-btn-lg" id="btn-auth-submit" style="width: 100%;">
+              <span>🔑</span> Log In
+            </button>
+          </div>
+
+          <div class="auth-switch-text" id="auth-switch-prompt" style="margin-top: 14px; text-align: center; font-size: 0.88rem; color: #64748b;">
+            Don't have an account? <a href="#" id="link-switch-to-signup" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Sign up now</a>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         MAIN APPLICATION CONTENT (PROTECTED)
+         Only accessible when user is authenticated.
+         ======================================================== -->
+    <div id="main-app-content" style="display: none;">
 
     <!-- HOME / OVERVIEW SECTION (DEFAULT ACTIVE) -->
     <div id="section-home">
@@ -490,6 +571,8 @@
       </div>
     </section>
 
+    </div> <!-- /#main-app-content -->
+
   </main>
 
   <!-- ========================================================
@@ -720,6 +803,155 @@
        ======================================================== -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // ========================================================
+      // AUTHENTICATION STATE & CONTROLLER
+      // ========================================================
+      let currentUser = null;
+      let currentAuthMode = 'login'; // 'login' or 'signup'
+
+      const authGate = document.getElementById('auth-gate');
+      const mainAppContent = document.getElementById('main-app-content');
+      const siteNavLinks = document.getElementById('site-nav-links');
+      const navUserBadge = document.getElementById('nav-user-badge');
+      const navUserEmail = document.getElementById('nav-user-email');
+      const authAlert = document.getElementById('auth-alert');
+      const authForm = document.getElementById('auth-form');
+      const tabLogin = document.getElementById('tab-auth-login');
+      const tabSignup = document.getElementById('tab-auth-signup');
+      const btnAuthSubmit = document.getElementById('btn-auth-submit');
+      const authSwitchPrompt = document.getElementById('auth-switch-prompt');
+
+      function showAuthAlert(type, message) {
+        if (!authAlert) return;
+        authAlert.className = `alert-message ${type}`;
+        authAlert.innerHTML = message;
+        authAlert.style.display = 'block';
+      }
+
+      function hideAuthAlert() {
+        if (authAlert) authAlert.style.display = 'none';
+      }
+
+      function setAuthMode(mode) {
+        currentAuthMode = mode;
+        hideAuthAlert();
+        if (mode === 'signup') {
+          tabSignup.classList.add('active');
+          tabLogin.classList.remove('active');
+          btnAuthSubmit.innerHTML = '<span>✨</span> Create Account';
+          btnAuthSubmit.className = 'pixel-btn pixel-btn-green pixel-btn-lg';
+          authSwitchPrompt.innerHTML = `Already have an account? <a href="#" id="link-switch-to-login" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Log in</a>`;
+          document.getElementById('link-switch-to-login')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            setAuthMode('login');
+          });
+        } else {
+          tabLogin.classList.add('active');
+          tabSignup.classList.remove('active');
+          btnAuthSubmit.innerHTML = '<span>🔑</span> Log In';
+          btnAuthSubmit.className = 'pixel-btn pixel-btn-blue pixel-btn-lg';
+          authSwitchPrompt.innerHTML = `Don't have an account? <a href="#" id="link-switch-to-signup" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Sign up now</a>`;
+          document.getElementById('link-switch-to-signup')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            setAuthMode('signup');
+          });
+        }
+      }
+
+      tabLogin?.addEventListener('click', () => setAuthMode('login'));
+      tabSignup?.addEventListener('click', () => setAuthMode('signup'));
+      document.getElementById('link-switch-to-signup')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        setAuthMode('signup');
+      });
+
+      function updateAuthUI() {
+        if (currentUser) {
+          authGate.style.display = 'none';
+          mainAppContent.style.display = 'block';
+          siteNavLinks.style.display = 'flex';
+          navUserBadge.style.display = 'inline-flex';
+          navUserEmail.textContent = currentUser.email;
+          navUserEmail.title = `Logged in as: ${currentUser.email}`;
+          handleRoute();
+        } else {
+          authGate.style.display = 'flex';
+          mainAppContent.style.display = 'none';
+          siteNavLinks.style.display = 'none';
+          navUserBadge.style.display = 'none';
+          navUserEmail.textContent = '';
+        }
+      }
+
+      async function checkAuthSession() {
+        try {
+          const res = await fetch('api/auth.php?action=user');
+          const json = await res.json();
+          if (res.ok && json.logged_in && json.user) {
+            currentUser = json.user;
+          } else {
+            currentUser = null;
+          }
+        } catch (e) {
+          currentUser = null;
+        } finally {
+          updateAuthUI();
+        }
+      }
+
+      // Handle Auth Form Submission
+      authForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+
+        if (!email || !password) {
+          showAuthAlert('error', '⚠️ Please enter both email and password.');
+          return;
+        }
+
+        try {
+          btnAuthSubmit.disabled = true;
+          btnAuthSubmit.innerHTML = '<span>⏳</span> Processing...';
+
+          const res = await fetch(`api/auth.php?action=${currentAuthMode}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          const json = await res.json();
+
+          if (res.ok && json.success) {
+            if (json.auto_logged_in || currentAuthMode === 'login') {
+              currentUser = json.user;
+              document.getElementById('auth-password').value = '';
+              hideAuthAlert();
+              updateAuthUI();
+            } else if (json.requires_confirmation) {
+              showAuthAlert('success', `🎉 <strong>Account Created!</strong> ${json.message}<br><small>If you have auto-confirm enabled or confirmed via email, click "Log In" above.</small>`);
+              setAuthMode('login');
+            }
+          } else {
+            showAuthAlert('error', `❌ <strong>${currentAuthMode === 'login' ? 'Login Failed' : 'Sign Up Failed'}:</strong> ${json.error || 'Server error'}`);
+          }
+        } catch (err) {
+          showAuthAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+        } finally {
+          btnAuthSubmit.disabled = false;
+          btnAuthSubmit.innerHTML = (currentAuthMode === 'login') ? '<span>🔑</span> Log In' : '<span>✨</span> Create Account';
+        }
+      });
+
+      // Handle Logout
+      document.getElementById('btn-logout')?.addEventListener('click', async () => {
+        try {
+          await fetch('api/auth.php?action=logout', { method: 'POST' });
+        } catch (e) {}
+        currentUser = null;
+        updateAuthUI();
+        showAuthAlert('success', '🚪 <strong>Logged out.</strong> You have successfully signed out.');
+      });
+
       const navLinks = {
         '#map': document.getElementById('nav-map'),
         '#my-car': document.getElementById('nav-my-car'),
@@ -738,6 +970,13 @@
       };
 
       function handleRoute() {
+        if (!currentUser) {
+          // Protected gate
+          authGate.style.display = 'flex';
+          mainAppContent.style.display = 'none';
+          return;
+        }
+
         const hash = window.location.hash || '#home';
 
         // Update nav active states
@@ -779,7 +1018,9 @@
       }
 
       window.addEventListener('hashchange', handleRoute);
-      handleRoute();
+
+      // Kick off authentication check
+      checkAuthSession();
 
       // Back to home buttons
       document.querySelectorAll('.btn-back-home').forEach(btn => {
