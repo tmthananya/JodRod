@@ -1,12 +1,14 @@
 /**
  * JodRod 3D Character Engine
  * Stylized low-poly 3D game character builder using Three.js
+ * Supports Gender selection, customizable Outfits, Hairstyles, and Color Palettes
  */
 (function() {
   class Character3D {
     constructor(canvas, options = {}) {
       this.canvas = canvas;
       this.options = Object.assign({
+        gender: 'female',
         hair: 'spiky',
         hairColor: '#261e1b',
         clothes: 'vest',
@@ -131,6 +133,11 @@
         roughness: 0.25,
         metalness: 0.25
       });
+      this.materials.brass = new THREE.MeshStandardMaterial({
+        color: 0xf59e0b,
+        roughness: 0.3,
+        metalness: 0.5
+      });
       this.materials.boots = new THREE.MeshStandardMaterial({
         color: 0xf59e0b, // iconic bright flood rescue boots
         roughness: 0.35
@@ -138,11 +145,22 @@
     }
 
     buildBaseBody() {
+      // Clear previous base body parts if re-building
+      if (this.parts.baseGroup) {
+        this.charGroup.remove(this.parts.baseGroup);
+      }
+
+      const bg = new THREE.Group();
+      this.parts.baseGroup = bg;
+      this.charGroup.add(bg);
+
+      const isFem = this.options.gender === 'female';
+
       // Head
       const headGeo = new THREE.BoxGeometry(0.72, 0.72, 0.68);
       this.parts.head = new THREE.Mesh(headGeo, this.materials.skin);
       this.parts.head.position.y = 1.62;
-      this.charGroup.add(this.parts.head);
+      bg.add(this.parts.head);
 
       // Eyes
       const eyeGeo = new THREE.BoxGeometry(0.09, 0.12, 0.05);
@@ -150,7 +168,7 @@
       eyeL.position.set(-0.18, 1.64, 0.34);
       const eyeR = new THREE.Mesh(eyeGeo, this.materials.dark);
       eyeR.position.set(0.18, 1.64, 0.34);
-      this.charGroup.add(eyeL, eyeR);
+      bg.add(eyeL, eyeR);
 
       // Eye highlights
       const hlGeo = new THREE.BoxGeometry(0.035, 0.045, 0.06);
@@ -158,45 +176,60 @@
       hlL.position.set(-0.16, 1.67, 0.35);
       const hlR = new THREE.Mesh(hlGeo, this.materials.white);
       hlR.position.set(0.20, 1.67, 0.35);
-      this.charGroup.add(hlL, hlR);
+      bg.add(hlL, hlR);
+
+      // Eyelashes for female model
+      if (isFem) {
+        const lashGeo = new THREE.BoxGeometry(0.12, 0.032, 0.06);
+        const lashL = new THREE.Mesh(lashGeo, this.materials.dark);
+        lashL.position.set(-0.19, 1.72, 0.35);
+        lashL.rotation.z = 0.12;
+        const lashR = new THREE.Mesh(lashGeo, this.materials.dark);
+        lashR.position.set(0.19, 1.72, 0.35);
+        lashR.rotation.z = -0.12;
+        bg.add(lashL, lashR);
+      }
 
       // Cute blush cheeks
-      const blushGeo = new THREE.BoxGeometry(0.12, 0.045, 0.04);
+      const blushGeo = new THREE.BoxGeometry(isFem ? 0.14 : 0.11, 0.045, 0.04);
       const blushL = new THREE.Mesh(blushGeo, this.materials.blush);
       blushL.position.set(-0.24, 1.53, 0.34);
       const blushR = new THREE.Mesh(blushGeo, this.materials.blush);
       blushR.position.set(0.24, 1.53, 0.34);
-      this.charGroup.add(blushL, blushR);
+      bg.add(blushL, blushR);
 
       // Smile mouth
       const mouthGeo = new THREE.BoxGeometry(0.15, 0.04, 0.04);
       const mouth = new THREE.Mesh(mouthGeo, this.materials.dark);
       mouth.position.set(0, 1.47, 0.34);
-      this.charGroup.add(mouth);
+      bg.add(mouth);
 
       // Hands
+      const handX = isFem ? 0.49 : 0.53;
       const handGeo = new THREE.BoxGeometry(0.15, 0.15, 0.18);
       this.parts.handL = new THREE.Mesh(handGeo, this.materials.skin);
-      this.parts.handL.position.set(-0.53, 0.54, 0);
+      this.parts.handL.position.set(-handX, 0.54, 0);
       this.parts.handR = new THREE.Mesh(handGeo, this.materials.skin);
-      this.parts.handR.position.set(0.53, 0.54, 0);
-      this.charGroup.add(this.parts.handL, this.parts.handR);
+      this.parts.handR.position.set(handX, 0.54, 0);
+      bg.add(this.parts.handL, this.parts.handR);
 
       // Legs / Pants
-      const legGeo = new THREE.BoxGeometry(0.24, 0.65, 0.26);
+      const legW = isFem ? 0.22 : 0.25;
+      const legSpacing = isFem ? 0.16 : 0.18;
+      const legGeo = new THREE.BoxGeometry(legW, 0.65, 0.26);
       const legL = new THREE.Mesh(legGeo, this.materials.dark);
-      legL.position.set(-0.18, 0.32, 0);
+      legL.position.set(-legSpacing, 0.32, 0);
       const legR = new THREE.Mesh(legGeo, this.materials.dark);
-      legR.position.set(0.18, 0.32, 0);
-      this.charGroup.add(legL, legR);
+      legR.position.set(legSpacing, 0.32, 0);
+      bg.add(legL, legR);
 
       // Flood Boots
-      const bootGeo = new THREE.BoxGeometry(0.26, 0.18, 0.36);
+      const bootGeo = new THREE.BoxGeometry(legW + 0.04, 0.18, 0.36);
       const bootL = new THREE.Mesh(bootGeo, this.materials.boots);
-      bootL.position.set(-0.18, 0.08, 0.05);
+      bootL.position.set(-legSpacing, 0.08, 0.05);
       const bootR = new THREE.Mesh(bootGeo, this.materials.boots);
-      bootR.position.set(0.18, 0.08, 0.05);
-      this.charGroup.add(bootL, bootR);
+      bootR.position.set(legSpacing, 0.08, 0.05);
+      bg.add(bootL, bootR);
     }
 
     buildHair(style) {
@@ -324,91 +357,181 @@
       this.charGroup.add(cg);
 
       const mat = this.materials.clothes;
+      const isFem = this.options.gender === 'female';
+      const bodyW = isFem ? 0.62 : 0.70;
+      const bodyH = isFem ? 0.73 : 0.76;
+      const bodyD = isFem ? 0.43 : 0.47;
+      const armX = isFem ? 0.45 : 0.49;
 
       // Body base
-      const bodyGeo = new THREE.BoxGeometry(0.68, 0.75, 0.46);
+      const bodyGeo = new THREE.BoxGeometry(bodyW, bodyH, bodyD);
       const body = new THREE.Mesh(bodyGeo, mat);
       body.position.y = 0.95;
       cg.add(body);
 
       // Arms
-      const armGeo = new THREE.BoxGeometry(0.18, 0.65, 0.22);
-      const armL = new THREE.Mesh(armGeo, style === 'tee' ? this.materials.skin : mat);
-      armL.position.set(-0.48, 0.92, 0);
+      const isShortSleeve = (style === 'tee' || style === 'scrubs');
+      const armGeo = new THREE.BoxGeometry(0.17, 0.65, 0.22);
+      const armL = new THREE.Mesh(armGeo, isShortSleeve ? this.materials.skin : mat);
+      armL.position.set(-armX, 0.92, 0);
       armL.rotation.z = 0.12;
 
-      const armR = new THREE.Mesh(armGeo, style === 'tee' ? this.materials.skin : mat);
-      armR.position.set(0.48, 0.92, 0);
+      const armR = new THREE.Mesh(armGeo, isShortSleeve ? this.materials.skin : mat);
+      armR.position.set(armX, 0.92, 0);
       armR.rotation.z = -0.12;
       cg.add(armL, armR);
 
-      if (style === 'tee') {
-        // Tee sleeves
-        const sleeveGeo = new THREE.BoxGeometry(0.20, 0.22, 0.24);
+      if (isShortSleeve) {
+        // Sleeves on top of arms
+        const sleeveGeo = new THREE.BoxGeometry(0.19, 0.24, 0.24);
         const slvL = new THREE.Mesh(sleeveGeo, mat);
-        slvL.position.set(-0.48, 1.14, 0);
+        slvL.position.set(-armX, 1.13, 0);
         const slvR = new THREE.Mesh(sleeveGeo, mat);
-        slvR.position.set(0.48, 1.14, 0);
+        slvR.position.set(armX, 1.13, 0);
         cg.add(slvL, slvR);
       }
 
+      // Specific Outfit Details
       if (style === 'vest') {
-        // Dual reflective stripes on front and back
-        const stripe1 = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.10, 0.48), this.materials.reflective);
+        // Rescue Vest: Dual reflective stripes + zipper
+        const stripe1 = new THREE.Mesh(new THREE.BoxGeometry(bodyW + 0.02, 0.10, bodyD + 0.02), this.materials.reflective);
         stripe1.position.y = 1.05;
-        const stripe2 = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.10, 0.48), this.materials.reflective);
+        const stripe2 = new THREE.Mesh(new THREE.BoxGeometry(bodyW + 0.02, 0.10, bodyD + 0.02), this.materials.reflective);
         stripe2.position.y = 0.80;
         cg.add(stripe1, stripe2);
 
-        // Zipper line
-        const zip = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.76, 0.49), this.materials.dark);
+        const zip = new THREE.Mesh(new THREE.BoxGeometry(0.04, bodyH + 0.02, bodyD + 0.03), this.materials.dark);
         zip.position.y = 0.95;
         cg.add(zip);
       } else if (style === 'jacket') {
-        // High collar
-        const collar = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.14, 0.48), mat);
+        // Weather Storm Jacket: Collar, pockets, reflective zip
+        const collar = new THREE.Mesh(new THREE.BoxGeometry(bodyW * 0.85, 0.14, bodyD + 0.02), mat);
         collar.position.set(0, 1.34, 0);
         cg.add(collar);
 
-        // Zipper & pockets
-        const zip = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.76, 0.48), this.materials.reflective);
+        const zip = new THREE.Mesh(new THREE.BoxGeometry(0.04, bodyH + 0.02, bodyD + 0.02), this.materials.reflective);
         zip.position.y = 0.95;
         cg.add(zip);
 
-        const pocketGeo = new THREE.BoxGeometry(0.18, 0.16, 0.04);
-        const pL = new THREE.Mesh(pocketGeo, this.materials.dark);
-        pL.position.set(-0.20, 0.82, 0.24);
-        const pR = new THREE.Mesh(pocketGeo, this.materials.dark);
-        pR.position.set(0.20, 0.82, 0.24);
+        const pL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 0.04), this.materials.dark);
+        pL.position.set(-bodyW * 0.3, 0.82, bodyD / 2 + 0.02);
+        const pR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 0.04), this.materials.dark);
+        pR.position.set(bodyW * 0.3, 0.82, bodyD / 2 + 0.02);
         cg.add(pL, pR);
+      } else if (style === 'raincoat') {
+        // Emergency Rain Poncho: Flared waterproof hem + storm cowl
+        const flareGeo = new THREE.BoxGeometry(bodyW + 0.10, 0.32, bodyD + 0.10);
+        const flare = new THREE.Mesh(flareGeo, mat);
+        flare.position.y = 0.70;
+        cg.add(flare);
+
+        const cowl = new THREE.Mesh(new THREE.BoxGeometry(bodyW * 0.92, 0.18, bodyD + 0.06), mat);
+        cowl.position.set(0, 1.35, 0);
+        cg.add(cowl);
+
+        // Reflective edge band
+        const edge = new THREE.Mesh(new THREE.BoxGeometry(bodyW + 0.12, 0.06, bodyD + 0.12), this.materials.reflective);
+        edge.position.y = 0.56;
+        cg.add(edge);
+      } else if (style === 'wetsuit') {
+        // Flood Rescue Diver Wetsuit: Scuba harness, belt & oxygen buckle
+        const harnessMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.3 });
+        const belt = new THREE.Mesh(new THREE.BoxGeometry(bodyW + 0.03, 0.14, bodyD + 0.03), this.materials.dark);
+        belt.position.y = 0.64;
+        cg.add(belt);
+
+        const strapL = new THREE.Mesh(new THREE.BoxGeometry(0.10, bodyH, bodyD + 0.02), harnessMat);
+        strapL.position.set(-bodyW * 0.28, 0.95, 0);
+        const strapR = new THREE.Mesh(new THREE.BoxGeometry(0.10, bodyH, bodyD + 0.02), harnessMat);
+        strapR.position.set(bodyW * 0.28, 0.95, 0);
+        cg.add(strapL, strapR);
+
+        const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, bodyD + 0.05), this.materials.reflective);
+        buckle.position.set(0, 0.64, 0);
+        cg.add(buckle);
+      } else if (style === 'parka') {
+        // High-Vis Winter Storm Parka: Thick padded collar & double reflective bands
+        const collar = new THREE.Mesh(new THREE.BoxGeometry(bodyW + 0.04, 0.20, bodyD + 0.06), this.materials.dark);
+        collar.position.set(0, 1.35, 0);
+        cg.add(collar);
+
+        const stripe1 = new THREE.Mesh(new THREE.BoxGeometry(bodyW + 0.02, 0.08, bodyD + 0.02), this.materials.reflective);
+        stripe1.position.y = 1.08;
+        const stripe2 = new THREE.Mesh(new THREE.BoxGeometry(bodyW + 0.02, 0.08, bodyD + 0.02), this.materials.reflective);
+        stripe2.position.y = 0.72;
+        cg.add(stripe1, stripe2);
+
+        // Arm reflective bands
+        const armBandL = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.08, 0.24), this.materials.reflective);
+        armBandL.position.set(-armX, 0.95, 0);
+        const armBandR = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.08, 0.24), this.materials.reflective);
+        armBandR.position.set(armX, 0.95, 0);
+        cg.add(armBandL, armBandR);
+      } else if (style === 'scrubs') {
+        // Medical Relief Scrubs: V-neck + Red Cross / White Cross badge
+        const crossH = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.05, 0.03), this.materials.white);
+        crossH.position.set(-bodyW * 0.26, 1.08, bodyD / 2 + 0.02);
+        const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.14, 0.03), this.materials.white);
+        crossV.position.set(-bodyW * 0.26, 1.08, bodyD / 2 + 0.02);
+        cg.add(crossH, crossV);
+
+        const vNeck = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.16, 0.04), this.materials.skin);
+        vNeck.position.set(0, 1.30, bodyD / 2);
+        cg.add(vNeck);
+      } else if (style === 'overalls') {
+        // Volunteer Overalls / Dungarees: Front bib, straps & brass buckles
+        const bib = new THREE.Mesh(new THREE.BoxGeometry(bodyW * 0.72, 0.44, bodyD + 0.02), this.materials.dark);
+        bib.position.set(0, 0.80, 0);
+        cg.add(bib);
+
+        const strapL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.48, bodyD + 0.03), this.materials.dark);
+        strapL.position.set(-bodyW * 0.26, 1.15, 0);
+        const strapR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.48, bodyD + 0.03), this.materials.dark);
+        strapR.position.set(bodyW * 0.26, 1.15, 0);
+        cg.add(strapL, strapR);
+
+        const bL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, bodyD + 0.05), this.materials.brass);
+        bL.position.set(-bodyW * 0.26, 0.98, 0);
+        const bR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, bodyD + 0.05), this.materials.brass);
+        bR.position.set(bodyW * 0.26, 0.98, 0);
+        cg.add(bL, bR);
+
+        // Center front pocket
+        const pocket = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.18, 0.03), this.materials.dark);
+        pocket.position.set(0, 0.78, bodyD / 2 + 0.02);
+        cg.add(pocket);
       } else if (style === 'uniform') {
-        // Rescue badge on chest
+        // Tactical Responder Uniform: Badge, belt & shoulder radio
         const badge = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.04), this.materials.white);
-        badge.position.set(-0.20, 1.12, 0.24);
+        badge.position.set(-bodyW * 0.28, 1.12, bodyD / 2 + 0.02);
         cg.add(badge);
 
-        // Utility belt
-        const belt = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.12, 0.48), this.materials.dark);
+        const belt = new THREE.Mesh(new THREE.BoxGeometry(bodyW + 0.03, 0.12, bodyD + 0.03), this.materials.dark);
         belt.position.y = 0.62;
         cg.add(belt);
 
-        const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.50), this.materials.reflective);
+        const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, bodyD + 0.05), this.materials.reflective);
         buckle.position.y = 0.62;
         cg.add(buckle);
+
+        // Shoulder radio
+        const radio = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.16, 0.10), this.materials.dark);
+        radio.position.set(bodyW * 0.32, 1.34, 0.10);
+        cg.add(radio);
       } else if (style === 'hoodie') {
-        // Hood on back
-        const hood = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.32, 0.22), mat);
-        hood.position.set(0, 1.25, -0.28);
+        // Relief Shelter Hoodie: Cowl on back + front kangaroo pocket
+        const hood = new THREE.Mesh(new THREE.BoxGeometry(bodyW * 0.88, 0.32, 0.22), mat);
+        hood.position.set(0, 1.25, -bodyD / 2 - 0.05);
         cg.add(hood);
 
-        // Pouch pocket
-        const pocket = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.22, 0.08), mat);
-        pocket.position.set(0, 0.82, 0.25);
+        const pocket = new THREE.Mesh(new THREE.BoxGeometry(bodyW * 0.65, 0.22, 0.08), mat);
+        pocket.position.set(0, 0.82, bodyD / 2 + 0.02);
         cg.add(pocket);
       }
     }
 
     updateConfig(newOptions) {
+      const genderChanged = newOptions.gender && newOptions.gender !== this.options.gender;
       Object.assign(this.options, newOptions);
 
       if (newOptions.skinColor && this.materials.skin) {
@@ -420,11 +543,16 @@
       if (newOptions.clothesColor && this.materials.clothes) {
         this.materials.clothes.color.set(newOptions.clothesColor);
       }
-      if (newOptions.hair) {
-        this.buildHair(newOptions.hair);
+
+      if (genderChanged) {
+        this.buildBaseBody();
       }
-      if (newOptions.clothes) {
-        this.buildClothes(newOptions.clothes);
+
+      if (genderChanged || newOptions.hair) {
+        this.buildHair(this.options.hair);
+      }
+      if (genderChanged || newOptions.clothes) {
+        this.buildClothes(this.options.clothes);
       }
 
       this.render();
@@ -491,7 +619,6 @@
 
     getSnapshot(quality = 0.85) {
       if (!this.renderer) return '';
-      // Force render front-facing for crisp snapshot
       const currentRot = this.charGroup.rotation.y;
       this.charGroup.rotation.y = 0.32; // pleasing 3/4 angle
       this.render();
@@ -502,6 +629,7 @@
 
     getConfig() {
       return {
+        gender: this.options.gender,
         hair: this.options.hair,
         hairColor: this.options.hairColor,
         clothes: this.options.clothes,

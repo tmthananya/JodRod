@@ -387,6 +387,15 @@
 
               <!-- Customizer Controls -->
               <div class="character-customizer-controls">
+                <!-- Gender Choice -->
+                <div class="customizer-group">
+                  <div class="customizer-label"><span>👤 Character Gender</span></div>
+                  <div class="gender-options-row" id="create-gender-options">
+                    <button type="button" class="gender-chip-btn active" data-gender="female">👩 Female</button>
+                    <button type="button" class="gender-chip-btn" data-gender="male">👨 Male</button>
+                  </div>
+                </div>
+
                 <!-- Hair Style -->
                 <div class="customizer-group">
                   <div class="customizer-label"><span>💇 Hair Style</span></div>
@@ -415,12 +424,17 @@
                   </div>
                 </div>
 
-                <!-- Clothes Style -->
+                <!-- Clothes Style (10 Relief Outfits) -->
                 <div class="customizer-group">
-                  <div class="customizer-label"><span>👕 Clothes / Outfit</span></div>
+                  <div class="customizer-label"><span>👕 Clothes / Outfit (10 Styles)</span></div>
                   <div class="customizer-options-row" id="create-clothes-styles">
                     <button type="button" class="customizer-chip-btn active" data-clothes="vest">🦺 Rescue Vest</button>
                     <button type="button" class="customizer-chip-btn" data-clothes="jacket">🧥 Flood Jacket</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="raincoat">🌧️ Rain Poncho</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="wetsuit">🤿 Wetsuit</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="parka">❄️ Storm Parka</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="scrubs">🩺 Medic Scrubs</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="overalls">👖 Overalls</button>
                     <button type="button" class="customizer-chip-btn" data-clothes="tee">👕 Casual Tee</button>
                     <button type="button" class="customizer-chip-btn" data-clothes="uniform">🥋 Uniform</button>
                     <button type="button" class="customizer-chip-btn" data-clothes="hoodie">🥷 Hoodie</button>
@@ -566,11 +580,11 @@
       <div id="edit-profile-alert" class="alert-message" role="alert" style="display: none;"></div>
 
       <form id="edit-profile-form" novalidate>
-        <!-- Record ID (Fixed & Non-editable) -->
+        <!-- Record ID (Cleaner Monospace ID Badge) -->
         <input type="hidden" id="edit-profile-id" name="id">
-        <div class="form-group" style="margin-bottom: 14px;">
-          <label class="form-label" style="font-size: 0.85rem; color: #64748b;">Profile ID (Non-editable)</label>
-          <input type="text" id="edit-profile-id-display" class="form-input" style="background: #f1f5f9; color: #64748b; font-family: monospace; font-size: 0.85rem; cursor: not-allowed;" readonly disabled>
+        <div class="clean-id-badge-container">
+          <span class="clean-id-badge-label">MEMBER ID</span>
+          <span class="clean-id-badge-value" id="edit-profile-id-display">#...</span>
         </div>
 
         <div class="form-group">
@@ -594,6 +608,15 @@
 
           <!-- Edit Customizer Controls -->
           <div class="character-customizer-controls">
+            <!-- Gender Choice -->
+            <div class="customizer-group">
+              <div class="customizer-label"><span>👤 Character Gender</span></div>
+              <div class="gender-options-row" id="edit-gender-options">
+                <button type="button" class="gender-chip-btn" data-gender="female">👩 Female</button>
+                <button type="button" class="gender-chip-btn" data-gender="male">👨 Male</button>
+              </div>
+            </div>
+
             <!-- Hair Style -->
             <div class="customizer-group">
               <div class="customizer-label"><span>💇 Hair Style</span></div>
@@ -622,12 +645,17 @@
               </div>
             </div>
 
-            <!-- Clothes Style -->
+            <!-- Clothes Style (10 Relief Outfits) -->
             <div class="customizer-group">
-              <div class="customizer-label"><span>👕 Clothes / Outfit</span></div>
+              <div class="customizer-label"><span>👕 Clothes / Outfit (10 Styles)</span></div>
               <div class="customizer-options-row" id="edit-clothes-styles">
                 <button type="button" class="customizer-chip-btn" data-clothes="vest">🦺 Rescue Vest</button>
                 <button type="button" class="customizer-chip-btn" data-clothes="jacket">🧥 Flood Jacket</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="raincoat">🌧️ Rain Poncho</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="wetsuit">🤿 Wetsuit</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="parka">❄️ Storm Parka</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="scrubs">🩺 Medic Scrubs</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="overalls">👖 Overalls</button>
                 <button type="button" class="customizer-chip-btn" data-clothes="tee">👕 Casual Tee</button>
                 <button type="button" class="customizer-chip-btn" data-clothes="uniform">🥋 Uniform</button>
                 <button type="button" class="customizer-chip-btn" data-clothes="hoodie">🥷 Hoodie</button>
@@ -985,6 +1013,7 @@
 
       // Current builder states
       let createCharConfig = {
+        gender: 'female',
         hair: 'spiky',
         hairColor: '#261e1b',
         clothes: 'vest',
@@ -993,6 +1022,7 @@
       };
 
       let editCharConfig = {
+        gender: 'female',
         hair: 'spiky',
         hairColor: '#261e1b',
         clothes: 'vest',
@@ -1021,6 +1051,17 @@
       }
 
       function setupCustomizerListeners(prefix, configObj, charInstanceGetter) {
+        // Gender choice
+        document.querySelectorAll(`#${prefix}-gender-options .gender-chip-btn`).forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll(`#${prefix}-gender-options .gender-chip-btn`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            configObj.gender = btn.dataset.gender;
+            const instance = charInstanceGetter();
+            if (instance) instance.updateConfig({ gender: configObj.gender });
+          });
+        });
+
         // Hair styles
         document.querySelectorAll(`#${prefix}-hair-styles .customizer-chip-btn`).forEach(btn => {
           btn.addEventListener('click', () => {
@@ -1116,9 +1157,21 @@
       function getAvatarSpecsBadge(avatarRaw) {
         const data = parseAvatarData(avatarRaw);
         if (data) {
-          const clothesName = data.clothes ? data.clothes.charAt(0).toUpperCase() + data.clothes.slice(1) : 'Rescue';
-          const hairName = data.hair ? data.hair.charAt(0).toUpperCase() + data.hair.slice(1) : 'Custom';
-          return `<span class="profile-card-specs-tag">🎮 3D Character &bull; ${clothesName} Outfit</span>`;
+          const genderIcon = data.gender === 'female' ? '👩' : '👨';
+          const outfitLabels = {
+            vest: 'Rescue Vest',
+            jacket: 'Flood Jacket',
+            raincoat: 'Rain Poncho',
+            wetsuit: 'Diver Wetsuit',
+            parka: 'Storm Parka',
+            scrubs: 'Medic Scrubs',
+            overalls: 'Overalls',
+            tee: 'Casual Tee',
+            uniform: 'Rescue Uniform',
+            hoodie: 'Shelter Hoodie'
+          };
+          const outfitName = outfitLabels[data.clothes] || (data.clothes ? data.clothes.charAt(0).toUpperCase() + data.clothes.slice(1) : 'Rescue');
+          return `<span class="profile-card-specs-tag">${genderIcon} 3D &bull; ${outfitName}</span>`;
         }
         return `<span class="profile-card-specs-tag">🎮 3D Community Member</span>`;
       }
@@ -1166,7 +1219,12 @@
                     <div>
                       <div class="profile-card-name">${p.name}</div>
                       ${getAvatarSpecsBadge(p.avatar)}
-                      <div class="profile-card-id">ID: ${p.id}</div>
+                      <div style="margin-top: 5px;">
+                        <span class="profile-clean-id" title="Full UUID: ${p.id} (Click to copy)" onclick="navigator.clipboard?.writeText('${p.id}'); const h = this.querySelector('.id-copy-hint'); if(h) { h.textContent='✓ Copied!'; setTimeout(()=>h.textContent='📋', 1500); }">
+                          <span class="id-hash">#</span>${p.id.slice(0, 8)}
+                          <span class="id-copy-hint" title="Copy UUID">📋</span>
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div class="profile-card-actions">
@@ -1207,6 +1265,7 @@
           // Generate 3D snapshot
           const snapshot = createChar3D ? createChar3D.getSnapshot(0.82) : '';
           const avatarPayload = JSON.stringify({
+            gender: createCharConfig.gender || 'female',
             hair: createCharConfig.hair,
             hairColor: createCharConfig.hairColor,
             clothes: createCharConfig.clothes,
@@ -1245,6 +1304,10 @@
 
       // Sync active UI buttons to a config
       function syncCustomizerUI(prefix, config) {
+        // Gender
+        document.querySelectorAll(`#${prefix}-gender-options .gender-chip-btn`).forEach(b => {
+          b.classList.toggle('active', b.dataset.gender === (config.gender || 'female'));
+        });
         // Hair style
         document.querySelectorAll(`#${prefix}-hair-styles .customizer-chip-btn`).forEach(b => {
           b.classList.toggle('active', b.dataset.hair === config.hair);
@@ -1273,12 +1336,17 @@
         if (!profile) return;
 
         document.getElementById('edit-profile-id').value = profile.id;
-        document.getElementById('edit-profile-id-display').value = profile.id;
+        const displayEl = document.getElementById('edit-profile-id-display');
+        if (displayEl) {
+          displayEl.textContent = `#${profile.id.slice(0, 8)} (${profile.id.slice(-4)})`;
+          displayEl.title = `Full UUID: ${profile.id}`;
+        }
         document.getElementById('edit-profile-name').value = profile.name;
 
         // Parse saved avatar config or defaults into shared object
         const parsed = parseAvatarData(profile.avatar);
         Object.assign(editCharConfig, {
+          gender: 'female',
           hair: 'spiky',
           hairColor: '#261e1b',
           clothes: 'vest',
@@ -1326,6 +1394,7 @@
           // Generate snapshot from edit viewport
           const snapshot = editChar3D ? editChar3D.getSnapshot(0.82) : '';
           const avatarPayload = JSON.stringify({
+            gender: editCharConfig.gender || 'female',
             hair: editCharConfig.hair,
             hairColor: editCharConfig.hairColor,
             clothes: editCharConfig.clothes,

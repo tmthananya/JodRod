@@ -1102,6 +1102,43 @@ footer {
   margin-bottom: 4px;
 }
 
+.gender-options-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.gender-chip-btn {
+  flex: 1;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: #f8fafc;
+  border: 2px solid var(--border-pixel);
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px var(--border-pixel);
+  transition: all 0.12s ease;
+  color: #1e293b;
+}
+
+.gender-chip-btn:hover {
+  background: #e0f2fe;
+  transform: translateY(-1px);
+}
+
+.gender-chip-btn.active {
+  background: #38bdf8;
+  color: #082f49;
+  border-color: #0284c7;
+  box-shadow: 2px 2px 0px #0284c7;
+  font-weight: 800;
+}
+
 .profile-card-specs-tag {
   display: inline-block;
   font-size: 0.72rem;
@@ -1111,13 +1148,69 @@ footer {
   color: #0369a1;
   border: 1px solid #7dd3fc;
   border-radius: 12px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-.profile-card-id {
-  font-size: 0.76rem;
-  font-family: monospace;
+/* Cleaner Modern ID Badge */
+.profile-clean-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: all;
+}
+
+.profile-clean-id:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.profile-clean-id .id-hash {
+  color: #0284c7;
+  font-weight: 800;
+}
+
+.profile-clean-id .id-copy-hint {
+  font-size: 0.70rem;
+  opacity: 0.6;
+}
+
+/* Clean ID Container for Edit Modal */
+.clean-id-badge-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 2px solid var(--border-pixel);
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-bottom: 16px;
+  box-shadow: 2px 2px 0px var(--border-pixel);
+}
+
+.clean-id-badge-label {
+  font-size: 0.65rem;
+  font-family: 'Press Start 2P', monospace;
   color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.clean-id-badge-value {
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0284c7;
+  letter-spacing: 0.5px;
 }
 
 .profile-card-actions {
