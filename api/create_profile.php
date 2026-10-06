@@ -33,7 +33,7 @@ $avatar = trim($input['avatar'] ?? '👤');
 
 $record = [
     'name'   => htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
-    'avatar' => htmlspecialchars($avatar, ENT_QUOTES, 'UTF-8')
+    'avatar' => $avatar
 ];
 
 // Supabase Live Mode

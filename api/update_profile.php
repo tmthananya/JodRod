@@ -42,7 +42,7 @@ $avatar = trim($input['avatar'] ?? '👤');
 
 $update_fields = [
     'name'   => htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
-    'avatar' => htmlspecialchars($avatar, ENT_QUOTES, 'UTF-8')
+    'avatar' => $avatar
 ];
 
 // Supabase Live Mode

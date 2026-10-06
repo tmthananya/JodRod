@@ -371,53 +371,89 @@
               <div class="form-help">Your display name for flood parking.</div>
             </div>
 
+            <!-- 3D Character Customizer -->
             <div class="form-group">
-              <label class="form-label">Choose Character Avatar *</label>
-              <div class="avatar-select-grid" id="create-avatar-picker">
-                <button type="button" class="avatar-opt-btn active" data-avatar="volunteer" title="Amanda (Relief Volunteer)">
-                  <div class="avatar-thumb-wrapper">
-                    <img src="assets/avatars/volunteer.jpg" alt="Amanda" class="avatar-thumb-img">
-                  </div>
-                  <div class="avatar-char-name">Amanda</div>
-                  <div class="avatar-char-role">Volunteer</div>
-                </button>
-                <button type="button" class="avatar-opt-btn" data-avatar="driver" title="Dan (Rescue Driver)">
-                  <div class="avatar-thumb-wrapper">
-                    <img src="assets/avatars/driver.jpg" alt="Dan" class="avatar-thumb-img">
-                  </div>
-                  <div class="avatar-char-name">Dan</div>
-                  <div class="avatar-char-role">Rescue Driver</div>
-                </button>
-                <button type="button" class="avatar-opt-btn" data-avatar="host" title="Uncle Som (Parking Space Host)">
-                  <div class="avatar-thumb-wrapper">
-                    <img src="assets/avatars/host.jpg" alt="Uncle Som" class="avatar-thumb-img">
-                  </div>
-                  <div class="avatar-char-name">Uncle Som</div>
-                  <div class="avatar-char-role">Space Host</div>
-                </button>
-                <button type="button" class="avatar-opt-btn" data-avatar="mechanic" title="Kai (Vehicle Mechanic)">
-                  <div class="avatar-thumb-wrapper">
-                    <img src="assets/avatars/mechanic.jpg" alt="Kai" class="avatar-thumb-img">
-                  </div>
-                  <div class="avatar-char-name">Kai</div>
-                  <div class="avatar-char-role">Mechanic</div>
-                </button>
-                <button type="button" class="avatar-opt-btn" data-avatar="rescuer" title="Maya (Flood Coordinator)">
-                  <div class="avatar-thumb-wrapper">
-                    <img src="assets/avatars/rescuer.jpg" alt="Maya" class="avatar-thumb-img">
-                  </div>
-                  <div class="avatar-char-name">Maya</div>
-                  <div class="avatar-char-role">Coordinator</div>
-                </button>
-                <button type="button" class="avatar-opt-btn" data-avatar="scout" title="Lin (Flood Patrol Scout)">
-                  <div class="avatar-thumb-wrapper">
-                    <img src="assets/avatars/scout.jpg" alt="Lin" class="avatar-thumb-img">
-                  </div>
-                  <div class="avatar-char-name">Lin</div>
-                  <div class="avatar-char-role">Patrol Scout</div>
-                </button>
+              <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>🎮 Custom 3D Character</span>
+                <span style="font-size: 0.72rem; color: #0284c7; font-weight: 700;">LIVE 3D VIEWPORT</span>
+              </label>
+
+              <!-- 3D Viewport -->
+              <div class="character-3d-viewport" id="create-3d-viewport">
+                <canvas id="create-character-canvas"></canvas>
+                <div class="viewport-hint">🖱️ Drag to rotate 360°</div>
+                <div class="viewport-badge">3D GAME AVATAR</div>
               </div>
-              <input type="hidden" id="create-profile-avatar" name="avatar" value="volunteer">
+
+              <!-- Customizer Controls -->
+              <div class="character-customizer-controls">
+                <!-- Hair Style -->
+                <div class="customizer-group">
+                  <div class="customizer-label"><span>💇 Hair Style</span></div>
+                  <div class="customizer-options-row" id="create-hair-styles">
+                    <button type="button" class="customizer-chip-btn active" data-hair="spiky">⚡ Spiky</button>
+                    <button type="button" class="customizer-chip-btn" data-hair="short">✂️ Short</button>
+                    <button type="button" class="customizer-chip-btn" data-hair="bob">💁 Bob</button>
+                    <button type="button" class="customizer-chip-btn" data-hair="ponytail">🎀 Ponytail</button>
+                    <button type="button" class="customizer-chip-btn" data-hair="helmet">👷 Helmet</button>
+                    <button type="button" class="customizer-chip-btn" data-hair="cap">🧢 Cap</button>
+                    <button type="button" class="customizer-chip-btn" data-hair="beanie">🧶 Beanie</button>
+                  </div>
+                </div>
+
+                <!-- Hair Color -->
+                <div class="customizer-group">
+                  <div class="customizer-label"><span>🎨 Hair Color</span></div>
+                  <div class="color-swatch-row" id="create-hair-colors">
+                    <button type="button" class="color-swatch-btn active" data-color="#261e1b" style="background: #261e1b;" title="Black"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#5c3a21" style="background: #5c3a21;" title="Brown"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Blonde"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#991b1b" style="background: #991b1b;" title="Red"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Blue"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#94a3b8" style="background: #94a3b8;" title="Silver"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#ec4899" style="background: #ec4899;" title="Pink"></button>
+                  </div>
+                </div>
+
+                <!-- Clothes Style -->
+                <div class="customizer-group">
+                  <div class="customizer-label"><span>👕 Clothes / Outfit</span></div>
+                  <div class="customizer-options-row" id="create-clothes-styles">
+                    <button type="button" class="customizer-chip-btn active" data-clothes="vest">🦺 Rescue Vest</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="jacket">🧥 Flood Jacket</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="tee">👕 Casual Tee</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="uniform">🥋 Uniform</button>
+                    <button type="button" class="customizer-chip-btn" data-clothes="hoodie">🥷 Hoodie</button>
+                  </div>
+                </div>
+
+                <!-- Clothes Color -->
+                <div class="customizer-group">
+                  <div class="customizer-label"><span>🌈 Clothes Color</span></div>
+                  <div class="color-swatch-row" id="create-clothes-colors">
+                    <button type="button" class="color-swatch-btn active" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Orange"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#059669" style="background: #059669;" title="Rescue Green"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Navy Blue"></button>
+                  </div>
+                </div>
+
+                <!-- Skin Tone -->
+                <div class="customizer-group">
+                  <div class="customizer-label"><span>🧑‍🦱 Skin Tone</span></div>
+                  <div class="color-swatch-row" id="create-skin-colors">
+                    <button type="button" class="color-swatch-btn" data-color="#ffedd5" style="background: #ffedd5;" title="Fair"></button>
+                    <button type="button" class="color-swatch-btn active" data-color="#fed7aa" style="background: #fed7aa;" title="Warm Peach"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#fcd34d" style="background: #fcd34d;" title="Golden"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Tan"></button>
+                    <button type="button" class="color-swatch-btn" data-color="#78350f" style="background: #78350f;" title="Deep"></button>
+                  </div>
+                </div>
+              </div>
+
+              <input type="hidden" id="create-profile-avatar" name="avatar">
             </div>
 
             <button type="submit" id="btn-submit-profile" class="pixel-btn pixel-btn-green" style="width: 100%; padding: 12px; font-size: 1rem; margin-top: 8px;">
@@ -542,53 +578,89 @@
           <input type="text" id="edit-profile-name" name="name" class="form-input" required>
         </div>
 
+        <!-- 3D Character Customizer for Edit -->
         <div class="form-group">
-          <label class="form-label">Choose Character Avatar *</label>
-          <div class="avatar-select-grid" id="edit-avatar-picker">
-            <button type="button" class="avatar-opt-btn" data-avatar="volunteer" title="Amanda (Relief Volunteer)">
-              <div class="avatar-thumb-wrapper">
-                <img src="assets/avatars/volunteer.jpg" alt="Amanda" class="avatar-thumb-img">
-              </div>
-              <div class="avatar-char-name">Amanda</div>
-              <div class="avatar-char-role">Volunteer</div>
-            </button>
-            <button type="button" class="avatar-opt-btn" data-avatar="driver" title="Dan (Rescue Driver)">
-              <div class="avatar-thumb-wrapper">
-                <img src="assets/avatars/driver.jpg" alt="Dan" class="avatar-thumb-img">
-              </div>
-              <div class="avatar-char-name">Dan</div>
-              <div class="avatar-char-role">Rescue Driver</div>
-            </button>
-            <button type="button" class="avatar-opt-btn" data-avatar="host" title="Uncle Som (Parking Space Host)">
-              <div class="avatar-thumb-wrapper">
-                <img src="assets/avatars/host.jpg" alt="Uncle Som" class="avatar-thumb-img">
-              </div>
-              <div class="avatar-char-name">Uncle Som</div>
-              <div class="avatar-char-role">Space Host</div>
-            </button>
-            <button type="button" class="avatar-opt-btn" data-avatar="mechanic" title="Kai (Vehicle Mechanic)">
-              <div class="avatar-thumb-wrapper">
-                <img src="assets/avatars/mechanic.jpg" alt="Kai" class="avatar-thumb-img">
-              </div>
-              <div class="avatar-char-name">Kai</div>
-              <div class="avatar-char-role">Mechanic</div>
-            </button>
-            <button type="button" class="avatar-opt-btn" data-avatar="rescuer" title="Maya (Flood Coordinator)">
-              <div class="avatar-thumb-wrapper">
-                <img src="assets/avatars/rescuer.jpg" alt="Maya" class="avatar-thumb-img">
-              </div>
-              <div class="avatar-char-name">Maya</div>
-              <div class="avatar-char-role">Coordinator</div>
-            </button>
-            <button type="button" class="avatar-opt-btn" data-avatar="scout" title="Lin (Flood Patrol Scout)">
-              <div class="avatar-thumb-wrapper">
-                <img src="assets/avatars/scout.jpg" alt="Lin" class="avatar-thumb-img">
-              </div>
-              <div class="avatar-char-name">Lin</div>
-              <div class="avatar-char-role">Patrol Scout</div>
-            </button>
+          <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>🎮 Custom 3D Character</span>
+            <span style="font-size: 0.72rem; color: #0284c7; font-weight: 700;">LIVE 3D VIEWPORT</span>
+          </label>
+
+          <!-- 3D Viewport in Edit Modal -->
+          <div class="character-3d-viewport" id="edit-3d-viewport">
+            <canvas id="edit-character-canvas"></canvas>
+            <div class="viewport-hint">🖱️ Drag to rotate 360°</div>
+            <div class="viewport-badge">3D GAME AVATAR</div>
           </div>
-          <input type="hidden" id="edit-profile-avatar" name="avatar" value="volunteer">
+
+          <!-- Edit Customizer Controls -->
+          <div class="character-customizer-controls">
+            <!-- Hair Style -->
+            <div class="customizer-group">
+              <div class="customizer-label"><span>💇 Hair Style</span></div>
+              <div class="customizer-options-row" id="edit-hair-styles">
+                <button type="button" class="customizer-chip-btn" data-hair="spiky">⚡ Spiky</button>
+                <button type="button" class="customizer-chip-btn" data-hair="short">✂️ Short</button>
+                <button type="button" class="customizer-chip-btn" data-hair="bob">💁 Bob</button>
+                <button type="button" class="customizer-chip-btn" data-hair="ponytail">🎀 Ponytail</button>
+                <button type="button" class="customizer-chip-btn" data-hair="helmet">👷 Helmet</button>
+                <button type="button" class="customizer-chip-btn" data-hair="cap">🧢 Cap</button>
+                <button type="button" class="customizer-chip-btn" data-hair="beanie">🧶 Beanie</button>
+              </div>
+            </div>
+
+            <!-- Hair Color -->
+            <div class="customizer-group">
+              <div class="customizer-label"><span>🎨 Hair Color</span></div>
+              <div class="color-swatch-row" id="edit-hair-colors">
+                <button type="button" class="color-swatch-btn" data-color="#261e1b" style="background: #261e1b;" title="Black"></button>
+                <button type="button" class="color-swatch-btn" data-color="#5c3a21" style="background: #5c3a21;" title="Brown"></button>
+                <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Blonde"></button>
+                <button type="button" class="color-swatch-btn" data-color="#991b1b" style="background: #991b1b;" title="Red"></button>
+                <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Blue"></button>
+                <button type="button" class="color-swatch-btn" data-color="#94a3b8" style="background: #94a3b8;" title="Silver"></button>
+                <button type="button" class="color-swatch-btn" data-color="#ec4899" style="background: #ec4899;" title="Pink"></button>
+              </div>
+            </div>
+
+            <!-- Clothes Style -->
+            <div class="customizer-group">
+              <div class="customizer-label"><span>👕 Clothes / Outfit</span></div>
+              <div class="customizer-options-row" id="edit-clothes-styles">
+                <button type="button" class="customizer-chip-btn" data-clothes="vest">🦺 Rescue Vest</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="jacket">🧥 Flood Jacket</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="tee">👕 Casual Tee</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="uniform">🥋 Uniform</button>
+                <button type="button" class="customizer-chip-btn" data-clothes="hoodie">🥷 Hoodie</button>
+              </div>
+            </div>
+
+            <!-- Clothes Color -->
+            <div class="customizer-group">
+              <div class="customizer-label"><span>🌈 Clothes Color</span></div>
+              <div class="color-swatch-row" id="edit-clothes-colors">
+                <button type="button" class="color-swatch-btn" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Orange"></button>
+                <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
+                <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
+                <button type="button" class="color-swatch-btn" data-color="#059669" style="background: #059669;" title="Rescue Green"></button>
+                <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
+                <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Navy Blue"></button>
+              </div>
+            </div>
+
+            <!-- Skin Tone -->
+            <div class="customizer-group">
+              <div class="customizer-label"><span>🧑‍🦱 Skin Tone</span></div>
+              <div class="color-swatch-row" id="edit-skin-colors">
+                <button type="button" class="color-swatch-btn" data-color="#ffedd5" style="background: #ffedd5;" title="Fair"></button>
+                <button type="button" class="color-swatch-btn" data-color="#fed7aa" style="background: #fed7aa;" title="Warm Peach"></button>
+                <button type="button" class="color-swatch-btn" data-color="#fcd34d" style="background: #fcd34d;" title="Golden"></button>
+                <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Tan"></button>
+                <button type="button" class="color-swatch-btn" data-color="#78350f" style="background: #78350f;" title="Deep"></button>
+              </div>
+            </div>
+          </div>
+
+          <input type="hidden" id="edit-profile-avatar" name="avatar">
         </div>
 
         <div class="modal-actions">
@@ -612,9 +684,11 @@
   </footer>
 
   <!-- ========================================================
-       LEAFLET & MAP ENGINE
+       LEAFLET & MAP ENGINE & 3D CHARACTER ENGINE
        ======================================================== -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="assets/js/character_3d.js"></script>
   <script src="assets/js/parking_map.js"></script>
 
   <!-- ========================================================
@@ -903,33 +977,150 @@
       }
 
       // ========================================================
-      // PROFILE CRUD CONTROLLER (CHARACTER AVATARS)
+      // PROFILE CRUD CONTROLLER (3D GAME CHARACTER CUSTOMIZER)
       // ========================================================
       let profilesData = {};
+      let createChar3D = null;
+      let editChar3D = null;
 
-      const characterAvatars = {
-        volunteer: { name: 'Amanda', role: 'Relief Volunteer', img: 'assets/avatars/volunteer.jpg' },
-        driver:    { name: 'Dan', role: 'Rescue Driver', img: 'assets/avatars/driver.jpg' },
-        host:      { name: 'Uncle Som', role: 'Parking Space Host', img: 'assets/avatars/host.jpg' },
-        mechanic:  { name: 'Kai', role: 'Vehicle Mechanic', img: 'assets/avatars/mechanic.jpg' },
-        rescuer:   { name: 'Maya', role: 'Flood Coordinator', img: 'assets/avatars/rescuer.jpg' },
-        scout:     { name: 'Lin', role: 'Flood Patrol Scout', img: 'assets/avatars/scout.jpg' }
+      // Current builder states
+      let createCharConfig = {
+        hair: 'spiky',
+        hairColor: '#261e1b',
+        clothes: 'vest',
+        clothesColor: '#ea580c',
+        skinColor: '#fed7aa'
       };
 
-      function renderAvatarPortrait(avatarKey) {
-        const char = characterAvatars[avatarKey];
-        if (char) {
-          return `<div class="profile-avatar-portrait"><img src="${char.img}" alt="${char.name}"></div>`;
+      let editCharConfig = {
+        hair: 'spiky',
+        hairColor: '#261e1b',
+        clothes: 'vest',
+        clothesColor: '#ea580c',
+        skinColor: '#fed7aa'
+      };
+
+      function initCreate3D() {
+        const canvas = document.getElementById('create-character-canvas');
+        if (!canvas || !window.Character3D) return;
+        if (!createChar3D) {
+          createChar3D = new window.Character3D(canvas, createCharConfig);
+        } else {
+          createChar3D.updateConfig(createCharConfig);
         }
-        return `<div class="profile-avatar-portrait"><span class="profile-avatar-fallback">${avatarKey || '👤'}</span></div>`;
       }
 
-      function getAvatarRoleBadge(avatarKey) {
-        const char = characterAvatars[avatarKey];
-        if (char) {
-          return `<span class="profile-card-role-tag">${char.name} &bull; ${char.role}</span>`;
+      function initEdit3D() {
+        const canvas = document.getElementById('edit-character-canvas');
+        if (!canvas || !window.Character3D) return;
+        if (!editChar3D) {
+          editChar3D = new window.Character3D(canvas, editCharConfig);
+        } else {
+          editChar3D.updateConfig(editCharConfig);
         }
-        return '';
+      }
+
+      function setupCustomizerListeners(prefix, configObj, charInstanceGetter) {
+        // Hair styles
+        document.querySelectorAll(`#${prefix}-hair-styles .customizer-chip-btn`).forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll(`#${prefix}-hair-styles .customizer-chip-btn`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            configObj.hair = btn.dataset.hair;
+            const instance = charInstanceGetter();
+            if (instance) instance.updateConfig({ hair: configObj.hair });
+          });
+        });
+
+        // Hair colors
+        document.querySelectorAll(`#${prefix}-hair-colors .color-swatch-btn`).forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll(`#${prefix}-hair-colors .color-swatch-btn`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            configObj.hairColor = btn.dataset.color;
+            const instance = charInstanceGetter();
+            if (instance) instance.updateConfig({ hairColor: configObj.hairColor });
+          });
+        });
+
+        // Clothes styles
+        document.querySelectorAll(`#${prefix}-clothes-styles .customizer-chip-btn`).forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll(`#${prefix}-clothes-styles .customizer-chip-btn`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            configObj.clothes = btn.dataset.clothes;
+            const instance = charInstanceGetter();
+            if (instance) instance.updateConfig({ clothes: configObj.clothes });
+          });
+        });
+
+        // Clothes colors
+        document.querySelectorAll(`#${prefix}-clothes-colors .color-swatch-btn`).forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll(`#${prefix}-clothes-colors .color-swatch-btn`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            configObj.clothesColor = btn.dataset.color;
+            const instance = charInstanceGetter();
+            if (instance) instance.updateConfig({ clothesColor: configObj.clothesColor });
+          });
+        });
+
+        // Skin colors
+        document.querySelectorAll(`#${prefix}-skin-colors .color-swatch-btn`).forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll(`#${prefix}-skin-colors .color-swatch-btn`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            configObj.skinColor = btn.dataset.color;
+            const instance = charInstanceGetter();
+            if (instance) instance.updateConfig({ skinColor: configObj.skinColor });
+          });
+        });
+      }
+
+      setupCustomizerListeners('create', createCharConfig, () => createChar3D);
+      setupCustomizerListeners('edit', editCharConfig, () => editChar3D);
+
+      // Initialize 3D when on profile section
+      setTimeout(initCreate3D, 200);
+
+      window.addEventListener('hashchange', () => {
+        if (window.location.hash === '#profile') {
+          setTimeout(initCreate3D, 150);
+        }
+      });
+
+      function parseAvatarData(avatarRaw) {
+        if (!avatarRaw) return null;
+        if (typeof avatarRaw === 'object') return avatarRaw;
+        try {
+          let str = avatarRaw;
+          if (str.includes('&quot;')) {
+            str = str.replace(/&quot;/g, '"');
+          }
+          if (str.startsWith('{')) {
+            return JSON.parse(str);
+          }
+        } catch (e) {}
+        return null;
+      }
+
+      function renderAvatarPortrait(avatarRaw) {
+        const data = parseAvatarData(avatarRaw);
+        if (data && data.snapshot) {
+          return `<div class="profile-avatar-portrait"><img src="${data.snapshot}" alt="3D Character"></div>`;
+        }
+        // Legacy fallback
+        return `<div class="profile-avatar-portrait"><span class="profile-avatar-fallback">👤</span></div>`;
+      }
+
+      function getAvatarSpecsBadge(avatarRaw) {
+        const data = parseAvatarData(avatarRaw);
+        if (data) {
+          const clothesName = data.clothes ? data.clothes.charAt(0).toUpperCase() + data.clothes.slice(1) : 'Rescue';
+          const hairName = data.hair ? data.hair.charAt(0).toUpperCase() + data.hair.slice(1) : 'Custom';
+          return `<span class="profile-card-specs-tag">🎮 3D Character &bull; ${clothesName} Outfit</span>`;
+        }
+        return `<span class="profile-card-specs-tag">🎮 3D Community Member</span>`;
       }
 
       function showProfileAlert(type, message) {
@@ -962,20 +1153,19 @@
             if (!container) return;
 
             if (json.data.length === 0) {
-              container.innerHTML = '<div class="empty-spaces-notice">No profiles created yet. Use the form on the left to create one.</div>';
+              container.innerHTML = '<div class="empty-spaces-notice">No profiles created yet. Use the 3D character builder on the left to create one.</div>';
               return;
             }
 
             let html = '';
             json.data.forEach(p => {
-              const avatarKey = p.avatar || 'volunteer';
               html += `
                 <div class="profile-card" id="profile-card-${p.id}">
                   <div class="profile-card-left">
-                    ${renderAvatarPortrait(avatarKey)}
+                    ${renderAvatarPortrait(p.avatar)}
                     <div>
                       <div class="profile-card-name">${p.name}</div>
-                      ${getAvatarRoleBadge(avatarKey)}
+                      ${getAvatarSpecsBadge(p.avatar)}
                       <div class="profile-card-id">ID: ${p.id}</div>
                     </div>
                   </div>
@@ -1001,24 +1191,6 @@
 
       loadProfiles();
 
-      // Avatar Picker handlers for Create
-      document.querySelectorAll('#create-avatar-picker .avatar-opt-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('#create-avatar-picker .avatar-opt-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById('create-profile-avatar').value = btn.dataset.avatar;
-        });
-      });
-
-      // Avatar Picker handlers for Edit
-      document.querySelectorAll('#edit-avatar-picker .avatar-opt-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('#edit-avatar-picker .avatar-opt-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById('edit-profile-avatar').value = btn.dataset.avatar;
-        });
-      });
-
       // Create Profile Submit
       const createProfileForm = document.getElementById('create-profile-form');
       if (createProfileForm) {
@@ -1026,13 +1198,22 @@
           e.preventDefault();
 
           const name = document.getElementById('create-profile-name').value.trim();
-          const avatar = document.getElementById('create-profile-avatar').value || 'volunteer';
-
           if (!name) {
             showProfileAlert('error', '⚠️ Please enter a profile name.');
             document.getElementById('create-profile-name').focus();
             return;
           }
+
+          // Generate 3D snapshot
+          const snapshot = createChar3D ? createChar3D.getSnapshot(0.82) : '';
+          const avatarPayload = JSON.stringify({
+            hair: createCharConfig.hair,
+            hairColor: createCharConfig.hairColor,
+            clothes: createCharConfig.clothes,
+            clothesColor: createCharConfig.clothesColor,
+            skinColor: createCharConfig.skinColor,
+            snapshot: snapshot
+          });
 
           const btn = document.getElementById('btn-submit-profile');
           try {
@@ -1042,7 +1223,7 @@
             const res = await fetch('api/create_profile.php', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name, avatar })
+              body: JSON.stringify({ name, avatar: avatarPayload })
             });
 
             const json = await res.json();
@@ -1062,6 +1243,30 @@
         });
       }
 
+      // Sync active UI buttons to a config
+      function syncCustomizerUI(prefix, config) {
+        // Hair style
+        document.querySelectorAll(`#${prefix}-hair-styles .customizer-chip-btn`).forEach(b => {
+          b.classList.toggle('active', b.dataset.hair === config.hair);
+        });
+        // Hair color
+        document.querySelectorAll(`#${prefix}-hair-colors .color-swatch-btn`).forEach(b => {
+          b.classList.toggle('active', b.dataset.color.toLowerCase() === config.hairColor.toLowerCase());
+        });
+        // Clothes style
+        document.querySelectorAll(`#${prefix}-clothes-styles .customizer-chip-btn`).forEach(b => {
+          b.classList.toggle('active', b.dataset.clothes === config.clothes);
+        });
+        // Clothes color
+        document.querySelectorAll(`#${prefix}-clothes-colors .color-swatch-btn`).forEach(b => {
+          b.classList.toggle('active', b.dataset.color.toLowerCase() === config.clothesColor.toLowerCase());
+        });
+        // Skin color
+        document.querySelectorAll(`#${prefix}-skin-colors .color-swatch-btn`).forEach(b => {
+          b.classList.toggle('active', b.dataset.color.toLowerCase() === config.skinColor.toLowerCase());
+        });
+      }
+
       // Open Edit Profile Modal
       function openEditProfileModal(id) {
         const profile = profilesData[id];
@@ -1070,22 +1275,30 @@
         document.getElementById('edit-profile-id').value = profile.id;
         document.getElementById('edit-profile-id-display').value = profile.id;
         document.getElementById('edit-profile-name').value = profile.name;
-        const currentAvatar = profile.avatar || 'volunteer';
-        document.getElementById('edit-profile-avatar').value = currentAvatar;
 
-        document.querySelectorAll('#edit-avatar-picker .avatar-opt-btn').forEach(b => {
-          if (b.dataset.avatar === currentAvatar) {
-            b.classList.add('active');
-          } else {
-            b.classList.remove('active');
-          }
-        });
+        // Parse saved avatar config or defaults into shared object
+        const parsed = parseAvatarData(profile.avatar);
+        Object.assign(editCharConfig, {
+          hair: 'spiky',
+          hairColor: '#261e1b',
+          clothes: 'vest',
+          clothesColor: '#ea580c',
+          skinColor: '#fed7aa'
+        }, parsed || {});
+
+        syncCustomizerUI('edit', editCharConfig);
 
         const alertBox = document.getElementById('edit-profile-alert');
         if (alertBox) alertBox.style.display = 'none';
 
         const modal = document.getElementById('edit-profile-modal');
         if (modal) modal.classList.add('active');
+
+        if (editChar3D) {
+          editChar3D.updateConfig(editCharConfig);
+        } else {
+          setTimeout(initEdit3D, 150);
+        }
       }
 
       function closeEditProfileModal() {
@@ -1101,7 +1314,6 @@
 
           const id = document.getElementById('edit-profile-id').value;
           const name = document.getElementById('edit-profile-name').value.trim();
-          const avatar = document.getElementById('edit-profile-avatar').value || 'volunteer';
 
           if (!name) {
             const alertBox = document.getElementById('edit-profile-alert');
@@ -1111,6 +1323,17 @@
             return;
           }
 
+          // Generate snapshot from edit viewport
+          const snapshot = editChar3D ? editChar3D.getSnapshot(0.82) : '';
+          const avatarPayload = JSON.stringify({
+            hair: editCharConfig.hair,
+            hairColor: editCharConfig.hairColor,
+            clothes: editCharConfig.clothes,
+            clothesColor: editCharConfig.clothesColor,
+            skinColor: editCharConfig.skinColor,
+            snapshot: snapshot
+          });
+
           const btn = document.getElementById('btn-save-edit-profile');
           try {
             btn.disabled = true;
@@ -1119,7 +1342,7 @@
             const res = await fetch('api/update_profile.php', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ id, name, avatar })
+              body: JSON.stringify({ id, name, avatar: avatarPayload })
             });
 
             const json = await res.json();
