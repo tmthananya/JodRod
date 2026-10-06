@@ -372,17 +372,52 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Avatar *</label>
+              <label class="form-label">Choose Character Avatar *</label>
               <div class="avatar-select-grid" id="create-avatar-picker">
-                <button type="button" class="avatar-opt-btn active" data-avatar="👤">👤</button>
-                <button type="button" class="avatar-opt-btn" data-avatar="🧑‍🌾">🧑‍🌾</button>
-                <button type="button" class="avatar-opt-btn" data-avatar="🧑‍🔧">🧑‍🔧</button>
-                <button type="button" class="avatar-opt-btn" data-avatar="🚗">🚗</button>
-                <button type="button" class="avatar-opt-btn" data-avatar="🚙">🚙</button>
-                <button type="button" class="avatar-opt-btn" data-avatar="🛡️">🛡️</button>
-                <button type="button" class="avatar-opt-btn" data-avatar="🌟">🌟</button>
+                <button type="button" class="avatar-opt-btn active" data-avatar="volunteer" title="Amanda (Relief Volunteer)">
+                  <div class="avatar-thumb-wrapper">
+                    <img src="assets/avatars/volunteer.jpg" alt="Amanda" class="avatar-thumb-img">
+                  </div>
+                  <div class="avatar-char-name">Amanda</div>
+                  <div class="avatar-char-role">Volunteer</div>
+                </button>
+                <button type="button" class="avatar-opt-btn" data-avatar="driver" title="Dan (Rescue Driver)">
+                  <div class="avatar-thumb-wrapper">
+                    <img src="assets/avatars/driver.jpg" alt="Dan" class="avatar-thumb-img">
+                  </div>
+                  <div class="avatar-char-name">Dan</div>
+                  <div class="avatar-char-role">Rescue Driver</div>
+                </button>
+                <button type="button" class="avatar-opt-btn" data-avatar="host" title="Uncle Som (Parking Space Host)">
+                  <div class="avatar-thumb-wrapper">
+                    <img src="assets/avatars/host.jpg" alt="Uncle Som" class="avatar-thumb-img">
+                  </div>
+                  <div class="avatar-char-name">Uncle Som</div>
+                  <div class="avatar-char-role">Space Host</div>
+                </button>
+                <button type="button" class="avatar-opt-btn" data-avatar="mechanic" title="Kai (Vehicle Mechanic)">
+                  <div class="avatar-thumb-wrapper">
+                    <img src="assets/avatars/mechanic.jpg" alt="Kai" class="avatar-thumb-img">
+                  </div>
+                  <div class="avatar-char-name">Kai</div>
+                  <div class="avatar-char-role">Mechanic</div>
+                </button>
+                <button type="button" class="avatar-opt-btn" data-avatar="rescuer" title="Maya (Flood Coordinator)">
+                  <div class="avatar-thumb-wrapper">
+                    <img src="assets/avatars/rescuer.jpg" alt="Maya" class="avatar-thumb-img">
+                  </div>
+                  <div class="avatar-char-name">Maya</div>
+                  <div class="avatar-char-role">Coordinator</div>
+                </button>
+                <button type="button" class="avatar-opt-btn" data-avatar="scout" title="Lin (Flood Patrol Scout)">
+                  <div class="avatar-thumb-wrapper">
+                    <img src="assets/avatars/scout.jpg" alt="Lin" class="avatar-thumb-img">
+                  </div>
+                  <div class="avatar-char-name">Lin</div>
+                  <div class="avatar-char-role">Patrol Scout</div>
+                </button>
               </div>
-              <input type="hidden" id="create-profile-avatar" name="avatar" value="👤">
+              <input type="hidden" id="create-profile-avatar" name="avatar" value="volunteer">
             </div>
 
             <button type="submit" id="btn-submit-profile" class="pixel-btn pixel-btn-green" style="width: 100%; padding: 12px; font-size: 1rem; margin-top: 8px;">
@@ -508,17 +543,52 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Avatar</label>
+          <label class="form-label">Choose Character Avatar *</label>
           <div class="avatar-select-grid" id="edit-avatar-picker">
-            <button type="button" class="avatar-opt-btn" data-avatar="👤">👤</button>
-            <button type="button" class="avatar-opt-btn" data-avatar="🧑‍🌾">🧑‍🌾</button>
-            <button type="button" class="avatar-opt-btn" data-avatar="🧑‍🔧">🧑‍🔧</button>
-            <button type="button" class="avatar-opt-btn" data-avatar="🚗">🚗</button>
-            <button type="button" class="avatar-opt-btn" data-avatar="🚙">🚙</button>
-            <button type="button" class="avatar-opt-btn" data-avatar="🛡️">🛡️</button>
-            <button type="button" class="avatar-opt-btn" data-avatar="🌟">🌟</button>
+            <button type="button" class="avatar-opt-btn" data-avatar="volunteer" title="Amanda (Relief Volunteer)">
+              <div class="avatar-thumb-wrapper">
+                <img src="assets/avatars/volunteer.jpg" alt="Amanda" class="avatar-thumb-img">
+              </div>
+              <div class="avatar-char-name">Amanda</div>
+              <div class="avatar-char-role">Volunteer</div>
+            </button>
+            <button type="button" class="avatar-opt-btn" data-avatar="driver" title="Dan (Rescue Driver)">
+              <div class="avatar-thumb-wrapper">
+                <img src="assets/avatars/driver.jpg" alt="Dan" class="avatar-thumb-img">
+              </div>
+              <div class="avatar-char-name">Dan</div>
+              <div class="avatar-char-role">Rescue Driver</div>
+            </button>
+            <button type="button" class="avatar-opt-btn" data-avatar="host" title="Uncle Som (Parking Space Host)">
+              <div class="avatar-thumb-wrapper">
+                <img src="assets/avatars/host.jpg" alt="Uncle Som" class="avatar-thumb-img">
+              </div>
+              <div class="avatar-char-name">Uncle Som</div>
+              <div class="avatar-char-role">Space Host</div>
+            </button>
+            <button type="button" class="avatar-opt-btn" data-avatar="mechanic" title="Kai (Vehicle Mechanic)">
+              <div class="avatar-thumb-wrapper">
+                <img src="assets/avatars/mechanic.jpg" alt="Kai" class="avatar-thumb-img">
+              </div>
+              <div class="avatar-char-name">Kai</div>
+              <div class="avatar-char-role">Mechanic</div>
+            </button>
+            <button type="button" class="avatar-opt-btn" data-avatar="rescuer" title="Maya (Flood Coordinator)">
+              <div class="avatar-thumb-wrapper">
+                <img src="assets/avatars/rescuer.jpg" alt="Maya" class="avatar-thumb-img">
+              </div>
+              <div class="avatar-char-name">Maya</div>
+              <div class="avatar-char-role">Coordinator</div>
+            </button>
+            <button type="button" class="avatar-opt-btn" data-avatar="scout" title="Lin (Flood Patrol Scout)">
+              <div class="avatar-thumb-wrapper">
+                <img src="assets/avatars/scout.jpg" alt="Lin" class="avatar-thumb-img">
+              </div>
+              <div class="avatar-char-name">Lin</div>
+              <div class="avatar-char-role">Patrol Scout</div>
+            </button>
           </div>
-          <input type="hidden" id="edit-profile-avatar" name="avatar" value="👤">
+          <input type="hidden" id="edit-profile-avatar" name="avatar" value="volunteer">
         </div>
 
         <div class="modal-actions">
@@ -833,9 +903,34 @@
       }
 
       // ========================================================
-      // PROFILE CRUD CONTROLLER
+      // PROFILE CRUD CONTROLLER (CHARACTER AVATARS)
       // ========================================================
       let profilesData = {};
+
+      const characterAvatars = {
+        volunteer: { name: 'Amanda', role: 'Relief Volunteer', img: 'assets/avatars/volunteer.jpg' },
+        driver:    { name: 'Dan', role: 'Rescue Driver', img: 'assets/avatars/driver.jpg' },
+        host:      { name: 'Uncle Som', role: 'Parking Space Host', img: 'assets/avatars/host.jpg' },
+        mechanic:  { name: 'Kai', role: 'Vehicle Mechanic', img: 'assets/avatars/mechanic.jpg' },
+        rescuer:   { name: 'Maya', role: 'Flood Coordinator', img: 'assets/avatars/rescuer.jpg' },
+        scout:     { name: 'Lin', role: 'Flood Patrol Scout', img: 'assets/avatars/scout.jpg' }
+      };
+
+      function renderAvatarPortrait(avatarKey) {
+        const char = characterAvatars[avatarKey];
+        if (char) {
+          return `<div class="profile-avatar-portrait"><img src="${char.img}" alt="${char.name}"></div>`;
+        }
+        return `<div class="profile-avatar-portrait"><span class="profile-avatar-fallback">${avatarKey || '👤'}</span></div>`;
+      }
+
+      function getAvatarRoleBadge(avatarKey) {
+        const char = characterAvatars[avatarKey];
+        if (char) {
+          return `<span class="profile-card-role-tag">${char.name} &bull; ${char.role}</span>`;
+        }
+        return '';
+      }
 
       function showProfileAlert(type, message) {
         const el = document.getElementById('profile-action-alert');
@@ -873,12 +968,14 @@
 
             let html = '';
             json.data.forEach(p => {
+              const avatarKey = p.avatar || 'volunteer';
               html += `
                 <div class="profile-card" id="profile-card-${p.id}">
                   <div class="profile-card-left">
-                    <div class="profile-avatar-bubble">${p.avatar || '👤'}</div>
+                    ${renderAvatarPortrait(avatarKey)}
                     <div>
                       <div class="profile-card-name">${p.name}</div>
+                      ${getAvatarRoleBadge(avatarKey)}
                       <div class="profile-card-id">ID: ${p.id}</div>
                     </div>
                   </div>
@@ -929,7 +1026,7 @@
           e.preventDefault();
 
           const name = document.getElementById('create-profile-name').value.trim();
-          const avatar = document.getElementById('create-profile-avatar').value || '👤';
+          const avatar = document.getElementById('create-profile-avatar').value || 'volunteer';
 
           if (!name) {
             showProfileAlert('error', '⚠️ Please enter a profile name.');
@@ -973,10 +1070,11 @@
         document.getElementById('edit-profile-id').value = profile.id;
         document.getElementById('edit-profile-id-display').value = profile.id;
         document.getElementById('edit-profile-name').value = profile.name;
-        document.getElementById('edit-profile-avatar').value = profile.avatar || '👤';
+        const currentAvatar = profile.avatar || 'volunteer';
+        document.getElementById('edit-profile-avatar').value = currentAvatar;
 
         document.querySelectorAll('#edit-avatar-picker .avatar-opt-btn').forEach(b => {
-          if (b.dataset.avatar === (profile.avatar || '👤')) {
+          if (b.dataset.avatar === currentAvatar) {
             b.classList.add('active');
           } else {
             b.classList.remove('active');
@@ -1003,7 +1101,7 @@
 
           const id = document.getElementById('edit-profile-id').value;
           const name = document.getElementById('edit-profile-name').value.trim();
-          const avatar = document.getElementById('edit-profile-avatar').value || '👤';
+          const avatar = document.getElementById('edit-profile-avatar').value || 'volunteer';
 
           if (!name) {
             const alertBox = document.getElementById('edit-profile-alert');
