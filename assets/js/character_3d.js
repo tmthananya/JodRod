@@ -9,7 +9,8 @@
       this.canvas = canvas;
       this.options = Object.assign({
         gender: 'female',
-        hair: 'spiky',
+        feature: 'natural',
+        hair: 'ponytail',
         hairColor: '#261e1b',
         clothes: 'vest',
         clothesColor: '#ea580c',
@@ -94,6 +95,7 @@
       this.buildBaseBody();
       this.buildHair(this.options.hair);
       this.buildClothes(this.options.clothes);
+      this.buildFeature(this.options.feature);
 
       if (this.options.interactive) {
         this.bindEvents();
@@ -142,6 +144,20 @@
         color: 0xf59e0b, // iconic bright flood rescue boots
         roughness: 0.35
       });
+      this.materials.stubble = new THREE.MeshStandardMaterial({
+        color: 0x334155,
+        roughness: 0.8,
+        transparent: true,
+        opacity: 0.7
+      });
+      this.materials.pink = new THREE.MeshStandardMaterial({
+        color: 0xf43f5e,
+        roughness: 0.4
+      });
+      this.materials.yellow = new THREE.MeshStandardMaterial({
+        color: 0xfde047,
+        roughness: 0.4
+      });
     }
 
     buildBaseBody() {
@@ -178,8 +194,9 @@
       hlR.position.set(0.20, 1.67, 0.35);
       bg.add(hlL, hlR);
 
-      // Eyelashes for female model
+      // Gender-specific facial features: Eyebrows, Eyelashes, and Jawline
       if (isFem) {
+        // Delicate feminine eyelashes
         const lashGeo = new THREE.BoxGeometry(0.12, 0.032, 0.06);
         const lashL = new THREE.Mesh(lashGeo, this.materials.dark);
         lashL.position.set(-0.19, 1.72, 0.35);
@@ -188,6 +205,32 @@
         lashR.position.set(0.19, 1.72, 0.35);
         lashR.rotation.z = -0.12;
         bg.add(lashL, lashR);
+
+        // Soft arched feminine eyebrows
+        const browGeo = new THREE.BoxGeometry(0.11, 0.025, 0.05);
+        const browL = new THREE.Mesh(browGeo, this.materials.hair);
+        browL.position.set(-0.18, 1.75, 0.35);
+        browL.rotation.z = 0.06;
+        const browR = new THREE.Mesh(browGeo, this.materials.hair);
+        browR.position.set(0.18, 1.75, 0.35);
+        browR.rotation.z = -0.06;
+        bg.add(browL, browR);
+      } else {
+        // Bold masculine eyebrows
+        const browGeo = new THREE.BoxGeometry(0.14, 0.045, 0.05);
+        const browL = new THREE.Mesh(browGeo, this.materials.hair);
+        browL.position.set(-0.18, 1.74, 0.35);
+        browL.rotation.z = -0.08;
+        const browR = new THREE.Mesh(browGeo, this.materials.hair);
+        browR.position.set(0.18, 1.74, 0.35);
+        browR.rotation.z = 0.08;
+        bg.add(browL, browR);
+
+        // Stronger defined masculine jawline
+        const jawGeo = new THREE.BoxGeometry(0.36, 0.07, 0.05);
+        const jaw = new THREE.Mesh(jawGeo, this.materials.skin);
+        jaw.position.set(0, 1.30, 0.34);
+        bg.add(jaw);
       }
 
       // Cute blush cheeks
@@ -199,7 +242,7 @@
       bg.add(blushL, blushR);
 
       // Smile mouth
-      const mouthGeo = new THREE.BoxGeometry(0.15, 0.04, 0.04);
+      const mouthGeo = new THREE.BoxGeometry(isFem ? 0.13 : 0.15, 0.04, 0.04);
       const mouth = new THREE.Mesh(mouthGeo, this.materials.dark);
       mouth.position.set(0, 1.47, 0.34);
       bg.add(mouth);
@@ -344,6 +387,141 @@
         const fold = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.12, 0.80), beanieMat);
         fold.position.set(0, 1.75, 0);
         hg.add(fold);
+      } else if (style === 'twintails') {
+        // Twin Tails (Female pigtails)
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.32, 0.74), mat);
+        top.position.set(0, 1.86, -0.02);
+        hg.add(top);
+
+        const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.14), mat);
+        fringe.position.set(0, 1.86, 0.34);
+        hg.add(fringe);
+
+        const tailL = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.55, 6), mat);
+        tailL.position.set(-0.45, 1.55, 0.05);
+        tailL.rotation.z = 0.25;
+        const tailR = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.55, 6), mat);
+        tailR.position.set(0.45, 1.55, 0.05);
+        tailR.rotation.z = -0.25;
+        hg.add(tailL, tailR);
+
+        const tieL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), this.materials.clothes);
+        tieL.position.set(-0.40, 1.80, 0.05);
+        const tieR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), this.materials.clothes);
+        tieR.position.set(0.40, 1.80, 0.05);
+        hg.add(tieL, tieR);
+      } else if (style === 'wavy') {
+        // Long Wavy Hair (Female)
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.34, 0.76), mat);
+        top.position.set(0, 1.87, -0.01);
+        hg.add(top);
+
+        const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.15), mat);
+        fringe.position.set(0, 1.86, 0.34);
+        hg.add(fringe);
+
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.85, 0.50), mat);
+        sideL.position.set(-0.39, 1.45, 0.08);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.85, 0.50), mat);
+        sideR.position.set(0.39, 1.45, 0.08);
+        hg.add(sideL, sideR);
+
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.85, 0.18), mat);
+        back.position.set(0, 1.45, -0.34);
+        hg.add(back);
+      } else if (style === 'quiff') {
+        // Quiff / Pompadour (Male)
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.38, 0.72), mat);
+        top.position.set(0, 1.90, -0.02);
+        top.rotation.x = -0.12;
+        hg.add(top);
+
+        const sweep = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.22, 0.25), mat);
+        sweep.position.set(0, 1.95, 0.30);
+        hg.add(sweep);
+
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.30, 0.65), mat);
+        sideL.position.set(-0.38, 1.72, 0);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.30, 0.65), mat);
+        sideR.position.set(0.38, 1.72, 0);
+        hg.add(sideL, sideR);
+      } else if (style === 'buzz') {
+        // Clean Buzz Cut (Male)
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.18, 0.72), mat);
+        top.position.set(0, 1.84, 0);
+        hg.add(top);
+      }
+    }
+
+    buildFeature(feature) {
+      if (this.parts.featureGroup) {
+        this.charGroup.remove(this.parts.featureGroup);
+      }
+
+      const fg = new THREE.Group();
+      this.parts.featureGroup = fg;
+      this.charGroup.add(fg);
+
+      const isFem = this.options.gender === 'female';
+
+      if (isFem) {
+        // Feminine Accents: 'natural', 'ribbon', 'flower', 'headband'
+        if (feature === 'ribbon') {
+          // Cute hair ribbon on top of hair
+          const knot = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), this.materials.pink);
+          knot.position.set(0.24, 1.96, 0.28);
+          fg.add(knot);
+
+          const wingL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.10, 0.04), this.materials.pink);
+          wingL.position.set(0.17, 1.98, 0.28);
+          wingL.rotation.z = 0.4;
+          const wingR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.10, 0.04), this.materials.pink);
+          wingR.position.set(0.31, 1.98, 0.28);
+          wingR.rotation.z = -0.4;
+          fg.add(wingL, wingR);
+        } else if (feature === 'flower') {
+          // Relief flower pin
+          const center = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), this.materials.yellow);
+          center.position.set(-0.36, 1.84, 0.24);
+          fg.add(center);
+
+          for (let i = 0; i < 5; i++) {
+            const angle = (i * Math.PI * 2) / 5;
+            const petal = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 6), this.materials.pink);
+            petal.position.set(-0.36 + Math.cos(angle) * 0.07, 1.84 + Math.sin(angle) * 0.07, 0.24);
+            fg.add(petal);
+          }
+        } else if (feature === 'headband') {
+          // Sport / Safety headband across forehead
+          const band = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.08, 0.72), this.materials.clothes);
+          band.position.set(0, 1.78, 0.02);
+          fg.add(band);
+        }
+      } else {
+        // Male Features: 'clean', 'stubble', 'mustache', 'goatee'
+        if (feature === 'stubble') {
+          // 5 o'clock shadow on chin and lower jaw
+          const shadow = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.18, 0.06), this.materials.stubble);
+          shadow.position.set(0, 1.40, 0.35);
+          fg.add(shadow);
+        } else if (feature === 'mustache') {
+          // Classic rescuer mustache above mouth
+          const stacheGeo = new THREE.BoxGeometry(0.24, 0.06, 0.06);
+          const stache = new THREE.Mesh(stacheGeo, this.materials.hair);
+          stache.position.set(0, 1.51, 0.36);
+          fg.add(stache);
+        } else if (feature === 'goatee') {
+          // Goatee (Mustache + Chin beard)
+          const stacheGeo = new THREE.BoxGeometry(0.22, 0.05, 0.06);
+          const stache = new THREE.Mesh(stacheGeo, this.materials.hair);
+          stache.position.set(0, 1.51, 0.36);
+          fg.add(stache);
+
+          const chinGeo = new THREE.BoxGeometry(0.16, 0.12, 0.06);
+          const chin = new THREE.Mesh(chinGeo, this.materials.hair);
+          chin.position.set(0, 1.36, 0.36);
+          fg.add(chin);
+        }
       }
     }
 
@@ -554,6 +732,9 @@
       if (genderChanged || newOptions.clothes) {
         this.buildClothes(this.options.clothes);
       }
+      if (genderChanged || newOptions.feature) {
+        this.buildFeature(this.options.feature);
+      }
 
       this.render();
     }
@@ -630,6 +811,7 @@
     getConfig() {
       return {
         gender: this.options.gender,
+        feature: this.options.feature,
         hair: this.options.hair,
         hairColor: this.options.hairColor,
         clothes: this.options.clothes,

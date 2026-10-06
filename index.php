@@ -396,18 +396,16 @@
                   </div>
                 </div>
 
-                <!-- Hair Style -->
+                <!-- Gender Feature (Feminine Accent or Facial Feature) -->
+                <div class="customizer-group" id="create-feature-group">
+                  <div class="customizer-label"><span id="create-feature-label">✨ Feminine Accent</span></div>
+                  <div class="customizer-options-row" id="create-feature-options"></div>
+                </div>
+
+                <!-- Hair Style (Dynamically tailored to gender) -->
                 <div class="customizer-group">
                   <div class="customizer-label"><span>💇 Hair Style</span></div>
-                  <div class="customizer-options-row" id="create-hair-styles">
-                    <button type="button" class="customizer-chip-btn active" data-hair="spiky">⚡ Spiky</button>
-                    <button type="button" class="customizer-chip-btn" data-hair="short">✂️ Short</button>
-                    <button type="button" class="customizer-chip-btn" data-hair="bob">💁 Bob</button>
-                    <button type="button" class="customizer-chip-btn" data-hair="ponytail">🎀 Ponytail</button>
-                    <button type="button" class="customizer-chip-btn" data-hair="helmet">👷 Helmet</button>
-                    <button type="button" class="customizer-chip-btn" data-hair="cap">🧢 Cap</button>
-                    <button type="button" class="customizer-chip-btn" data-hair="beanie">🧶 Beanie</button>
-                  </div>
+                  <div class="customizer-options-row" id="create-hair-styles"></div>
                 </div>
 
                 <!-- Hair Color -->
@@ -617,18 +615,16 @@
               </div>
             </div>
 
-            <!-- Hair Style -->
+            <!-- Gender Feature (Feminine Accent or Facial Feature) -->
+            <div class="customizer-group" id="edit-feature-group">
+              <div class="customizer-label"><span id="edit-feature-label">✨ Feminine Accent</span></div>
+              <div class="customizer-options-row" id="edit-feature-options"></div>
+            </div>
+
+            <!-- Hair Style (Dynamically tailored to gender) -->
             <div class="customizer-group">
               <div class="customizer-label"><span>💇 Hair Style</span></div>
-              <div class="customizer-options-row" id="edit-hair-styles">
-                <button type="button" class="customizer-chip-btn" data-hair="spiky">⚡ Spiky</button>
-                <button type="button" class="customizer-chip-btn" data-hair="short">✂️ Short</button>
-                <button type="button" class="customizer-chip-btn" data-hair="bob">💁 Bob</button>
-                <button type="button" class="customizer-chip-btn" data-hair="ponytail">🎀 Ponytail</button>
-                <button type="button" class="customizer-chip-btn" data-hair="helmet">👷 Helmet</button>
-                <button type="button" class="customizer-chip-btn" data-hair="cap">🧢 Cap</button>
-                <button type="button" class="customizer-chip-btn" data-hair="beanie">🧶 Beanie</button>
-              </div>
+              <div class="customizer-options-row" id="edit-hair-styles"></div>
             </div>
 
             <!-- Hair Color -->
@@ -1011,10 +1007,55 @@
       let createChar3D = null;
       let editChar3D = null;
 
+      // Gender-specific hairstyles and features
+      const GENDER_DATA = {
+        female: {
+          defaultHair: 'ponytail',
+          defaultFeature: 'natural',
+          hairstyles: [
+            { id: 'ponytail', label: '🎀 Ponytail' },
+            { id: 'bob', label: '💁 Bob' },
+            { id: 'twintails', label: '👧 Twin Tails' },
+            { id: 'wavy', label: '🌊 Long Wavy' },
+            { id: 'cap', label: '🧢 Cap' },
+            { id: 'beanie', label: '🧶 Beanie' },
+            { id: 'helmet', label: '👷 Helmet' }
+          ],
+          featureLabel: '✨ Feminine Accent',
+          features: [
+            { id: 'natural', label: '🌸 Natural Glow' },
+            { id: 'ribbon', label: '🎀 Hair Ribbon' },
+            { id: 'flower', label: '🌺 Relief Flower' },
+            { id: 'headband', label: '🩱 Sport Headband' }
+          ]
+        },
+        male: {
+          defaultHair: 'spiky',
+          defaultFeature: 'stubble',
+          hairstyles: [
+            { id: 'spiky', label: '⚡ Spiky' },
+            { id: 'short', label: '✂️ Short Crop' },
+            { id: 'quiff', label: '🌪️ Quiff' },
+            { id: 'buzz', label: '🪖 Buzz Cut' },
+            { id: 'cap', label: '🧢 Cap' },
+            { id: 'beanie', label: '🧶 Beanie' },
+            { id: 'helmet', label: '👷 Helmet' }
+          ],
+          featureLabel: '🧔 Facial Feature',
+          features: [
+            { id: 'clean', label: '🪒 Clean Shaven' },
+            { id: 'stubble', label: '🧔 Rescuer Stubble' },
+            { id: 'mustache', label: '👨 Hero Mustache' },
+            { id: 'goatee', label: '🧔‍♂️ Goatee' }
+          ]
+        }
+      };
+
       // Current builder states
       let createCharConfig = {
         gender: 'female',
-        hair: 'spiky',
+        feature: 'natural',
+        hair: 'ponytail',
         hairColor: '#261e1b',
         clothes: 'vest',
         clothesColor: '#ea580c',
@@ -1023,7 +1064,8 @@
 
       let editCharConfig = {
         gender: 'female',
-        hair: 'spiky',
+        feature: 'natural',
+        hair: 'ponytail',
         hairColor: '#261e1b',
         clothes: 'vest',
         clothesColor: '#ea580c',
@@ -1050,26 +1092,81 @@
         }
       }
 
-      function setupCustomizerListeners(prefix, configObj, charInstanceGetter) {
-        // Gender choice
-        document.querySelectorAll(`#${prefix}-gender-options .gender-chip-btn`).forEach(btn => {
-          btn.addEventListener('click', () => {
-            document.querySelectorAll(`#${prefix}-gender-options .gender-chip-btn`).forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            configObj.gender = btn.dataset.gender;
-            const instance = charInstanceGetter();
-            if (instance) instance.updateConfig({ gender: configObj.gender });
-          });
+      function renderGenderDependentControls(prefix, configObj, charInstanceGetter) {
+        const gender = configObj.gender || 'female';
+        const gData = GENDER_DATA[gender] || GENDER_DATA.female;
+
+        // 1. Gender active button
+        document.querySelectorAll(`#${prefix}-gender-options .gender-chip-btn`).forEach(b => {
+          b.classList.toggle('active', b.dataset.gender === gender);
         });
 
-        // Hair styles
-        document.querySelectorAll(`#${prefix}-hair-styles .customizer-chip-btn`).forEach(btn => {
+        // 2. Feature Label and Buttons
+        const featureLabelEl = document.getElementById(`${prefix}-feature-label`);
+        if (featureLabelEl) featureLabelEl.textContent = gData.featureLabel;
+
+        const featureContainer = document.getElementById(`${prefix}-feature-options`);
+        if (featureContainer) {
+          const validFeatureIds = gData.features.map(f => f.id);
+          if (!validFeatureIds.includes(configObj.feature)) {
+            configObj.feature = gData.defaultFeature;
+          }
+          featureContainer.innerHTML = gData.features.map(f => `
+            <button type="button" class="customizer-chip-btn ${f.id === configObj.feature ? 'active' : ''}" data-feature="${f.id}">${f.label}</button>
+          `).join('');
+
+          featureContainer.querySelectorAll('.customizer-chip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              featureContainer.querySelectorAll('.customizer-chip-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              configObj.feature = btn.dataset.feature;
+              const instance = charInstanceGetter();
+              if (instance) instance.updateConfig({ feature: configObj.feature });
+            });
+          });
+        }
+
+        // 3. Hairstyle Buttons
+        const hairContainer = document.getElementById(`${prefix}-hair-styles`);
+        if (hairContainer) {
+          const validHairIds = gData.hairstyles.map(h => h.id);
+          if (!validHairIds.includes(configObj.hair)) {
+            configObj.hair = gData.defaultHair;
+          }
+          hairContainer.innerHTML = gData.hairstyles.map(h => `
+            <button type="button" class="customizer-chip-btn ${h.id === configObj.hair ? 'active' : ''}" data-hair="${h.id}">${h.label}</button>
+          `).join('');
+
+          hairContainer.querySelectorAll('.customizer-chip-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              hairContainer.querySelectorAll('.customizer-chip-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              configObj.hair = btn.dataset.hair;
+              const instance = charInstanceGetter();
+              if (instance) instance.updateConfig({ hair: configObj.hair });
+            });
+          });
+        }
+      }
+
+      function setupCustomizerListeners(prefix, configObj, charInstanceGetter) {
+        // Initial populate of gender-dependent controls
+        renderGenderDependentControls(prefix, configObj, charInstanceGetter);
+
+        // Gender choice click listener
+        document.querySelectorAll(`#${prefix}-gender-options .gender-chip-btn`).forEach(btn => {
           btn.addEventListener('click', () => {
-            document.querySelectorAll(`#${prefix}-hair-styles .customizer-chip-btn`).forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            configObj.hair = btn.dataset.hair;
+            if (configObj.gender === btn.dataset.gender) return;
+            configObj.gender = btn.dataset.gender;
+            renderGenderDependentControls(prefix, configObj, charInstanceGetter);
             const instance = charInstanceGetter();
-            if (instance) instance.updateConfig({ hair: configObj.hair });
+            if (instance) {
+              instance.updateConfig({
+                gender: configObj.gender,
+                hair: configObj.hair,
+                feature: configObj.feature
+              });
+            }
           });
         });
 
@@ -1170,8 +1267,19 @@
             uniform: 'Rescue Uniform',
             hoodie: 'Shelter Hoodie'
           };
+          const featureLabels = {
+            natural: 'Natural',
+            ribbon: 'Ribbon',
+            flower: 'Flower',
+            headband: 'Headband',
+            clean: 'Clean Shaven',
+            stubble: 'Stubble',
+            mustache: 'Mustache',
+            goatee: 'Goatee'
+          };
           const outfitName = outfitLabels[data.clothes] || (data.clothes ? data.clothes.charAt(0).toUpperCase() + data.clothes.slice(1) : 'Rescue');
-          return `<span class="profile-card-specs-tag">${genderIcon} 3D &bull; ${outfitName}</span>`;
+          const featureName = featureLabels[data.feature] ? ` &bull; ${featureLabels[data.feature]}` : '';
+          return `<span class="profile-card-specs-tag">${genderIcon} 3D &bull; ${outfitName}${featureName}</span>`;
         }
         return `<span class="profile-card-specs-tag">🎮 3D Community Member</span>`;
       }
@@ -1266,6 +1374,7 @@
           const snapshot = createChar3D ? createChar3D.getSnapshot(0.82) : '';
           const avatarPayload = JSON.stringify({
             gender: createCharConfig.gender || 'female',
+            feature: createCharConfig.feature || 'natural',
             hair: createCharConfig.hair,
             hairColor: createCharConfig.hairColor,
             clothes: createCharConfig.clothes,
@@ -1303,15 +1412,9 @@
       }
 
       // Sync active UI buttons to a config
-      function syncCustomizerUI(prefix, config) {
-        // Gender
-        document.querySelectorAll(`#${prefix}-gender-options .gender-chip-btn`).forEach(b => {
-          b.classList.toggle('active', b.dataset.gender === (config.gender || 'female'));
-        });
-        // Hair style
-        document.querySelectorAll(`#${prefix}-hair-styles .customizer-chip-btn`).forEach(b => {
-          b.classList.toggle('active', b.dataset.hair === config.hair);
-        });
+      function syncCustomizerUI(prefix, config, charInstanceGetter) {
+        renderGenderDependentControls(prefix, config, charInstanceGetter);
+
         // Hair color
         document.querySelectorAll(`#${prefix}-hair-colors .color-swatch-btn`).forEach(b => {
           b.classList.toggle('active', b.dataset.color.toLowerCase() === config.hairColor.toLowerCase());
@@ -1347,14 +1450,15 @@
         const parsed = parseAvatarData(profile.avatar);
         Object.assign(editCharConfig, {
           gender: 'female',
-          hair: 'spiky',
+          feature: 'natural',
+          hair: 'ponytail',
           hairColor: '#261e1b',
           clothes: 'vest',
           clothesColor: '#ea580c',
           skinColor: '#fed7aa'
         }, parsed || {});
 
-        syncCustomizerUI('edit', editCharConfig);
+        syncCustomizerUI('edit', editCharConfig, () => editChar3D);
 
         const alertBox = document.getElementById('edit-profile-alert');
         if (alertBox) alertBox.style.display = 'none';
@@ -1395,6 +1499,7 @@
           const snapshot = editChar3D ? editChar3D.getSnapshot(0.82) : '';
           const avatarPayload = JSON.stringify({
             gender: editCharConfig.gender || 'female',
+            feature: editCharConfig.feature || 'natural',
             hair: editCharConfig.hair,
             hairColor: editCharConfig.hairColor,
             clothes: editCharConfig.clothes,
