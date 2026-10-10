@@ -12,6 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $_SERVER['REQUEST_METHOD'] !== 'DEL
     exit;
 }
 
+// Stage 1: Enforce backend authentication guard
+$currentUser = require_auth();
+
 $input = json_decode(file_get_contents('php://input'), true);
 $id = trim($input['id'] ?? ($_GET['id'] ?? ''));
 

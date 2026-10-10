@@ -331,7 +331,10 @@ class ParkingMapController {
     try {
       const res = await fetch('api/delete_parking_space.php', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': window.csrfToken || ''
+        },
         body: JSON.stringify({ id: spaceId })
       });
 

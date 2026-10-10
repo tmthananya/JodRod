@@ -807,6 +807,7 @@
       // AUTHENTICATION STATE & CONTROLLER
       // ========================================================
       let currentUser = null;
+      window.csrfToken = '';
       let currentAuthMode = 'login'; // 'login' or 'signup'
 
       const authGate = document.getElementById('auth-gate');
@@ -887,6 +888,9 @@
         try {
           const res = await fetch('api/auth.php?action=user');
           const json = await res.json();
+          if (json && json.csrf_token) {
+            window.csrfToken = json.csrf_token;
+          }
           if (res.ok && json.logged_in && json.user) {
             currentUser = json.user;
           } else {
@@ -922,6 +926,9 @@
           const json = await res.json();
 
           if (res.ok && json.success) {
+            if (json.csrf_token) {
+              window.csrfToken = json.csrf_token;
+            }
             if (json.auto_logged_in || currentAuthMode === 'login') {
               currentUser = json.user;
               document.getElementById('auth-password').value = '';
@@ -945,7 +952,14 @@
       // Handle Logout
       document.getElementById('btn-logout')?.addEventListener('click', async () => {
         try {
-          await fetch('api/auth.php?action=logout', { method: 'POST' });
+          const res = await fetch('api/auth.php?action=logout', {
+            method: 'POST',
+            headers: { 'X-CSRF-Token': window.csrfToken || '' }
+          });
+          const json = await res.json();
+          if (json && json.csrf_token) {
+            window.csrfToken = json.csrf_token;
+          }
         } catch (e) {}
         currentUser = null;
         updateAuthUI();
@@ -1107,7 +1121,10 @@
 
             const response = await fetch('api/create_parking_space.php', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.csrfToken || ''
+              },
               body: JSON.stringify(payload)
             });
 
@@ -1206,7 +1223,10 @@
 
             const response = await fetch('api/update_parking_space.php', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.csrfToken || ''
+              },
               body: JSON.stringify(payload)
             });
 
@@ -1631,7 +1651,10 @@
 
             const res = await fetch('api/create_profile.php', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.csrfToken || ''
+              },
               body: JSON.stringify({ name, avatar: avatarPayload })
             });
 
@@ -1756,7 +1779,10 @@
 
             const res = await fetch('api/update_profile.php', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.csrfToken || ''
+              },
               body: JSON.stringify({ id, name, avatar: avatarPayload })
             });
 
@@ -1799,7 +1825,10 @@
         try {
           const res = await fetch('api/delete_profile.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
             body: JSON.stringify({ id })
           });
 

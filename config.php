@@ -160,3 +160,84 @@ function save_local_data($filename, $data) {
     $path = DATA_DIR . '/' . $filename;
     return file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 }
+
+/**
+ * Safe Session Initializer with strict cookie attributes.
+ */
+function jodrod_session_start() {
+    if (session_status() === PHP_SESSION_NONE) {
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            session_set_cookie_params([
+                'lifetime' => $params['lifetime'],
+                'path'     => $params['path'] ?: '/',
+                'domain'   => $params['domain'],
+                'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+        }
+        session_start();
+    }
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+}
+
+/**
+ * Retrieve current session CSRF token.
+ */
+function get_csrf_token() {
+    jodrod_session_start();
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Stage 1 Backend Authentication & CSRF Guard
+ * Reusable helper that verifies the current PHP session contains an authenticated Supabase user.
+ * On write requests (POST, PATCH, PUT, DELETE), verifies valid X-CSRF-Token header.
+ * Exits immediately with HTTP 401 JSON if unauthenticated or token invalid.
+ *
+ * @return array The authenticated user session array
+ */
+function require_auth() {
+    jodrod_session_start();
+
+    // 1. Verify authenticated user in PHP session
+    if (empty($_SESSION['auth_user']) || empty($_SESSION['access_token'])) {
+        http_response_code(401);
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Unauthorized. Please log in to perform this action.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    // 2. CSRF Token Verification for state-modifying requests
+    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    if (in_array($method, ['POST', 'PATCH', 'PUT', 'DELETE'], true)) {
+        $client_token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        if (empty($client_token) && function_exists('getallheaders')) {
+            $hdrs = getallheaders();
+            foreach ($hdrs as $k => $v) {
+                if (strcasecmp($k, 'X-CSRF-Token') === 0) {
+                    $client_token = $v;
+                    break;
+                }
+            }
+        }
+
+        $server_token = $_SESSION['csrf_token'] ?? '';
+        if (empty($client_token) || empty($server_token) || !hash_equals($server_token, $client_token)) {
+            http_response_code(401);
+            echo json_encode([
+                'success' => false,
+                'error'   => 'Unauthorized. Missing or invalid CSRF token.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+    }
+
+    return $_SESSION['auth_user'];
+}
+

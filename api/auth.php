@@ -7,9 +7,7 @@
 header('Content-Type: application/json; charset=UTF-8');
 require_once __DIR__ . '/../config.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+jodrod_session_start();
 
 $action = strtolower(trim($_GET['action'] ?? ''));
 $method = $_SERVER['REQUEST_METHOD'];
@@ -26,9 +24,10 @@ function auth_response($data, $code = 200) {
 if ($action === 'user' || $action === 'session') {
     if (empty($_SESSION['access_token']) || empty($_SESSION['auth_user'])) {
         auth_response([
-            'success'   => true,
-            'logged_in' => false,
-            'user'      => null
+            'success'    => true,
+            'logged_in'  => false,
+            'user'       => null,
+            'csrf_token' => get_csrf_token()
         ]);
     }
 
@@ -41,9 +40,10 @@ if ($action === 'user' || $action === 'session') {
         // Token is valid and verified by Supabase
         $_SESSION['auth_user'] = $res['data'];
         auth_response([
-            'success'   => true,
-            'logged_in' => true,
-            'user'      => [
+            'success'    => true,
+            'logged_in'  => true,
+            'csrf_token' => get_csrf_token(),
+            'user'       => [
                 'id'    => $res['data']['id'],
                 'email' => $res['data']['email'] ?? ''
             ]
@@ -52,9 +52,10 @@ if ($action === 'user' || $action === 'session') {
         // Expired or invalid token
         unset($_SESSION['auth_user'], $_SESSION['access_token']);
         auth_response([
-            'success'   => true,
-            'logged_in' => false,
-            'user'      => null
+            'success'    => true,
+            'logged_in'  => false,
+            'user'       => null,
+            'csrf_token' => get_csrf_token()
         ]);
     }
 }
@@ -101,6 +102,7 @@ if ($action === 'signup') {
             'success'        => true,
             'auto_logged_in' => true,
             'message'        => 'Account created and logged in successfully!',
+            'csrf_token'     => get_csrf_token(),
             'user'           => [
                 'id'    => $user['id'] ?? '',
                 'email' => $user['email'] ?? $email
@@ -114,6 +116,7 @@ if ($action === 'signup') {
         'auto_logged_in'        => false,
         'requires_confirmation' => true,
         'message'               => 'Account created successfully! Please log in with your email and password.',
+        'csrf_token'            => get_csrf_token(),
         'user'                  => [
             'id'    => $user['id'] ?? '',
             'email' => $user['email'] ?? $email
@@ -170,9 +173,10 @@ if ($action === 'login') {
     $_SESSION['auth_user'] = $data['user'];
 
     auth_response([
-        'success' => true,
-        'message' => 'Logged in successfully.',
-        'user'    => [
+        'success'    => true,
+        'message'    => 'Logged in successfully.',
+        'csrf_token' => get_csrf_token(),
+        'user'       => [
             'id'    => $data['user']['id'] ?? '',
             'email' => $data['user']['email'] ?? $email
         ]
@@ -193,10 +197,12 @@ if ($action === 'logout') {
     if (session_status() === PHP_SESSION_ACTIVE) {
         session_destroy();
     }
+    jodrod_session_start();
 
     auth_response([
-        'success' => true,
-        'message' => 'Logged out successfully.'
+        'success'    => true,
+        'message'    => 'Logged out successfully.',
+        'csrf_token' => get_csrf_token()
     ]);
 }
 
