@@ -207,13 +207,14 @@ assert(strpos($indexAnon['raw_body'], 'window.initialUser = null') !== false, "A
 echo "   [PASS] index.php bootstrap script injects session user and CSRF without race condition.\n\n";
 
 // -----------------------------------------------------------------
-// Step 10: Verify User Does Not Appear in Community List & Left Editor
+// Step 10: Verify User Appears in List Without Edit/Delete Buttons & Left Editor Active
 // -----------------------------------------------------------------
-echo "Step 10: Verifying user is not in community list and left editor controls are configured...\n";
+echo "Step 10: Verifying user appears in community list without edit/delete buttons, and left editor is active...\n";
 $indexContent = $indexWithAuth['raw_body'];
 assert(strpos($indexContent, 'id="my-profile-id"') !== false, "Form must have #my-profile-id hidden field");
 assert(strpos($indexContent, 'id="btn-delete-my-profile"') !== false, "Form must have left delete button");
-assert(strpos($indexContent, 'const communityProfiles = json.data.filter(p => !currentUser || p.user_id !== currentUser.id);') !== false, "Must filter out current user from community list");
-echo "   [PASS] Verified: user is excluded from community list and managed directly via left 3D editor.\n\n";
+assert(strpos($indexContent, 'sortedProfiles') !== false, "Community list must sort and include profiles");
+assert(strpos($indexContent, '${isMe ? \'👤 Your Active Profile\' : \'👤 Community Member\'}') !== false, "User card must have 'Your Active Profile' badge without edit/delete buttons");
+echo "   [PASS] Verified: user profile appears in community list with 'You' badge and no edit/delete buttons, edited directly via left 3D editor.\n\n";
 
 echo "=== ALL PROFILE EDITING & OWNERSHIP TESTS PASSED SUCCESSFULLY ===\n";

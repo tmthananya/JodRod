@@ -5,6 +5,7 @@
  * Retrieves user profiles from public.profiles table.
  */
 header('Content-Type: application/json; charset=UTF-8');
+header('Cache-Control: no-cache, no-store, must-revalidate');
 require_once __DIR__ . '/../config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

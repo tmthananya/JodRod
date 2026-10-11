@@ -1674,7 +1674,7 @@ if (!empty($_SESSION['auth_user'])) {
         const deleteBtn = document.getElementById('btn-delete-my-profile');
 
         try {
-          const res = await fetch('api/get_profiles.php');
+          const res = await fetch('api/get_profiles.php?_t=' + Date.now());
           const json = await res.json();
 
           if (json.success && Array.isArray(json.data)) {
@@ -1731,28 +1731,38 @@ if (!empty($_SESSION['auth_user'])) {
             }
 
             // 2. Sync Right Panel (Community Profiles)
-            // USER REQUIREMENT: Filter out logged-in user from the list
-            const communityProfiles = json.data.filter(p => !currentUser || p.user_id !== currentUser.id);
+            // Displays all profiles with user's own card sorted to top, but without edit/delete buttons
+            const sortedProfiles = [...json.data].sort((a, b) => {
+              const aIsMe = Boolean(currentUser && a.user_id && a.user_id === currentUser.id);
+              const bIsMe = Boolean(currentUser && b.user_id && b.user_id === currentUser.id);
+              if (aIsMe) return -1;
+              if (bIsMe) return 1;
+              return (a.name || '').localeCompare(b.name || '');
+            });
 
             if (countPill) {
-              countPill.textContent = `${communityProfiles.length} ${communityProfiles.length === 1 ? 'Neighbor' : 'Neighbors'}`;
+              countPill.textContent = `${sortedProfiles.length} ${sortedProfiles.length === 1 ? 'Profile' : 'Profiles'}`;
             }
 
             if (!container) return;
 
-            if (communityProfiles.length === 0) {
-              container.innerHTML = '<div class="empty-spaces-notice">No other community members registered yet.</div>';
+            if (sortedProfiles.length === 0) {
+              container.innerHTML = '<div class="empty-spaces-notice">No community members registered yet.</div>';
               return;
             }
 
             let html = '';
-            communityProfiles.forEach(p => {
+            sortedProfiles.forEach(p => {
+              const isMe = Boolean(currentUser && p.user_id && p.user_id === currentUser.id);
               html += `
-                <div class="profile-card" id="profile-card-${p.id}">
+                <div class="profile-card" id="profile-card-${p.id}" style="${isMe ? 'border: 2px solid #3b82f6; background: #f8fafc;' : ''}">
                   <div class="profile-card-left">
                     ${renderAvatarPortrait(p.avatar)}
                     <div>
-                      <div class="profile-card-name">${p.name}</div>
+                      <div class="profile-card-name">
+                        ${p.name}
+                        ${isMe ? '<span class="status-badge status-available" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 6px;">You</span>' : ''}
+                      </div>
                       ${getAvatarSpecsBadge(p.avatar)}
                       <div style="margin-top: 5px;">
                         <span class="profile-clean-id" title="Full UUID: ${p.id} (Click to copy)" onclick="navigator.clipboard?.writeText('${p.id}'); const h = this.querySelector('.id-copy-hint'); if(h) { h.textContent='✓ Copied!'; setTimeout(()=>h.textContent='📋', 1500); }">
@@ -1763,8 +1773,8 @@ if (!empty($_SESSION['auth_user'])) {
                     </div>
                   </div>
                   <div class="profile-card-actions">
-                    <span style="font-size: 0.75rem; color: #64748b; font-weight: 600; padding: 4px 8px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0;">
-                      👤 Community Member
+                    <span style="font-size: 0.75rem; color: ${isMe ? '#2563eb' : '#64748b'}; font-weight: 600; padding: 4px 8px; background: ${isMe ? '#eff6ff' : '#f8fafc'}; border-radius: 4px; border: 1px solid ${isMe ? '#bfdbfe' : '#e2e8f0'};">
+                      ${isMe ? '👤 Your Active Profile' : '👤 Community Member'}
                     </span>
                   </div>
                 </div>
