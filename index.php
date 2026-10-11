@@ -505,134 +505,175 @@ if (!empty($_SESSION['auth_user'])) {
       <div id="profile-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
 
       <div class="actions-grid" style="align-items: start; margin-bottom: 24px;">
-        <!-- Left: My 3D Avatar & Profile Form -->
-        <div class="form-card">
-          <h3 id="create-profile-card-title" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
-            <span>👤</span> My Profile
-          </h3>
-          <p id="create-profile-card-desc" style="font-size: 0.88rem; color: #64748b; margin-bottom: 18px;">
-            Customize your personal 3D avatar and flood rescue display name.
-          </p>
-
-          <form id="create-profile-form" novalidate>
-            <input type="hidden" id="my-profile-id" name="id" value="">
-            <div id="my-profile-badge-bar" style="display: none; align-items: center; justify-content: space-between; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 12px; margin-bottom: 14px;">
-              <span style="font-size: 0.8rem; font-weight: 700; color: #166534;">🟢 Your Active 3D Avatar</span>
-              <span style="font-size: 0.75rem; font-family: monospace; color: #475569;" id="my-profile-id-tag">#...</span>
+        <!-- Left: My 3D Avatar & Profile (View Summary & Dedicated Editor) -->
+        <div class="form-card" id="left-profile-container">
+          <!-- 1. View Mode: Active Profile Summary -->
+          <div id="my-profile-view-box" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
+                <span>👤</span> My Profile
+              </h3>
+              <span class="status-badge status-available" style="font-size: 0.72rem; padding: 3px 8px;">🟢 Active</span>
             </div>
+            <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 16px;">
+              Your active flood parking identity and custom 3D avatar.
+            </p>
 
-            <div class="form-group">
-              <label for="create-profile-name" class="form-label">Full Name or Nickname *</label>
-              <input type="text" id="create-profile-name" name="name" class="form-input" placeholder="e.g. Somsak P." required>
-              <div class="form-help">Your display name for flood parking.</div>
-            </div>
-
-            <!-- 3D Character Customizer -->
-            <div class="form-group">
-              <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
-                <span>🎮 Custom 3D Character</span>
-                <span style="font-size: 0.72rem; color: #0284c7; font-weight: 700;">LIVE 3D VIEWPORT</span>
-              </label>
-
-              <!-- 3D Viewport -->
-              <div class="character-3d-viewport" id="create-3d-viewport">
-                <canvas id="create-character-canvas"></canvas>
-                <div class="viewport-hint">🖱️ Drag to rotate 360°</div>
-                <div class="viewport-badge">3D GAME AVATAR</div>
-              </div>
-
-              <!-- Customizer Controls -->
-              <div class="character-customizer-controls">
-                <!-- Gender Choice -->
-                <div class="customizer-group">
-                  <div class="customizer-label"><span>👤 Character Gender</span></div>
-                  <div class="gender-options-row" id="create-gender-options">
-                    <button type="button" class="gender-chip-btn active" data-gender="female">👩 Female</button>
-                    <button type="button" class="gender-chip-btn" data-gender="male">👨 Male</button>
+            <div class="profile-card" id="my-profile-summary-card" style="border: 2px solid #3b82f6; background: #f8fafc; margin-bottom: 18px; padding: 14px;">
+              <div class="profile-card-left" style="align-items: center; gap: 14px;">
+                <div id="my-profile-view-avatar" style="flex-shrink: 0;"></div>
+                <div style="flex: 1; min-width: 0;">
+                  <div class="profile-card-name" style="font-size: 1.15rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px;">
+                    <span id="my-profile-view-name">...</span>
+                    <span class="status-badge status-available" style="font-size: 0.65rem; padding: 2px 6px;">You</span>
                   </div>
-                </div>
-
-                <!-- Gender Feature (Feminine Accent or Facial Feature) -->
-                <div class="customizer-group" id="create-feature-group">
-                  <div class="customizer-label"><span id="create-feature-label">✨ Feminine Accent</span></div>
-                  <div class="customizer-options-row" id="create-feature-options"></div>
-                </div>
-
-                <!-- Hair Style (Dynamically tailored to gender) -->
-                <div class="customizer-group">
-                  <div class="customizer-label"><span>💇 Hair Style</span></div>
-                  <div class="customizer-options-row" id="create-hair-styles"></div>
-                </div>
-
-                <!-- Hair Color -->
-                <div class="customizer-group">
-                  <div class="customizer-label"><span>🎨 Hair Color</span></div>
-                  <div class="color-swatch-row" id="create-hair-colors">
-                    <button type="button" class="color-swatch-btn active" data-color="#261e1b" style="background: #261e1b;" title="Black"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#5c3a21" style="background: #5c3a21;" title="Brown"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Blonde"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#991b1b" style="background: #991b1b;" title="Red"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Blue"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#94a3b8" style="background: #94a3b8;" title="Silver"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#ec4899" style="background: #ec4899;" title="Pink"></button>
-                  </div>
-                </div>
-
-                <!-- Clothes Style (10 Relief Outfits) -->
-                <div class="customizer-group">
-                  <div class="customizer-label"><span>👕 Clothes / Outfit (10 Styles)</span></div>
-                  <div class="customizer-options-row" id="create-clothes-styles">
-                    <button type="button" class="customizer-chip-btn active" data-clothes="vest">🦺 Rescue Vest</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="jacket">🧥 Flood Jacket</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="raincoat">🌧️ Rain Poncho</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="wetsuit">🤿 Wetsuit</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="parka">❄️ Storm Parka</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="scrubs">🩺 Medic Scrubs</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="overalls">👖 Overalls</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="tee">👕 Casual Tee</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="uniform">🥋 Uniform</button>
-                    <button type="button" class="customizer-chip-btn" data-clothes="hoodie">🥷 Hoodie</button>
-                  </div>
-                </div>
-
-                <!-- Clothes Color -->
-                <div class="customizer-group">
-                  <div class="customizer-label"><span>🌈 Clothes Color</span></div>
-                  <div class="color-swatch-row" id="create-clothes-colors">
-                    <button type="button" class="color-swatch-btn active" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Orange"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#059669" style="background: #059669;" title="Rescue Green"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Navy Blue"></button>
-                  </div>
-                </div>
-
-                <!-- Skin Tone -->
-                <div class="customizer-group">
-                  <div class="customizer-label"><span>🧑‍🦱 Skin Tone</span></div>
-                  <div class="color-swatch-row" id="create-skin-colors">
-                    <button type="button" class="color-swatch-btn" data-color="#ffedd5" style="background: #ffedd5;" title="Fair"></button>
-                    <button type="button" class="color-swatch-btn active" data-color="#fed7aa" style="background: #fed7aa;" title="Warm Peach"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#fcd34d" style="background: #fcd34d;" title="Golden"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Tan"></button>
-                    <button type="button" class="color-swatch-btn" data-color="#78350f" style="background: #78350f;" title="Deep"></button>
+                  <div id="my-profile-view-specs" style="margin-top: 5px;"></div>
+                  <div style="margin-top: 6px;">
+                    <span class="profile-clean-id" id="my-profile-view-id-badge" style="font-size: 0.75rem;">
+                      <span class="id-hash">#</span><span id="my-profile-view-id-text">...</span>
+                    </span>
                   </div>
                 </div>
               </div>
-
-              <input type="hidden" id="create-profile-avatar" name="avatar">
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-              <button type="submit" id="btn-submit-profile" class="pixel-btn pixel-btn-green" style="flex: 1; padding: 12px; font-size: 1rem;">
-                <span>💾</span> Save Changes
-              </button>
-              <button type="button" id="btn-delete-my-profile" class="pixel-btn pixel-btn-sm pixel-btn-red" style="display: none; padding: 12px 14px;" title="Permanently delete your profile">
-                🗑️ Delete
-              </button>
-            </div>
-          </form>
+            <button type="button" id="btn-open-my-profile-editor" class="pixel-btn pixel-btn-blue" style="width: 100%; padding: 12px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <span>✏️</span> Edit My Profile
+            </button>
+          </div>
+
+          <!-- 2. Editor Mode: Editable details form -->
+          <div id="my-profile-editor-box">
+            <h3 id="create-profile-card-title" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+              <span>👤</span> My Profile
+            </h3>
+            <p id="create-profile-card-desc" style="font-size: 0.88rem; color: #64748b; margin-bottom: 18px;">
+              Customize your personal 3D avatar and flood rescue display name.
+            </p>
+
+            <form id="create-profile-form" novalidate>
+              <input type="hidden" id="my-profile-id" name="id" value="">
+              <div id="my-profile-badge-bar" style="display: none; align-items: center; justify-content: space-between; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 12px; margin-bottom: 14px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #166534;">🟢 Editing Your Active Profile</span>
+                <span style="font-size: 0.75rem; font-family: monospace; color: #475569;" id="my-profile-id-tag">#...</span>
+              </div>
+
+              <div class="form-group">
+                <label for="create-profile-name" class="form-label">Full Name or Nickname *</label>
+                <input type="text" id="create-profile-name" name="name" class="form-input" placeholder="e.g. Somsak P." required>
+                <div class="form-help">Your display name for flood parking.</div>
+              </div>
+
+              <!-- 3D Character Customizer -->
+              <div class="form-group">
+                <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>🎮 Custom 3D Character</span>
+                  <span style="font-size: 0.72rem; color: #0284c7; font-weight: 700;">LIVE 3D VIEWPORT</span>
+                </label>
+
+                <!-- 3D Viewport -->
+                <div class="character-3d-viewport" id="create-3d-viewport">
+                  <canvas id="create-character-canvas"></canvas>
+                  <div class="viewport-hint">🖱️ Drag to rotate 360°</div>
+                  <div class="viewport-badge">3D GAME AVATAR</div>
+                </div>
+
+                <!-- Customizer Controls -->
+                <div class="character-customizer-controls">
+                  <!-- Gender Choice -->
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>👤 Character Gender</span></div>
+                    <div class="gender-options-row" id="create-gender-options">
+                      <button type="button" class="gender-chip-btn active" data-gender="female">👩 Female</button>
+                      <button type="button" class="gender-chip-btn" data-gender="male">👨 Male</button>
+                    </div>
+                  </div>
+
+                  <!-- Gender Feature (Feminine Accent or Facial Feature) -->
+                  <div class="customizer-group" id="create-feature-group">
+                    <div class="customizer-label"><span id="create-feature-label">✨ Feminine Accent</span></div>
+                    <div class="customizer-options-row" id="create-feature-options"></div>
+                  </div>
+
+                  <!-- Hair Style (Dynamically tailored to gender) -->
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>💇 Hair Style</span></div>
+                    <div class="customizer-options-row" id="create-hair-styles"></div>
+                  </div>
+
+                  <!-- Hair Color -->
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>🎨 Hair Color</span></div>
+                    <div class="color-swatch-row" id="create-hair-colors">
+                      <button type="button" class="color-swatch-btn active" data-color="#261e1b" style="background: #261e1b;" title="Black"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#5c3a21" style="background: #5c3a21;" title="Brown"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Blonde"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#991b1b" style="background: #991b1b;" title="Red"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Blue"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#94a3b8" style="background: #94a3b8;" title="Silver"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#ec4899" style="background: #ec4899;" title="Pink"></button>
+                    </div>
+                  </div>
+
+                  <!-- Clothes Style (10 Relief Outfits) -->
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>👕 Clothes / Outfit (10 Styles)</span></div>
+                    <div class="customizer-options-row" id="create-clothes-styles">
+                      <button type="button" class="customizer-chip-btn active" data-clothes="vest">🦺 Rescue Vest</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="jacket">🧥 Flood Jacket</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="raincoat">🌧️ Rain Poncho</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="wetsuit">🤿 Wetsuit</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="parka">❄️ Storm Parka</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="scrubs">🩺 Medic Scrubs</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="overalls">👖 Overalls</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="tee">👕 Casual Tee</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="uniform">🥋 Uniform</button>
+                      <button type="button" class="customizer-chip-btn" data-clothes="hoodie">🥷 Hoodie</button>
+                    </div>
+                  </div>
+
+                  <!-- Clothes Color -->
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>🌈 Clothes Color</span></div>
+                    <div class="color-swatch-row" id="create-clothes-colors">
+                      <button type="button" class="color-swatch-btn active" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Orange"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#059669" style="background: #059669;" title="Rescue Green"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Navy Blue"></button>
+                    </div>
+                  </div>
+
+                  <!-- Skin Tone -->
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>🧑‍🦱 Skin Tone</span></div>
+                    <div class="color-swatch-row" id="create-skin-colors">
+                      <button type="button" class="color-swatch-btn" data-color="#ffedd5" style="background: #ffedd5;" title="Fair"></button>
+                      <button type="button" class="color-swatch-btn active" data-color="#fed7aa" style="background: #fed7aa;" title="Warm Peach"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#fcd34d" style="background: #fcd34d;" title="Golden"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Tan"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#78350f" style="background: #78350f;" title="Deep"></button>
+                    </div>
+                  </div>
+                </div>
+
+                <input type="hidden" id="create-profile-avatar" name="avatar">
+              </div>
+
+              <div style="display: flex; gap: 10px; margin-top: 14px;">
+                <button type="submit" id="btn-submit-profile" class="pixel-btn pixel-btn-green" style="flex: 1; padding: 12px; font-size: 1rem;">
+                  <span>💾</span> Save
+                </button>
+                <button type="button" id="btn-cancel-profile-edit" class="pixel-btn pixel-btn-sm" style="display: none; padding: 12px 18px; background: #f1f5f9; border-color: #cbd5e1; color: #475569;">
+                  Cancel
+                </button>
+                <button type="button" id="btn-delete-my-profile" class="pixel-btn pixel-btn-sm pixel-btn-red" style="display: none; padding: 12px 14px;" title="Permanently delete your profile">
+                  🗑️ Delete
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <!-- Right: Profiles List (View Profile) -->
@@ -717,142 +758,6 @@ if (!empty($_SESSION['auth_user'])) {
         <div class="modal-actions">
           <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-edit">Cancel</button>
           <button type="submit" class="pixel-btn pixel-btn-green" id="btn-save-edit-space">
-            <span>💾</span> Save Changes
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       EDIT PROFILE MODAL DIALOG
-       Strictly allows editing ONLY:
-       - Name
-       - Avatar
-       Record ID is fixed / non-editable.
-       ======================================================== -->
-  <div id="edit-profile-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-profile-modal-title">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <h3 id="edit-profile-modal-title" class="modal-title"><span>✏️</span> Edit Profile</h3>
-        <button type="button" class="modal-close-btn" id="btn-close-edit-profile-modal" title="Close">&times;</button>
-      </div>
-
-      <div id="edit-profile-alert" class="alert-message" role="alert" style="display: none;"></div>
-
-      <form id="edit-profile-form" novalidate>
-        <!-- Record ID (Cleaner Monospace ID Badge) -->
-        <input type="hidden" id="edit-profile-id" name="id">
-        <div class="clean-id-badge-container">
-          <span class="clean-id-badge-label">MEMBER ID</span>
-          <span class="clean-id-badge-value" id="edit-profile-id-display">#...</span>
-        </div>
-
-        <div class="form-group">
-          <label for="edit-profile-name" class="form-label">Full Name or Nickname *</label>
-          <input type="text" id="edit-profile-name" name="name" class="form-input" required>
-        </div>
-
-        <!-- 3D Character Customizer for Edit -->
-        <div class="form-group">
-          <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
-            <span>🎮 Custom 3D Character</span>
-            <span style="font-size: 0.72rem; color: #0284c7; font-weight: 700;">LIVE 3D VIEWPORT</span>
-          </label>
-
-          <!-- 3D Viewport in Edit Modal -->
-          <div class="character-3d-viewport" id="edit-3d-viewport">
-            <canvas id="edit-character-canvas"></canvas>
-            <div class="viewport-hint">🖱️ Drag to rotate 360°</div>
-            <div class="viewport-badge">3D GAME AVATAR</div>
-          </div>
-
-          <!-- Edit Customizer Controls -->
-          <div class="character-customizer-controls">
-            <!-- Gender Choice -->
-            <div class="customizer-group">
-              <div class="customizer-label"><span>👤 Character Gender</span></div>
-              <div class="gender-options-row" id="edit-gender-options">
-                <button type="button" class="gender-chip-btn" data-gender="female">👩 Female</button>
-                <button type="button" class="gender-chip-btn" data-gender="male">👨 Male</button>
-              </div>
-            </div>
-
-            <!-- Gender Feature (Feminine Accent or Facial Feature) -->
-            <div class="customizer-group" id="edit-feature-group">
-              <div class="customizer-label"><span id="edit-feature-label">✨ Feminine Accent</span></div>
-              <div class="customizer-options-row" id="edit-feature-options"></div>
-            </div>
-
-            <!-- Hair Style (Dynamically tailored to gender) -->
-            <div class="customizer-group">
-              <div class="customizer-label"><span>💇 Hair Style</span></div>
-              <div class="customizer-options-row" id="edit-hair-styles"></div>
-            </div>
-
-            <!-- Hair Color -->
-            <div class="customizer-group">
-              <div class="customizer-label"><span>🎨 Hair Color</span></div>
-              <div class="color-swatch-row" id="edit-hair-colors">
-                <button type="button" class="color-swatch-btn" data-color="#261e1b" style="background: #261e1b;" title="Black"></button>
-                <button type="button" class="color-swatch-btn" data-color="#5c3a21" style="background: #5c3a21;" title="Brown"></button>
-                <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Blonde"></button>
-                <button type="button" class="color-swatch-btn" data-color="#991b1b" style="background: #991b1b;" title="Red"></button>
-                <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Blue"></button>
-                <button type="button" class="color-swatch-btn" data-color="#94a3b8" style="background: #94a3b8;" title="Silver"></button>
-                <button type="button" class="color-swatch-btn" data-color="#ec4899" style="background: #ec4899;" title="Pink"></button>
-              </div>
-            </div>
-
-            <!-- Clothes Style (10 Relief Outfits) -->
-            <div class="customizer-group">
-              <div class="customizer-label"><span>👕 Clothes / Outfit (10 Styles)</span></div>
-              <div class="customizer-options-row" id="edit-clothes-styles">
-                <button type="button" class="customizer-chip-btn" data-clothes="vest">🦺 Rescue Vest</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="jacket">🧥 Flood Jacket</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="raincoat">🌧️ Rain Poncho</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="wetsuit">🤿 Wetsuit</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="parka">❄️ Storm Parka</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="scrubs">🩺 Medic Scrubs</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="overalls">👖 Overalls</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="tee">👕 Casual Tee</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="uniform">🥋 Uniform</button>
-                <button type="button" class="customizer-chip-btn" data-clothes="hoodie">🥷 Hoodie</button>
-              </div>
-            </div>
-
-            <!-- Clothes Color -->
-            <div class="customizer-group">
-              <div class="customizer-label"><span>🌈 Clothes Color</span></div>
-              <div class="color-swatch-row" id="edit-clothes-colors">
-                <button type="button" class="color-swatch-btn" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Orange"></button>
-                <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
-                <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
-                <button type="button" class="color-swatch-btn" data-color="#059669" style="background: #059669;" title="Rescue Green"></button>
-                <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
-                <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Navy Blue"></button>
-              </div>
-            </div>
-
-            <!-- Skin Tone -->
-            <div class="customizer-group">
-              <div class="customizer-label"><span>🧑‍🦱 Skin Tone</span></div>
-              <div class="color-swatch-row" id="edit-skin-colors">
-                <button type="button" class="color-swatch-btn" data-color="#ffedd5" style="background: #ffedd5;" title="Fair"></button>
-                <button type="button" class="color-swatch-btn" data-color="#fed7aa" style="background: #fed7aa;" title="Warm Peach"></button>
-                <button type="button" class="color-swatch-btn" data-color="#fcd34d" style="background: #fcd34d;" title="Golden"></button>
-                <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Tan"></button>
-                <button type="button" class="color-swatch-btn" data-color="#78350f" style="background: #78350f;" title="Deep"></button>
-              </div>
-            </div>
-          </div>
-
-          <input type="hidden" id="edit-profile-avatar" name="avatar">
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-edit-profile">Cancel</button>
-          <button type="submit" class="pixel-btn pixel-btn-green" id="btn-save-edit-profile">
             <span>💾</span> Save Changes
           </button>
         </div>
@@ -1661,9 +1566,13 @@ if (!empty($_SESSION['auth_user'])) {
         el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
+      let isEditingProfile = false;
+
       async function loadProfiles() {
         const container = document.getElementById('profiles-list-container');
         const countPill = document.getElementById('profile-count-pill');
+        const viewBox = document.getElementById('my-profile-view-box');
+        const editorBox = document.getElementById('my-profile-editor-box');
         const createTitle = document.getElementById('create-profile-card-title');
         const createDesc = document.getElementById('create-profile-card-desc');
         const idInput = document.getElementById('my-profile-id');
@@ -1671,7 +1580,13 @@ if (!empty($_SESSION['auth_user'])) {
         const badgeBar = document.getElementById('my-profile-badge-bar');
         const idTag = document.getElementById('my-profile-id-tag');
         const submitBtn = document.getElementById('btn-submit-profile');
+        const cancelBtn = document.getElementById('btn-cancel-profile-edit');
         const deleteBtn = document.getElementById('btn-delete-my-profile');
+
+        const viewAvatar = document.getElementById('my-profile-view-avatar');
+        const viewName = document.getElementById('my-profile-view-name');
+        const viewSpecs = document.getElementById('my-profile-view-specs');
+        const viewIdText = document.getElementById('my-profile-view-id-text');
 
         try {
           const res = await fetch('api/get_profiles.php?_t=' + Date.now());
@@ -1687,18 +1602,24 @@ if (!empty($_SESSION['auth_user'])) {
               }
             });
 
-            // 1. Sync Left Panel (My Profile & 3D Avatar)
+            // 1. Sync Left Panel (My Profile: View Summary & Dedicated Editor)
             if (myProfile) {
-              if (createTitle) createTitle.innerHTML = '<span>👤</span> My Profile';
-              if (createDesc) createDesc.textContent = 'Customize your personal 3D avatar and flood rescue display name.';
+              // Populate View Mode
+              if (viewName) viewName.textContent = myProfile.name;
+              if (viewAvatar) viewAvatar.innerHTML = renderAvatarPortrait(myProfile.avatar);
+              if (viewSpecs) viewSpecs.innerHTML = getAvatarSpecsBadge(myProfile.avatar);
+              if (viewIdText) viewIdText.textContent = `${myProfile.id.slice(0, 8)} (${myProfile.id.slice(-4)})`;
+
+              // Populate Editor Mode fields
               if (idInput) idInput.value = myProfile.id;
               if (nameInput) nameInput.value = myProfile.name;
               if (badgeBar) badgeBar.style.display = 'flex';
               if (idTag) idTag.textContent = `#${myProfile.id.slice(0, 8)} (${myProfile.id.slice(-4)})`;
-              if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save Changes';
+              if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save';
+              if (cancelBtn) cancelBtn.style.display = 'inline-block';
               if (deleteBtn) deleteBtn.style.display = 'inline-block';
 
-              // Load user's saved avatar config into left 3D canvas
+              // Load user's saved avatar config into customizer
               const defaultCharConfig = {
                 gender: 'female',
                 feature: 'natural',
@@ -1715,23 +1636,45 @@ if (!empty($_SESSION['auth_user'])) {
               });
               if (parsed.snapshot) createCharConfig.snapshot = parsed.snapshot;
 
+              if (isEditingProfile) {
+                if (viewBox) viewBox.style.display = 'none';
+                if (editorBox) editorBox.style.display = 'block';
+                if (createTitle) createTitle.innerHTML = '<span>✏️</span> Edit My Profile';
+                if (createDesc) createDesc.textContent = 'Modify your display name, 3D avatar, and relief style.';
+                syncCustomizerUI('create', createCharConfig, () => createChar3D);
+                if (createChar3D) {
+                  createChar3D.updateConfig(createCharConfig);
+                } else {
+                  setTimeout(initCreate3D, 150);
+                }
+              } else {
+                if (viewBox) viewBox.style.display = 'block';
+                if (editorBox) editorBox.style.display = 'none';
+              }
+            } else {
+              // User does not have a profile yet: Show create form directly
+              isEditingProfile = false;
+              if (viewBox) viewBox.style.display = 'none';
+              if (editorBox) editorBox.style.display = 'block';
+              if (createTitle) createTitle.innerHTML = '<span>➕</span> Create My Profile';
+              if (createDesc) createDesc.textContent = 'Customize your 3D avatar and set your display name for flood parking.';
+              if (idInput) idInput.value = '';
+              if (badgeBar) badgeBar.style.display = 'none';
+              if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save';
+              if (cancelBtn) cancelBtn.style.display = 'none';
+              if (deleteBtn) deleteBtn.style.display = 'none';
+
               syncCustomizerUI('create', createCharConfig, () => createChar3D);
               if (createChar3D) {
                 createChar3D.updateConfig(createCharConfig);
               } else {
                 setTimeout(initCreate3D, 150);
               }
-            } else {
-              if (createTitle) createTitle.innerHTML = '<span>➕</span> Create Profile';
-              if (createDesc) createDesc.textContent = 'Add a new member profile to the community.';
-              if (idInput) idInput.value = '';
-              if (badgeBar) badgeBar.style.display = 'none';
-              if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save Profile';
-              if (deleteBtn) deleteBtn.style.display = 'none';
             }
 
             // 2. Sync Right Panel (Community Profiles)
-            // Displays all profiles with user's own card sorted to top, but without edit/delete buttons
+            // Displays public profile info. Current user appears at top with "You" badge.
+            // Other members are strictly view-only with NO edit or delete controls.
             const sortedProfiles = [...json.data].sort((a, b) => {
               const aIsMe = Boolean(currentUser && a.user_id && a.user_id === currentUser.id);
               const bIsMe = Boolean(currentUser && b.user_id && b.user_id === currentUser.id);
@@ -1791,7 +1734,55 @@ if (!empty($_SESSION['auth_user'])) {
 
       loadProfiles();
 
-      // Profile Form Submit (Handles both Create and Update seamlessly on the left)
+      // "Edit My Profile" button handler (Opens editable details on the left)
+      const btnOpenMyProfileEditor = document.getElementById('btn-open-my-profile-editor');
+      if (btnOpenMyProfileEditor) {
+        btnOpenMyProfileEditor.addEventListener('click', () => {
+          isEditingProfile = true;
+          const viewBox = document.getElementById('my-profile-view-box');
+          const editorBox = document.getElementById('my-profile-editor-box');
+          const createTitle = document.getElementById('create-profile-card-title');
+          const createDesc = document.getElementById('create-profile-card-desc');
+          const cancelBtn = document.getElementById('btn-cancel-profile-edit');
+          const deleteBtn = document.getElementById('btn-delete-my-profile');
+          const submitBtn = document.getElementById('btn-submit-profile');
+
+          if (viewBox) viewBox.style.display = 'none';
+          if (editorBox) editorBox.style.display = 'block';
+          if (createTitle) createTitle.innerHTML = '<span>✏️</span> Edit My Profile';
+          if (createDesc) createDesc.textContent = 'Modify your display name, 3D avatar, and relief style.';
+          if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save';
+          if (cancelBtn) cancelBtn.style.display = 'inline-block';
+          if (deleteBtn) deleteBtn.style.display = 'inline-block';
+
+          syncCustomizerUI('create', createCharConfig, () => createChar3D);
+          if (createChar3D) {
+            createChar3D.updateConfig(createCharConfig);
+            if (typeof createChar3D.handleResize === 'function') {
+              createChar3D.handleResize();
+            }
+          } else {
+            setTimeout(initCreate3D, 150);
+          }
+
+          const nameEl = document.getElementById('create-profile-name');
+          if (nameEl) nameEl.focus();
+        });
+      }
+
+      // "Cancel" button handler (Returns to view mode)
+      const btnCancelProfileEdit = document.getElementById('btn-cancel-profile-edit');
+      if (btnCancelProfileEdit) {
+        btnCancelProfileEdit.addEventListener('click', () => {
+          isEditingProfile = false;
+          const viewBox = document.getElementById('my-profile-view-box');
+          const editorBox = document.getElementById('my-profile-editor-box');
+          if (viewBox) viewBox.style.display = 'block';
+          if (editorBox) editorBox.style.display = 'none';
+        });
+      }
+
+      // Profile Form Submit (Validates and saves changes to Supabase)
       const createProfileForm = document.getElementById('create-profile-form');
       if (createProfileForm) {
         createProfileForm.addEventListener('submit', async (e) => {
@@ -1843,9 +1834,10 @@ if (!empty($_SESSION['auth_user'])) {
             const json = await res.json();
             if (res.ok && json.success) {
               const msg = isUpdate
-                ? `✅ <strong>Profile Updated!</strong> Changes saved for "${json.data.name}".`
+                ? `✅ <strong>Profile Saved!</strong> Updated changes for "${json.data.name}".`
                 : `🎉 <strong>Profile Created Successfully!</strong> Welcome, ${json.data.name}!`;
               showProfileAlert('success', msg);
+              isEditingProfile = false;
               await loadProfiles();
             } else {
               showProfileAlert('error', `❌ <strong>Failed to save profile:</strong> ${json.error || 'Server error'}`);
@@ -1854,7 +1846,7 @@ if (!empty($_SESSION['auth_user'])) {
             showProfileAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
           } finally {
             btn.disabled = false;
-            btn.innerHTML = isUpdate ? '<span>💾</span> Save Changes' : '<span>💾</span> Save Profile';
+            btn.innerHTML = '<span>💾</span> Save';
           }
         });
       }
@@ -1876,7 +1868,7 @@ if (!empty($_SESSION['auth_user'])) {
 
             const res = await fetch('api/delete_profile.php', {
               method: 'POST',
-              headers: {
+              headers: { 
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': window.csrfToken || ''
               },
@@ -1887,6 +1879,7 @@ if (!empty($_SESSION['auth_user'])) {
               showProfileAlert('success', `🗑️ <strong>Profile Deleted!</strong> Your profile has been removed.`);
               document.getElementById('my-profile-id').value = '';
               document.getElementById('create-profile-name').value = '';
+              isEditingProfile = false;
               await loadProfiles();
             } else {
               showProfileAlert('error', `❌ <strong>Failed to delete profile:</strong> ${json.error || 'Server error'}`);
@@ -1922,167 +1915,20 @@ if (!empty($_SESSION['auth_user'])) {
         });
       }
 
-      // Open Edit Profile Modal
+      // Safe Profile Edit Trigger (Directs to the Left Editor ONLY if target is user's own profile)
       function openEditProfileModal(id) {
         const profile = profilesData[id];
         if (!profile) return;
 
         if (!currentUser || !profile.user_id || profile.user_id !== currentUser.id) {
-          showProfileAlert('error', '⚠️ Forbidden: You do not have permission to edit this profile.');
+          showProfileAlert('error', '⚠️ Forbidden: You can edit only your own profile.');
           return;
         }
 
-        document.getElementById('edit-profile-id').value = profile.id;
-        const displayEl = document.getElementById('edit-profile-id-display');
-        if (displayEl) {
-          displayEl.textContent = `#${profile.id.slice(0, 8)} (${profile.id.slice(-4)})`;
-          displayEl.title = `Full UUID: ${profile.id}`;
-        }
-        document.getElementById('edit-profile-name').value = profile.name;
-
-        // Parse saved avatar config or defaults into shared object
-        const defaultCharConfig = {
-          gender: 'female',
-          feature: 'natural',
-          hair: 'ponytail',
-          hairColor: '#261e1b',
-          clothes: 'vest',
-          clothesColor: '#ea580c',
-          skinColor: '#fed7aa'
-        };
-        const parsed = parseAvatarData(profile.avatar) || {};
-        Object.assign(editCharConfig, defaultCharConfig);
-        Object.keys(defaultCharConfig).forEach(k => {
-          if (parsed[k]) editCharConfig[k] = parsed[k];
-        });
-        if (parsed.snapshot) editCharConfig.snapshot = parsed.snapshot;
-
-        syncCustomizerUI('edit', editCharConfig, () => editChar3D);
-
-        const alertBox = document.getElementById('edit-profile-alert');
-        if (alertBox) alertBox.style.display = 'none';
-
-        const modal = document.getElementById('edit-profile-modal');
-        if (modal) modal.classList.add('active');
-
-        if (editChar3D) {
-          editChar3D.updateConfig(editCharConfig);
-        } else {
-          setTimeout(initEdit3D, 150);
-        }
-      }
-
-      function closeEditProfileModal() {
-        const modal = document.getElementById('edit-profile-modal');
-        if (modal) modal.classList.remove('active');
-      }
-
-      // Edit Profile Submit
-      const editProfileForm = document.getElementById('edit-profile-form');
-      if (editProfileForm) {
-        editProfileForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-
-          const id = document.getElementById('edit-profile-id').value;
-          const name = document.getElementById('edit-profile-name').value.trim();
-
-          if (!name) {
-            const alertBox = document.getElementById('edit-profile-alert');
-            alertBox.className = 'alert-message error';
-            alertBox.innerHTML = '⚠️ Please enter a profile name.';
-            alertBox.style.display = 'block';
-            return;
-          }
-
-          // Generate snapshot from edit viewport
-          const snapshot = editChar3D ? editChar3D.getSnapshot(0.82) : '';
-          const avatarPayload = JSON.stringify({
-            gender: editCharConfig.gender || 'female',
-            feature: editCharConfig.feature || 'natural',
-            hair: editCharConfig.hair,
-            hairColor: editCharConfig.hairColor,
-            clothes: editCharConfig.clothes,
-            clothesColor: editCharConfig.clothesColor,
-            skinColor: editCharConfig.skinColor,
-            snapshot: snapshot
-          });
-
-          const btn = document.getElementById('btn-save-edit-profile');
-          try {
-            btn.disabled = true;
-            btn.innerHTML = '<span>⏳</span> Saving...';
-
-            const res = await fetch('api/update_profile.php', {
-              method: 'POST',
-              headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': window.csrfToken || ''
-              },
-              body: JSON.stringify({ id, name, avatar: avatarPayload })
-            });
-
-            const json = await res.json();
-            if (res.ok && json.success) {
-              const alertBox = document.getElementById('edit-profile-alert');
-              alertBox.className = 'alert-message success';
-              alertBox.innerHTML = `✅ <strong>Profile Updated!</strong> Changes saved for "${json.data.name}".`;
-              alertBox.style.display = 'block';
-
-              await loadProfiles();
-              setTimeout(() => {
-                closeEditProfileModal();
-              }, 1200);
-            } else {
-              const alertBox = document.getElementById('edit-profile-alert');
-              alertBox.className = 'alert-message error';
-              alertBox.innerHTML = `❌ <strong>Failed to update:</strong> ${json.error || 'Server error'}`;
-              alertBox.style.display = 'block';
-            }
-          } catch (err) {
-            const alertBox = document.getElementById('edit-profile-alert');
-            alertBox.className = 'alert-message error';
-            alertBox.innerHTML = `❌ <strong>Network error:</strong> ${err.message}`;
-            alertBox.style.display = 'block';
-          } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<span>💾</span> Save Changes';
-          }
-        });
-      }
-
-      // Delete Profile Handler
-      async function deleteProfile(id, name) {
-        if (!id) return;
-
-        const profile = profilesData[id];
-        if (!currentUser || !profile || !profile.user_id || profile.user_id !== currentUser.id) {
-          showProfileAlert('error', '⚠️ Forbidden: You do not have permission to delete this profile.');
-          return;
-        }
-
-        const displayName = name || 'this profile';
-        const confirmed = window.confirm(`Are you sure you want to delete profile "${displayName}"?\n\nThis will permanently delete the record from Supabase.`);
-        if (!confirmed) return;
-
-        try {
-          const res = await fetch('api/delete_profile.php', {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'X-CSRF-Token': window.csrfToken || ''
-            },
-            body: JSON.stringify({ id })
-          });
-
-          const json = await res.json();
-          if (res.ok && json.success) {
-            showProfileAlert('success', `🗑️ <strong>Profile Deleted!</strong> "${displayName}" has been permanently removed from Supabase.`);
-            await loadProfiles();
-          } else {
-            showProfileAlert('error', `❌ <strong>Failed to delete profile:</strong> ${json.error || 'Server error'}`);
-          }
-        } catch (err) {
-          showProfileAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+        const openBtn = document.getElementById('btn-open-my-profile-editor');
+        if (openBtn) {
+          openBtn.click();
+          openBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }
 
@@ -2360,7 +2206,7 @@ if (!empty($_SESSION['auth_user'])) {
         }
       }
 
-      // Delegated events for Edit and Delete buttons on profile cards, cars, and reservations
+      // Delegated events for cars, reservations, and profile actions
       document.body.addEventListener('click', (e) => {
         const editBtn = e.target.closest('.btn-edit-profile');
         if (editBtn) {
@@ -2390,10 +2236,6 @@ if (!empty($_SESSION['auth_user'])) {
           if (window.parkingMap && window.parkingMap.map) {
             window.parkingMap.map.flyTo([lat, lng], 15, { duration: 1.0 });
           }
-        }
-
-        if (e.target.closest('#btn-close-edit-profile-modal') || e.target.closest('#btn-cancel-edit-profile')) {
-          closeEditProfileModal();
         }
       });
     });
