@@ -40,6 +40,13 @@ if ($name === '') {
     exit;
 }
 
+// Check for attempted ownership tampering
+if (isset($input['user_id']) && $input['user_id'] !== $currentUser['id']) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Forbidden: user_id cannot be changed. Profile ownership is strictly immutable.']);
+    exit;
+}
+
 // 3. Avatar
 $avatar = trim($input['avatar'] ?? '👤');
 
@@ -50,17 +57,35 @@ $update_fields = [
 
 // Supabase Live Mode
 if (SUPABASE_LIVE_MODE) {
-    $res = supabase_request("/rest/v1/profiles?id=eq.{$id}", 'PATCH', $update_fields);
+    // 1. Fetch target profile to verify existence and ownership
+    $check = supabase_request("/rest/v1/profiles?id=eq.{$id}&select=id,name,avatar,user_id", 'GET');
+    if (!$check['success'] || empty($check['data'])) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'error' => 'Profile not found with the specified ID.']);
+        exit;
+    }
+
+    $existingProfile = $check['data'][0];
+
+    // 2. Strict ownership check: Must belong to current authenticated user
+    if (empty($existingProfile['user_id']) || $existingProfile['user_id'] !== $currentUser['id']) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Forbidden. You do not have permission to update this profile.']);
+        exit;
+    }
+
+    // 3. Update profile while scoping by user_id
+    $res = supabase_request("/rest/v1/profiles?id=eq.{$id}&user_id=eq.{$currentUser['id']}", 'PATCH', $update_fields);
     if ($res['success']) {
         echo json_encode([
             'success' => true,
             'source'  => 'supabase',
             'message' => 'Profile updated successfully in Supabase.',
-            'data'    => $res['data'][0] ?? array_merge(['id' => $id], $update_fields)
+            'data'    => $res['data'][0] ?? array_merge(['id' => $id, 'user_id' => $currentUser['id']], $update_fields)
         ], JSON_UNESCAPED_UNICODE);
         exit;
     } else {
-        http_response_code(500);
+        http_response_code($res['http_code'] ?: 500);
         echo json_encode([
             'success' => false,
             'source'  => 'supabase',
@@ -70,31 +95,6 @@ if (SUPABASE_LIVE_MODE) {
     }
 }
 
-// Local Fallback Storage
-$profiles = get_local_data('profiles.json', []);
-$updated_record = null;
-
-foreach ($profiles as &$p) {
-    if (isset($p['id']) && $p['id'] === $id) {
-        $p['name'] = $update_fields['name'];
-        $p['avatar'] = $update_fields['avatar'];
-        $updated_record = $p;
-        break;
-    }
-}
-
-if ($updated_record) {
-    save_local_data('profiles.json', $profiles);
-    echo json_encode([
-        'success' => true,
-        'source'  => 'local_fallback',
-        'message' => 'Profile updated successfully.',
-        'data'    => $updated_record
-    ], JSON_UNESCAPED_UNICODE);
-} else {
-    http_response_code(404);
-    echo json_encode([
-        'success' => false,
-        'error'   => 'Profile not found with the specified ID.'
-    ]);
-}
+http_response_code(503);
+echo json_encode(['success' => false, 'error' => 'Database unavailable: Supabase credentials are not configured.']);
+exit;

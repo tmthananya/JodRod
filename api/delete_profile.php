@@ -26,7 +26,24 @@ if (empty($id)) {
 
 // Supabase Live Mode
 if (SUPABASE_LIVE_MODE) {
-    $res = supabase_request("/rest/v1/profiles?id=eq.{$id}", 'DELETE');
+    // 1. Fetch target profile to verify existence and ownership
+    $check = supabase_request("/rest/v1/profiles?id=eq.{$id}&select=id,user_id", 'GET');
+    if (!$check['success'] || empty($check['data'])) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'error' => 'Profile not found with the specified ID.']);
+        exit;
+    }
+
+    $existingProfile = $check['data'][0];
+
+    // 2. Strict ownership check: Must belong to current authenticated user
+    if (empty($existingProfile['user_id']) || $existingProfile['user_id'] !== $currentUser['id']) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Forbidden. You do not have permission to delete this profile.']);
+        exit;
+    }
+
+    $res = supabase_request("/rest/v1/profiles?id=eq.{$id}&user_id=eq.{$currentUser['id']}", 'DELETE');
     if ($res['success']) {
         echo json_encode([
             'success' => true,
@@ -36,7 +53,7 @@ if (SUPABASE_LIVE_MODE) {
         ], JSON_UNESCAPED_UNICODE);
         exit;
     } else {
-        http_response_code(500);
+        http_response_code($res['http_code'] ?: 500);
         echo json_encode([
             'success' => false,
             'source'  => 'supabase',
@@ -46,25 +63,6 @@ if (SUPABASE_LIVE_MODE) {
     }
 }
 
-// Local Fallback Storage
-$profiles = get_local_data('profiles.json', []);
-$initial_count = count($profiles);
-$filtered = array_values(array_filter($profiles, function ($p) use ($id) {
-    return ($p['id'] ?? '') !== $id;
-}));
-
-if (count($filtered) < $initial_count) {
-    save_local_data('profiles.json', $filtered);
-    echo json_encode([
-        'success' => true,
-        'source'  => 'local_fallback',
-        'message' => 'Profile deleted successfully.',
-        'id'      => $id
-    ], JSON_UNESCAPED_UNICODE);
-} else {
-    http_response_code(404);
-    echo json_encode([
-        'success' => false,
-        'error'   => 'Profile not found with the specified ID.'
-    ]);
-}
+http_response_code(503);
+echo json_encode(['success' => false, 'error' => 'Database unavailable: Supabase credentials are not configured.']);
+exit;

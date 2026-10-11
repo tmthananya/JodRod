@@ -31,31 +31,26 @@
         </div>
       </a>
 
-      <!-- Strictly: Map, My Car, My Spaces, Points, Profile -->
+      <!-- Strictly: Find Parking, My Parking Lots, My Reservations, My Profile -->
       <ul class="nav-links" id="site-nav-links" style="display: none;">
         <li>
           <a href="#map" class="nav-link" id="nav-map">
-            <span>🗺️</span> Map
-          </a>
-        </li>
-        <li>
-          <a href="#my-car" class="nav-link" id="nav-my-car">
-            <span>🚙</span> My Car
+            <span>🗺️</span> Find Parking
           </a>
         </li>
         <li>
           <a href="#my-spaces" class="nav-link" id="nav-my-spaces">
-            <span>🅿️</span> My Spaces
+            <span>🅿️</span> My Parking Lots
           </a>
         </li>
         <li>
-          <a href="#points" class="nav-link" id="nav-points">
-            <span>⭐</span> Points
+          <a href="#my-reservations" class="nav-link" id="nav-my-reservations">
+            <span>📋</span> My Reservations
           </a>
         </li>
         <li>
           <a href="#profile" class="nav-link" id="nav-profile">
-            <span>👤</span> Profile
+            <span>👤</span> My Profile
           </a>
         </li>
       </ul>
@@ -315,26 +310,86 @@
       </div>
     </section>
 
-    <!-- 2. My Car Section -->
-    <section id="section-my-car" class="nav-content-section">
+    <!-- 2. My Reservations Section -->
+    <section id="section-my-reservations" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>🚙</span> My Car & Requests</h2>
+        <h2 class="section-title"><span>📋</span> My Reservations</h2>
         <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">Track your vehicle and ongoing parking requests.</p>
-      <div class="placeholder-notice">
-        <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 8px;">🚙 Driver Dashboard Ready</p>
-        <p>Parking request status and arrival confirmations will appear here.</p>
+      <p class="section-subtitle">View and manage your safe flood parking reservations.</p>
+
+      <!-- Reservation Action Alert Box -->
+      <div id="reservation-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 16px;"></div>
+
+      <!-- My Vehicles Card -->
+      <div class="form-card" style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+              <span>🚘</span> My Vehicles (Cars)
+            </h3>
+            <p style="font-size: 0.88rem; color: #64748b; margin: 0;">
+              Register your cars to link them with parking reservations. One account can own multiple cars.
+            </p>
+          </div>
+          <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-toggle-add-car">
+            <span>➕</span> Add Vehicle
+          </button>
+        </div>
+
+        <!-- Add Car Form (Collapsible) -->
+        <form id="add-car-form" style="display: none; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 4px; padding: 14px; margin-bottom: 14px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="form-label" for="car-plate">License Plate *</label>
+              <input type="text" id="car-plate" class="form-input" placeholder="e.g. 1กข-9999" required>
+            </div>
+            <div>
+              <label class="form-label" for="car-model">Car Model / Color</label>
+              <input type="text" id="car-model" class="form-input" placeholder="e.g. Toyota Hilux (White)">
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-add-car">Cancel</button>
+            <button type="submit" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-submit-car">💾 Save Vehicle</button>
+          </div>
+        </form>
+
+        <div id="cars-list-container">
+          <div style="font-size: 0.88rem; color: #64748b;">Loading registered vehicles...</div>
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
+              <span>🚗</span> Reserve a Parking Lot
+            </h3>
+            <p style="font-size: 0.88rem; color: #64748b; margin: 0;">
+              Find an available elevated parking lot offered by a neighbor and request a spot before water rises.
+            </p>
+          </div>
+          <a href="#map" class="pixel-btn pixel-btn-blue pixel-btn-sm">
+            <span>🔍</span> Browse Available Lots on Map &rarr;
+          </a>
+        </div>
+      </div>
+
+      <div id="reservations-list-container">
+        <div class="empty-spaces-notice">
+          <span>📋</span> You do not have any active parking reservations. Browse available lots on the map to reserve a safe spot.
+        </div>
       </div>
     </section>
 
-    <!-- 3. My Spaces Section: OFFER PARKING SPACE FORM -->
+    <!-- 3. My Parking Lots Section: OFFER PARKING LOT FORM -->
     <section id="section-my-spaces" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>🅿️</span> Offer & Manage Parking Spaces</h2>
+        <h2 class="section-title"><span>🅿️</span> My Parking Lots & Offer Space</h2>
         <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">Register your safe elevated space to help neighbors protect their cars from flooding.</p>
+      <p class="section-subtitle">Register and manage your safe elevated spaces to help neighbors protect their vehicles from flooding.</p>
 
       <!-- Offer Parking Space Form Card -->
       <div class="form-card">
@@ -427,10 +482,10 @@
     <!-- 5. Profile Section -->
     <section id="section-profile" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>👤</span> Community Profiles</h2>
+        <h2 class="section-title"><span>👤</span> My Profile</h2>
         <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">Manage your community member profile (Driver & Parking Owner).</p>
+      <p class="section-subtitle">Manage your personal community profile (acting as both Driver and Parking Owner with a single account).</p>
 
       <!-- Profile Action Alert Box -->
       <div id="profile-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
@@ -867,6 +922,7 @@
       });
 
       function updateAuthUI() {
+        window.currentUser = currentUser;
         if (currentUser) {
           authGate.style.display = 'none';
           mainAppContent.style.display = 'block';
@@ -968,17 +1024,18 @@
 
       const navLinks = {
         '#map': document.getElementById('nav-map'),
-        '#my-car': document.getElementById('nav-my-car'),
         '#my-spaces': document.getElementById('nav-my-spaces'),
-        '#points': document.getElementById('nav-points'),
+        '#my-reservations': document.getElementById('nav-my-reservations'),
+        '#my-car': document.getElementById('nav-my-reservations'),
         '#profile': document.getElementById('nav-profile')
       };
 
       const sections = {
         '#home': document.getElementById('section-home'),
         '#map': document.getElementById('section-map'),
-        '#my-car': document.getElementById('section-my-car'),
         '#my-spaces': document.getElementById('section-my-spaces'),
+        '#my-reservations': document.getElementById('section-my-reservations'),
+        '#my-car': document.getElementById('section-my-reservations'),
         '#points': document.getElementById('section-points'),
         '#profile': document.getElementById('section-profile')
       };
@@ -1028,6 +1085,13 @@
         // Refresh map dimensions if map section is shown
         if (hash === '#map' && window.parkingMap) {
           window.parkingMap.invalidateSize();
+          window.parkingMap.loadParkingSpaces();
+        }
+
+        // Load cars and reservations if my-reservations section is shown
+        if (hash === '#my-reservations' || hash === '#my-car') {
+          loadCars();
+          loadReservations();
         }
       }
 
@@ -1581,12 +1645,13 @@
 
             let html = '';
             json.data.forEach(p => {
+              const isOwner = Boolean(currentUser && p.user_id && p.user_id === currentUser.id);
               html += `
                 <div class="profile-card" id="profile-card-${p.id}">
                   <div class="profile-card-left">
                     ${renderAvatarPortrait(p.avatar)}
                     <div>
-                      <div class="profile-card-name">${p.name}</div>
+                      <div class="profile-card-name">${p.name} ${isOwner ? '<span class="status-badge status-available" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 6px;">You</span>' : ''}</div>
                       ${getAvatarSpecsBadge(p.avatar)}
                       <div style="margin-top: 5px;">
                         <span class="profile-clean-id" title="Full UUID: ${p.id} (Click to copy)" onclick="navigator.clipboard?.writeText('${p.id}'); const h = this.querySelector('.id-copy-hint'); if(h) { h.textContent='✓ Copied!'; setTimeout(()=>h.textContent='📋', 1500); }">
@@ -1597,12 +1662,18 @@
                     </div>
                   </div>
                   <div class="profile-card-actions">
+                    ${isOwner ? `
                     <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-profile" data-id="${p.id}">
                       ✏️ Edit
                     </button>
                     <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-profile" data-id="${p.id}" data-name="${p.name}">
                       🗑️ Delete
                     </button>
+                    ` : `
+                    <span style="font-size: 0.75rem; color: #64748b; font-weight: 600; padding: 4px 8px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0;">
+                      👤 Community Member
+                    </span>
+                    `}
                   </div>
                 </div>
               `;
@@ -1701,6 +1772,11 @@
       function openEditProfileModal(id) {
         const profile = profilesData[id];
         if (!profile) return;
+
+        if (!currentUser || !profile.user_id || profile.user_id !== currentUser.id) {
+          showProfileAlert('error', '⚠️ Forbidden: You do not have permission to edit this profile.');
+          return;
+        }
 
         document.getElementById('edit-profile-id').value = profile.id;
         const displayEl = document.getElementById('edit-profile-id-display');
@@ -1818,6 +1894,13 @@
       // Delete Profile Handler
       async function deleteProfile(id, name) {
         if (!id) return;
+
+        const profile = profilesData[id];
+        if (!currentUser || !profile || !profile.user_id || profile.user_id !== currentUser.id) {
+          showProfileAlert('error', '⚠️ Forbidden: You do not have permission to delete this profile.');
+          return;
+        }
+
         const displayName = name || 'this profile';
         const confirmed = window.confirm(`Are you sure you want to delete profile "${displayName}"?\n\nThis will permanently delete the record from Supabase.`);
         if (!confirmed) return;
@@ -1844,7 +1927,281 @@
         }
       }
 
-      // Delegated events for Edit and Delete buttons on profile cards
+      // ========================================================
+      // RESERVATION MANAGEMENT CONTROLLER
+      // ========================================================
+      function showReservationAlert(type, message) {
+        const alertBox = document.getElementById('reservation-action-alert');
+        if (alertBox) {
+          alertBox.className = `alert-message ${type}`;
+          alertBox.innerHTML = message;
+          alertBox.style.display = 'block';
+          alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+
+      async function loadReservations() {
+        const container = document.getElementById('reservations-list-container');
+        if (!container) return;
+
+        if (!currentUser) {
+          container.innerHTML = `
+            <div class="empty-spaces-notice">
+              <span>🔒</span> Please log in to view and manage your reservations.
+            </div>
+          `;
+          return;
+        }
+
+        try {
+          container.innerHTML = '<div class="empty-spaces-notice"><span>⏳</span> Loading your reservations...</div>';
+          const res = await fetch('api/get_reservations.php');
+          const json = await res.json();
+
+          if (!res.ok || !json.success) {
+            container.innerHTML = `
+              <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
+                ❌ Could not load reservations: ${json.error || 'Server error'}
+              </div>
+            `;
+            return;
+          }
+
+          const reservations = json.data || [];
+          if (reservations.length === 0) {
+            container.innerHTML = `
+              <div class="empty-spaces-notice">
+                <span>📋</span> You do not have any flood parking reservations yet. Browse available lots on the map to reserve a safe spot.
+              </div>
+            `;
+            return;
+          }
+
+          let cardsHtml = '<div class="spaces-list-container">';
+          reservations.forEach(r => {
+            const space = r.parking_spaces || {};
+            const spaceName = space.name || 'Flood Parking Lot';
+            const status = r.status || 'confirmed';
+            const isActive = (status === 'confirmed' || status === 'active');
+            const statusClass = isActive ? 'status-available' : 'status-closed';
+            const statusLabel = isActive ? '✅ CONFIRMED' : (status === 'cancelled' ? '🚫 CANCELLED' : status.toUpperCase());
+            const createdAtFormatted = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+            const lat = space.latitude ? parseFloat(space.latitude).toFixed(5) : 'N/A';
+            const lng = space.longitude ? parseFloat(space.longitude).toFixed(5) : 'N/A';
+
+            let actionButtons = '';
+            if (space.latitude && space.longitude) {
+              actionButtons += `
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-reservation-map" data-lat="${space.latitude}" data-lng="${space.longitude}" style="flex: 1;">
+                  🗺️ View on Map
+                </button>
+              `;
+            }
+            if (isActive) {
+              actionButtons += `
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${spaceName}" style="flex: 1;">
+                  ❌ Cancel Reservation
+                </button>
+              `;
+            }
+
+            cardsHtml += `
+              <article class="space-card" id="reservation-card-${r.id}">
+                <div>
+                  <div class="space-card-header">
+                    <h4 class="space-card-title">🚗 ${spaceName}</h4>
+                    <span class="status-pill ${statusClass}">${statusLabel}</span>
+                  </div>
+                  <div class="space-card-body" style="margin-top: 10px;">
+                    <div><strong>Reserved On:</strong> ${createdAtFormatted}</div>
+                    ${r.cars ? `<div><strong>Vehicle:</strong> 🚘 ${r.cars.license_plate} (${r.cars.model || 'Standard'})</div>` : ''}
+                    <div><strong>Coordinates:</strong> <span style="font-family: monospace;">${lat}, ${lng}</span></div>
+                    <div><strong>Lot Status:</strong> ${space.status || 'Active'} (${space.available_spaces ?? '?'} / ${space.capacity ?? '?'} spots open)</div>
+                    ${r.notes ? `<div><strong>Notes:</strong> <em>${r.notes}</em></div>` : ''}
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
+                  ${actionButtons}
+                </div>
+              </article>
+            `;
+          });
+          cardsHtml += '</div>';
+
+          container.innerHTML = cardsHtml;
+        } catch (err) {
+          container.innerHTML = `
+            <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
+              ❌ Network error while loading reservations: ${err.message}
+            </div>
+          `;
+        }
+      }
+
+      window.loadReservations = loadReservations;
+
+      // ========================================================
+      // VEHICLES (CARS) MANAGEMENT CONTROLLER
+      // ========================================================
+      async function loadCars() {
+        const container = document.getElementById('cars-list-container');
+        if (!container || !currentUser) return;
+
+        try {
+          container.innerHTML = '<div style="font-size: 0.88rem; color: #64748b;">⏳ Loading vehicles from Supabase...</div>';
+          const res = await fetch('api/cars.php');
+          const json = await res.json();
+
+          if (!res.ok || !json.success) {
+            container.innerHTML = `<div style="font-size: 0.88rem; color: #ef4444;">❌ Could not load vehicles: ${json.error || 'Database error'}</div>`;
+            return;
+          }
+
+          const cars = json.data || [];
+          if (cars.length === 0) {
+            container.innerHTML = `
+              <div style="font-size: 0.88rem; color: #64748b; background: #f8fafc; padding: 10px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                🚘 No vehicles registered yet. Click "Add Vehicle" above to register your car in Supabase.
+              </div>
+            `;
+            return;
+          }
+
+          let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">';
+          cars.forEach(c => {
+            html += `
+              <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 4px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 800; font-size: 1rem; color: #0f172a;">🚘 ${c.license_plate}</div>
+                  <div style="font-size: 0.82rem; color: #64748b;">${c.model || 'Standard Vehicle'}</div>
+                </div>
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${c.id}" data-plate="${c.license_plate}" title="Delete Vehicle">
+                  🗑️
+                </button>
+              </div>
+            `;
+          });
+          html += '</div>';
+          container.innerHTML = html;
+        } catch (err) {
+          container.innerHTML = `<div style="font-size: 0.88rem; color: #ef4444;">❌ Network error: ${err.message}</div>`;
+        }
+      }
+
+      window.loadCars = loadCars;
+
+      document.getElementById('btn-toggle-add-car')?.addEventListener('click', () => {
+        const form = document.getElementById('add-car-form');
+        if (form) {
+          form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+
+      document.getElementById('btn-cancel-add-car')?.addEventListener('click', () => {
+        const form = document.getElementById('add-car-form');
+        if (form) form.style.display = 'none';
+      });
+
+      document.getElementById('add-car-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const plateInput = document.getElementById('car-plate');
+        const modelInput = document.getElementById('car-model');
+        const plate = plateInput ? plateInput.value.trim() : '';
+        const model = modelInput ? modelInput.value.trim() : '';
+
+        if (!plate) return;
+
+        try {
+          const res = await fetch('api/cars.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify({ license_plate: plate, model })
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            showReservationAlert('success', `🚘 <strong>Vehicle Registered:</strong> "${plate}" has been saved in Supabase.`);
+            if (plateInput) plateInput.value = '';
+            if (modelInput) modelInput.value = '';
+            document.getElementById('add-car-form').style.display = 'none';
+            await loadCars();
+          } else {
+            showReservationAlert('error', `❌ <strong>Failed to register vehicle:</strong> ${json.error || 'Server error'}`);
+          }
+        } catch (err) {
+          showReservationAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+        }
+      });
+
+      async function deleteCar(id, plate) {
+        if (!id) return;
+        const confirmed = window.confirm(`Are you sure you want to delete vehicle "${plate}" from Supabase?`);
+        if (!confirmed) return;
+
+        try {
+          const res = await fetch('api/cars.php', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify({ id })
+          });
+          const json = await res.json();
+          if (res.ok && json.success) {
+            showReservationAlert('success', `🗑️ Vehicle "${plate}" deleted from Supabase.`);
+            await loadCars();
+          } else {
+            showReservationAlert('error', `❌ <strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
+          }
+        } catch (err) {
+          showReservationAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+        }
+      }
+
+      async function cancelReservation(reservationId, spaceName) {
+        if (!reservationId) return;
+
+        const displayName = spaceName || 'this parking spot';
+        const confirmed = window.confirm(
+          `❌ Cancel Parking Reservation\n\n` +
+          `Are you sure you want to cancel your reservation for "${displayName}"?\n\n` +
+          `The parking space will immediately be returned to available capacity for neighbors in need.`
+        );
+        if (!confirmed) return;
+
+        try {
+          const res = await fetch('api/cancel_reservation.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify({ reservation_id: reservationId })
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            showReservationAlert('success', `
+              ✅ <strong>Reservation Cancelled:</strong><br>
+              Your reservation for "${displayName}" has been cancelled. The parking spot is now available for other drivers.
+            `);
+            await loadReservations();
+            if (window.parkingMap) {
+              window.parkingMap.loadParkingSpaces();
+            }
+          } else {
+            showReservationAlert('error', `❌ <strong>Failed to cancel reservation:</strong> ${json.error || 'Server error'}`);
+          }
+        } catch (err) {
+          showReservationAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+        }
+      }
+
+      // Delegated events for Edit and Delete buttons on profile cards, cars, and reservations
       document.body.addEventListener('click', (e) => {
         const editBtn = e.target.closest('.btn-edit-profile');
         if (editBtn) {
@@ -1854,6 +2211,26 @@
         const deleteBtn = e.target.closest('.btn-delete-profile');
         if (deleteBtn) {
           deleteProfile(deleteBtn.dataset.id, deleteBtn.dataset.name);
+        }
+
+        const deleteCarBtn = e.target.closest('.btn-delete-car');
+        if (deleteCarBtn) {
+          deleteCar(deleteCarBtn.dataset.id, deleteCarBtn.dataset.plate);
+        }
+
+        const cancelResBtn = e.target.closest('.btn-cancel-reservation');
+        if (cancelResBtn) {
+          cancelReservation(cancelResBtn.dataset.id, cancelResBtn.dataset.name);
+        }
+
+        const viewResMapBtn = e.target.closest('.btn-view-reservation-map');
+        if (viewResMapBtn) {
+          const lat = parseFloat(viewResMapBtn.dataset.lat);
+          const lng = parseFloat(viewResMapBtn.dataset.lng);
+          window.location.hash = '#map';
+          if (window.parkingMap && window.parkingMap.map) {
+            window.parkingMap.map.flyTo([lat, lng], 15, { duration: 1.0 });
+          }
         }
 
         if (e.target.closest('#btn-close-edit-profile-modal') || e.target.closest('#btn-cancel-edit-profile')) {

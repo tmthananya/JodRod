@@ -61,8 +61,7 @@ if (SUPABASE_LIVE_MODE) {
     $count = ($count_res['success'] && is_array($count_res['data'])) ? count($count_res['data']) : 0;
     $results['tests']['permanent_parking_count'] = $count;
 } else {
-    $local_data = get_local_data('parking_spaces.json', []);
-    $results['tests']['permanent_parking_count'] = count($local_data);
+    $results['tests']['permanent_parking_count'] = 0;
 }
 
 echo json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

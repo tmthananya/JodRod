@@ -23,6 +23,13 @@ if (!$input) {
     exit;
 }
 
+// Check for forged owner_id parameter
+if (isset($input['owner_id']) && $input['owner_id'] !== $currentUser['id']) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Forbidden: owner_id cannot be forged. Parking spaces are linked strictly to your authenticated session.']);
+    exit;
+}
+
 // 1. Validate: Parking Name (required, non-empty)
 $name = trim($input['name'] ?? '');
 if ($name === '') {
@@ -96,8 +103,9 @@ if (!in_array($status, $allowed_statuses, true)) {
     exit;
 }
 
-// Build exact record payload with ONLY the required columns
+// Build exact record payload stamped with authenticated owner_id
 $record = [
+    'owner_id'         => $currentUser['id'],
     'name'             => htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
     'latitude'         => $latitude,
     'longitude'        => $longitude,
@@ -106,48 +114,32 @@ $record = [
     'status'           => $status
 ];
 
-// If in Supabase Live Mode, send POST to Supabase PostgREST endpoint
-if (SUPABASE_LIVE_MODE) {
-    $res = supabase_request('/rest/v1/parking_spaces', 'POST', $record);
-    if ($res['success']) {
-        http_response_code(201);
-        echo json_encode([
-            'success' => true,
-            'source'  => 'supabase',
-            'message' => 'Parking space created successfully in Supabase.',
-            'data'    => $res['data'][0] ?? $record
-        ], JSON_UNESCAPED_UNICODE);
-        exit;
-    } else {
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'source'  => 'supabase',
-            'error'   => 'Failed to create record in Supabase: ' . ($res['error'] ?? 'Unknown error')
-        ]);
-        exit;
-    }
+// Send POST to Supabase PostgREST endpoint
+if (!SUPABASE_LIVE_MODE) {
+    http_response_code(503);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Database unavailable: Supabase credentials are not configured.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
-// Fallback persistence (when .env credentials are not yet configured)
-// Uses a real generated UUID
-$record['id'] = sprintf(
-    '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-    mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-    mt_rand(0, 0xffff),
-    mt_rand(0, 0x0fff) | 0x4000,
-    mt_rand(0, 0x3fff) | 0x8000,
-    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-);
-
-$existing = get_local_data('parking_spaces.json', []);
-array_unshift($existing, $record);
-save_local_data('parking_spaces.json', $existing);
-
-http_response_code(201);
-echo json_encode([
-    'success' => true,
-    'source'  => 'local_fallback',
-    'message' => 'Parking space created successfully.',
-    'data'    => $record
-], JSON_UNESCAPED_UNICODE);
+$res = supabase_request('/rest/v1/parking_spaces', 'POST', $record);
+if ($res['success']) {
+    http_response_code(201);
+    echo json_encode([
+        'success' => true,
+        'source'  => 'supabase',
+        'message' => 'Parking space created successfully in Supabase.',
+        'data'    => $res['data'][0] ?? $record
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+} else {
+    http_response_code($res['http_code'] ?: 500);
+    echo json_encode([
+        'success' => false,
+        'source'  => 'supabase',
+        'error'   => 'Failed to create record in Supabase: ' . ($res['error'] ?? 'Unknown error')
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}

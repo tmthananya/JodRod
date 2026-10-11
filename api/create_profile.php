@@ -31,16 +31,36 @@ if ($name === '') {
     exit;
 }
 
+// Check for forged user_id parameter
+if (isset($input['user_id']) && $input['user_id'] !== $currentUser['id']) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Forbidden: user_id cannot be forged. Profiles are linked strictly to your authenticated session.']);
+    exit;
+}
+
 // 2. Avatar (optional TEXT string, defaults to standard avatar)
 $avatar = trim($input['avatar'] ?? '👤');
 
 $record = [
-    'name'   => htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
-    'avatar' => $avatar
+    'user_id' => $currentUser['id'],
+    'name'    => htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
+    'avatar'  => $avatar
 ];
 
 // Supabase Live Mode
 if (SUPABASE_LIVE_MODE) {
+    // Check if the authenticated account already has a profile (1 profile per account)
+    $existingCheck = supabase_request("/rest/v1/profiles?user_id=eq.{$currentUser['id']}&select=id,name,avatar,user_id", 'GET');
+    if ($existingCheck['success'] && !empty($existingCheck['data'])) {
+        http_response_code(409);
+        echo json_encode([
+            'success' => false,
+            'error'   => 'A profile already exists for this account. Please update your existing profile.',
+            'data'    => $existingCheck['data'][0]
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     $res = supabase_request('/rest/v1/profiles', 'POST', $record);
     if ($res['success']) {
         http_response_code(201);
@@ -52,34 +72,17 @@ if (SUPABASE_LIVE_MODE) {
         ], JSON_UNESCAPED_UNICODE);
         exit;
     } else {
-        http_response_code(500);
+        $code = ($res['http_code'] === 409) ? 409 : 500;
+        http_response_code($code);
         echo json_encode([
             'success' => false,
             'source'  => 'supabase',
-            'error'   => 'Failed to create profile in Supabase: ' . ($res['error'] ?? 'Unknown error')
+            'error'   => ($code === 409) ? 'A profile already exists for this account.' : ('Failed to create profile in Supabase: ' . ($res['error'] ?? 'Unknown error'))
         ]);
         exit;
     }
 }
 
-// Local Fallback Storage
-$record['id'] = sprintf(
-    '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-    mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-    mt_rand(0, 0xffff),
-    mt_rand(0, 0x0fff) | 0x4000,
-    mt_rand(0, 0x3fff) | 0x8000,
-    mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-);
-
-$existing = get_local_data('profiles.json', []);
-array_unshift($existing, $record);
-save_local_data('profiles.json', $existing);
-
-http_response_code(201);
-echo json_encode([
-    'success' => true,
-    'source'  => 'local_fallback',
-    'message' => 'Profile created successfully.',
-    'data'    => $record
-], JSON_UNESCAPED_UNICODE);
+http_response_code(503);
+echo json_encode(['success' => false, 'error' => 'Database unavailable: Supabase credentials are not configured.']);
+exit;

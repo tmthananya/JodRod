@@ -83,9 +83,16 @@ function supabase_request($endpoint, $method = 'GET', $payload = null, $headers 
     $url = rtrim(SUPABASE_URL, '/') . $endpoint;
     $ch = curl_init($url);
 
+    if (session_status() === PHP_SESSION_NONE && function_exists('jodrod_session_start')) {
+        jodrod_session_start();
+    }
+
+    // Forward active user access_token if present in session, otherwise fallback to SUPABASE_ANON_KEY
+    $bearer_token = (!empty($_SESSION['access_token'])) ? $_SESSION['access_token'] : SUPABASE_ANON_KEY;
+
     $header_map = [
         'apikey'        => 'apikey: ' . SUPABASE_ANON_KEY,
-        'authorization' => 'Authorization: Bearer ' . SUPABASE_ANON_KEY,
+        'authorization' => 'Authorization: Bearer ' . $bearer_token,
         'content-type'  => 'Content-Type: application/json',
         'prefer'        => 'Prefer: return=representation'
     ];
@@ -144,21 +151,14 @@ function supabase_request($endpoint, $method = 'GET', $payload = null, $headers 
 }
 
 /**
- * Local Data Helpers for zero-risk fallback
+ * Local Data Helpers (Disabled: Supabase PostgreSQL is the only source of truth)
  */
 function get_local_data($filename, $default = []) {
-    $path = DATA_DIR . '/' . $filename;
-    if (!file_exists($path)) {
-        file_put_contents($path, json_encode($default, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        return $default;
-    }
-    $raw = file_get_contents($path);
-    return json_decode($raw, true) ?: $default;
+    return $default;
 }
 
 function save_local_data($filename, $data) {
-    $path = DATA_DIR . '/' . $filename;
-    return file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    return false;
 }
 
 /**
@@ -166,7 +166,7 @@ function save_local_data($filename, $data) {
  */
 function jodrod_session_start() {
     if (session_status() === PHP_SESSION_NONE) {
-        if (ini_get('session.use_cookies')) {
+        if (!headers_sent() && ini_get('session.use_cookies')) {
             $params = session_get_cookie_params();
             session_set_cookie_params([
                 'lifetime' => $params['lifetime'],
@@ -177,7 +177,9 @@ function jodrod_session_start() {
                 'samesite' => 'Lax'
             ]);
         }
-        session_start();
+        if (!headers_sent()) {
+            @session_start();
+        }
     }
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -236,8 +238,36 @@ function require_auth() {
             ], JSON_UNESCAPED_UNICODE);
             exit;
         }
+
+        // 3. Stage 4 Defense: Validate live access token with Supabase Auth
+        if (SUPABASE_LIVE_MODE) {
+            $token = $_SESSION['access_token'];
+            $verifyRes = supabase_request('/auth/v1/user', 'GET', null, [
+                'Authorization: Bearer ' . $token
+            ]);
+            if (!$verifyRes['success'] || empty($verifyRes['data']['id'])) {
+                unset($_SESSION['auth_user'], $_SESSION['access_token']);
+                http_response_code(401);
+                echo json_encode([
+                    'success' => false,
+                    'error'   => 'Unauthorized. Session expired or revoked in Supabase Auth. Please log in again.'
+                ], JSON_UNESCAPED_UNICODE);
+                exit;
+            }
+            $_SESSION['auth_user'] = $verifyRes['data'];
+        }
     }
 
     return $_SESSION['auth_user'];
+}
+
+/**
+ * Generate a cryptographically secure UUID v4 string.
+ */
+function generate_uuid_v4() {
+    $data = random_bytes(16);
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 

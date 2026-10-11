@@ -1,0 +1,45 @@
+<?php
+/**
+ * API: Get Reservations (READ)
+ * Supabase-Only Source of Truth.
+ * Returns all reservations for the currently authenticated user from public.reservations.
+ */
+header('Content-Type: application/json; charset=UTF-8');
+require_once __DIR__ . '/../config.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'error' => 'Method Not Allowed']);
+    exit;
+}
+
+// 1. Enforce backend authentication guard
+$currentUser = require_auth();
+$uid = $currentUser['id'];
+
+// 2. Enforce Supabase-Only Storage
+if (!SUPABASE_LIVE_MODE) {
+    http_response_code(503);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Database unavailable: Supabase credentials are not configured.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$res = supabase_request("/rest/v1/reservations?user_id=eq.{$uid}&select=*,cars(id,license_plate,model),parking_spaces(id,name,latitude,longitude,capacity,available_spaces,status)&order=created_at.desc", 'GET');
+if ($res['success'] && is_array($res['data'])) {
+    echo json_encode([
+        'success' => true,
+        'source'  => 'supabase',
+        'count'   => count($res['data']),
+        'data'    => $res['data']
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+http_response_code($res['http_code'] ?: 500);
+echo json_encode([
+    'success' => false,
+    'error'   => 'Failed to retrieve reservations from Supabase: ' . ($res['error'] ?? 'Table unavailable.')
+], JSON_UNESCAPED_UNICODE);

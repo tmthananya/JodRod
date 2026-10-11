@@ -26,7 +26,31 @@ if (empty($id)) {
 
 // Live Supabase Mode
 if (SUPABASE_LIVE_MODE) {
-    $res = supabase_request("/rest/v1/parking_spaces?id=eq.{$id}", 'DELETE');
+    // 1. Fetch target space to verify existence and ownership
+    $check = supabase_request("/rest/v1/parking_spaces?id=eq.{$id}&select=id,name,owner_id", 'GET');
+    if (!$check['success'] || empty($check['data'])) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'error' => 'Parking space not found with the specified ID.']);
+        exit;
+    }
+
+    $targetSpace = $check['data'][0];
+
+    // 2. Protect existing unassigned community lots (owner_id IS NULL)
+    if (empty($targetSpace['owner_id'])) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Forbidden. Community parking spaces cannot be deleted.']);
+        exit;
+    }
+
+    // 3. Enforce ownership: only the owner can delete their space
+    if ($targetSpace['owner_id'] !== $currentUser['id']) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Forbidden. You do not have permission to delete this parking space.']);
+        exit;
+    }
+
+    $res = supabase_request("/rest/v1/parking_spaces?id=eq.{$id}&owner_id=eq.{$currentUser['id']}", 'DELETE');
     if ($res['success']) {
         echo json_encode([
             'success' => true,
@@ -36,7 +60,7 @@ if (SUPABASE_LIVE_MODE) {
         ], JSON_UNESCAPED_UNICODE);
         exit;
     } else {
-        http_response_code(500);
+        http_response_code($res['http_code'] ?: 500);
         echo json_encode([
             'success' => false,
             'source'  => 'supabase',
@@ -46,25 +70,6 @@ if (SUPABASE_LIVE_MODE) {
     }
 }
 
-// Local Fallback Storage
-$spaces = get_local_data('parking_spaces.json', []);
-$initial_count = count($spaces);
-$filtered = array_values(array_filter($spaces, function ($s) use ($id) {
-    return ($s['id'] ?? '') !== $id;
-}));
-
-if (count($filtered) < $initial_count) {
-    save_local_data('parking_spaces.json', $filtered);
-    echo json_encode([
-        'success' => true,
-        'source'  => 'local_fallback',
-        'message' => 'Parking space deleted successfully.',
-        'id'      => $id
-    ], JSON_UNESCAPED_UNICODE);
-} else {
-    http_response_code(404);
-    echo json_encode([
-        'success' => false,
-        'error'   => 'Parking space not found with the specified ID.'
-    ]);
-}
+http_response_code(503);
+echo json_encode(['success' => false, 'error' => 'Database unavailable: Supabase credentials are not configured.']);
+exit;

@@ -178,9 +178,44 @@ class ParkingMapController {
         iconAnchor: [18, 18]
       });
 
+      const isOwner = Boolean(window.currentUser && s.owner_id && s.owner_id === window.currentUser.id);
+      const isCommunity = !s.owner_id;
+      const isAvailable = (s.status === 'available' && parseInt(s.available_spaces, 10) > 0);
+
       const marker = L.marker([s.latitude, s.longitude], { icon: pinIcon });
 
-      // Marker Popup displaying ONLY: Parking name, Location, Capacity, Available spaces, Status, plus Edit action
+      // Marker Popup Actions:
+      // - If owner: Edit & Delete
+      // - If not owner & available: Reserve Spot
+      // - If not owner & full/closed: No reserve button, show status pill
+      let popupActionsHtml = '';
+      if (isOwner) {
+        popupActionsHtml = `
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
+              ✏️ Edit
+            </button>
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-space" data-id="${s.id}" data-name="${s.name}" style="flex: 1;">
+              🗑️ Delete
+            </button>
+          </div>
+        `;
+      } else if (isAvailable) {
+        popupActionsHtml = `
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-reserve-space" data-id="${s.id}" data-name="${s.name}" data-available="${s.available_spaces}" style="flex: 1;">
+              🚗 Reserve Spot
+            </button>
+          </div>
+        `;
+      } else {
+        popupActionsHtml = `
+          <div style="margin-top: 8px; text-align: center; font-size: 0.75rem; color: #ef4444; font-weight: 700; background: #fee2e2; padding: 4px; border-radius: 4px;">
+            🚫 ${s.status === 'closed' ? 'Lot Closed' : 'Lot Full (0 spots)'}
+          </div>
+        `;
+      }
+
       const popupHtml = `
         <div style="font-family: inherit; min-width: 190px;">
           <h4 style="margin: 0 0 6px; font-size: 1rem; color: #0f172a; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">${s.name}</h4>
@@ -190,20 +225,37 @@ class ParkingMapController {
             <div><strong>Available spaces:</strong> ${s.available_spaces}</div>
             <div><strong>Status:</strong> <span class="status-pill ${statusClass}">${s.status.toUpperCase()}</span></div>
           </div>
-          <div style="display: flex; gap: 6px; margin-top: 8px;">
-            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
-              ✏️ Edit
-            </button>
-            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-space" data-id="${s.id}" data-name="${s.name}" style="flex: 1;">
-              🗑️ Delete
-            </button>
-          </div>
+          ${popupActionsHtml}
         </div>
       `;
       marker.bindPopup(popupHtml);
       this.parkingLayer.addLayer(marker);
 
-      // Directory Card displaying strictly the 5 required fields plus Edit and Delete actions
+      // Directory Card Actions:
+      let cardActionsHtml = '';
+      if (isOwner) {
+        cardActionsHtml = `
+          <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
+            ✏️ Edit
+          </button>
+          <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-space" data-id="${s.id}" data-name="${s.name}" style="flex: 1;">
+            🗑️ Delete
+          </button>
+        `;
+      } else if (isAvailable) {
+        cardActionsHtml = `
+          <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-reserve-space" data-id="${s.id}" data-name="${s.name}" data-available="${s.available_spaces}" style="flex: 1;">
+            🚗 Reserve Spot
+          </button>
+        `;
+      } else {
+        cardActionsHtml = `
+          <span style="font-size: 0.75rem; color: #ef4444; font-weight: 700; background: #fee2e2; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; flex: 1;">
+            🚫 ${s.status === 'closed' ? 'Closed' : 'Lot Full (0 spots)'}
+          </span>
+        `;
+      }
+
       listHtml += `
         <article class="space-card" id="space-card-${idx}">
           <div>
@@ -222,12 +274,7 @@ class ParkingMapController {
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-pin" data-lat="${s.latitude}" data-lng="${s.longitude}" style="flex: 1;">
               🗺️ View on Map
             </button>
-            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
-              ✏️ Edit
-            </button>
-            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-space" data-id="${s.id}" data-name="${s.name}" style="flex: 1;">
-              🗑️ Delete
-            </button>
+            ${cardActionsHtml}
           </div>
         </article>
       `;
@@ -267,6 +314,11 @@ class ParkingMapController {
     const space = this.spacesData ? this.spacesData[spaceId] : null;
     if (!space) {
       console.warn('Parking space not found for edit:', spaceId);
+      return;
+    }
+
+    if (!window.currentUser || !space.owner_id || space.owner_id !== window.currentUser.id) {
+      this.showMapAlert('error', '⚠️ Forbidden: You do not have permission to edit this parking space.');
       return;
     }
 
@@ -321,6 +373,12 @@ class ParkingMapController {
   async deleteParkingSpace(spaceId, spaceName) {
     if (!spaceId) return;
 
+    const space = this.spacesData ? this.spacesData[spaceId] : null;
+    if (!window.currentUser || !space || !space.owner_id || space.owner_id !== window.currentUser.id) {
+      this.showMapAlert('error', '⚠️ Forbidden: You do not have permission to delete this parking space.');
+      return;
+    }
+
     const displayName = spaceName || 'this parking space';
 
     // 1. Before deleting: Ask for confirmation
@@ -357,6 +415,94 @@ class ParkingMapController {
     }
   }
 
+  // Reserve parking space
+  async reserveParkingSpace(spaceId, spaceName, availableSpots) {
+    if (!spaceId) return;
+
+    if (!window.currentUser) {
+      alert('⚠️ Please log in to your account before reserving a parking spot.');
+      window.location.hash = '#home';
+      return;
+    }
+
+    if (availableSpots <= 0) {
+      this.showMapAlert('error', '⚠️ This parking space is currently full.');
+      return;
+    }
+
+    // Retrieve user's registered vehicles from Supabase
+    let selectedCarId = null;
+    let selectedCarInfo = '';
+    try {
+      const carsRes = await fetch('api/cars.php');
+      const carsJson = await carsRes.json();
+      if (carsJson.success && Array.isArray(carsJson.data) && carsJson.data.length > 0) {
+        const cars = carsJson.data;
+        if (cars.length === 1) {
+          selectedCarId = cars[0].id;
+          selectedCarInfo = `Vehicle: ${cars[0].license_plate} (${cars[0].model || 'Standard'})\n`;
+        } else {
+          const carOptions = cars.map((c, i) => `${i + 1}. ${c.license_plate} (${c.model || 'Standard'})`).join('\n');
+          const choice = window.prompt(
+            `🚗 Select which vehicle to park at "${spaceName}":\n\n${carOptions}\n\nEnter number (1-${cars.length}):`,
+            '1'
+          );
+          if (choice === null) return; // cancelled
+          const idx = parseInt(choice, 10) - 1;
+          if (cars[idx]) {
+            selectedCarId = cars[idx].id;
+            selectedCarInfo = `Vehicle: ${cars[idx].license_plate}\n`;
+          }
+        }
+      }
+    } catch (e) {}
+
+    const displayName = spaceName || 'this parking lot';
+    const confirmed = window.confirm(
+      `🚗 Confirm Flood Parking Reservation\n\n` +
+      `Parking Lot: ${displayName}\n` +
+      selectedCarInfo +
+      `Spots Available: ${availableSpots}\n\n` +
+      `Would you like to reserve 1 parking spot?`
+    );
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch('api/create_reservation.php', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': window.csrfToken || ''
+        },
+        body: JSON.stringify({ 
+          parking_space_id: spaceId,
+          car_id: selectedCarId
+        })
+      });
+
+      const json = await res.json();
+
+      if (res.ok && json.success) {
+        this.showMapAlert('success', `
+          🎉 <strong>Reservation Confirmed!</strong><br>
+          <span>Spot successfully reserved in Supabase at "${displayName}". View your reservation under <a href="#my-reservations" style="color: #0284c7; font-weight: bold; text-decoration: underline;">My Reservations</a>.</span>
+        `);
+
+        // Refresh spaces to reflect decremented spots
+        await this.loadParkingSpaces();
+
+        // Refresh reservations list if user visits reservations section
+        if (typeof window.loadReservations === 'function') {
+          window.loadReservations();
+        }
+      } else {
+        this.showMapAlert('error', `❌ <strong>Reservation Failed:</strong> ${json.error || 'Server error'}`);
+      }
+    } catch (err) {
+      this.showMapAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+    }
+  }
+
   updateStatusBadge(count) {
     const badge = document.getElementById('map-status-badge');
     if (badge) {
@@ -381,6 +527,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Delegated click handler for actions (handles both directory cards and Leaflet map popups)
   document.body.addEventListener('click', (e) => {
+    // Reserve action
+    const reserveBtn = e.target.closest('.btn-reserve-space');
+    if (reserveBtn && window.parkingMap) {
+      const spaceId = reserveBtn.dataset.id;
+      const spaceName = reserveBtn.dataset.name;
+      const available = parseInt(reserveBtn.dataset.available || '0', 10);
+      if (spaceId) {
+        window.parkingMap.reserveParkingSpace(spaceId, spaceName, available);
+      }
+    }
+
     // Edit action
     const editBtn = e.target.closest('.btn-edit-space');
     if (editBtn && window.parkingMap) {
