@@ -3,6 +3,16 @@
  * JodRod (จอดรถ) - Flood Parking Community
  * Index / Home Page
  */
+require_once __DIR__ . '/config.php';
+$initialUser = null;
+$initialCsrf = '';
+if (session_status() === PHP_SESSION_NONE) {
+    jodrod_session_start();
+}
+if (!empty($_SESSION['auth_user'])) {
+    $initialUser = $_SESSION['auth_user'];
+    $initialCsrf = $_SESSION['csrf_token'] ?? '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +24,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+  <script>
+    window.initialUser = <?= json_encode($initialUser, JSON_UNESCAPED_UNICODE) ?>;
+    window.initialCsrf = <?= json_encode($initialCsrf) ?>;
+  </script>
 </head>
 <body>
 
@@ -491,12 +505,13 @@
       <div id="profile-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
 
       <div class="actions-grid" style="align-items: start; margin-bottom: 24px;">
-        <!-- Left: Create Profile Form -->
+        <!-- Left: Create Profile Form / Active Profile Card -->
         <div class="form-card">
-          <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+          <div id="my-profile-existing-notice" style="display: none;"></div>
+          <h3 id="create-profile-card-title" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
             <span>➕</span> Create Profile
           </h3>
-          <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 18px;">
+          <p id="create-profile-card-desc" style="font-size: 0.88rem; color: #64748b; margin-bottom: 18px;">
             Add a new member profile to the community.
           </p>
 
@@ -861,8 +876,8 @@
       // ========================================================
       // AUTHENTICATION STATE & CONTROLLER
       // ========================================================
-      let currentUser = null;
-      window.csrfToken = '';
+      let currentUser = window.initialUser || null;
+      window.csrfToken = window.initialCsrf || '';
       let currentAuthMode = 'login'; // 'login' or 'signup'
 
       const authGate = document.getElementById('auth-gate');
@@ -931,12 +946,18 @@
           navUserEmail.textContent = currentUser.email;
           navUserEmail.title = `Logged in as: ${currentUser.email}`;
           handleRoute();
+          if (typeof loadProfiles === 'function') {
+            loadProfiles();
+          }
         } else {
           authGate.style.display = 'flex';
           mainAppContent.style.display = 'none';
           siteNavLinks.style.display = 'none';
           navUserBadge.style.display = 'none';
           navUserEmail.textContent = '';
+          if (typeof loadProfiles === 'function') {
+            loadProfiles();
+          }
         }
       }
 
@@ -1093,11 +1114,23 @@
           loadCars();
           loadReservations();
         }
+
+        // Load profiles if profile section is shown
+        if (hash === '#profile') {
+          if (typeof loadProfiles === 'function') {
+            loadProfiles();
+          }
+        }
       }
 
       window.addEventListener('hashchange', handleRoute);
 
-      // Kick off authentication check
+      // Immediately synchronize UI if initial session was restored from PHP
+      if (currentUser) {
+        updateAuthUI();
+      }
+
+      // Kick off background authentication check with Supabase Auth
       checkAuthSession();
 
       // Back to home buttons
@@ -1621,6 +1654,10 @@
       async function loadProfiles() {
         const container = document.getElementById('profiles-list-container');
         const countPill = document.getElementById('profile-count-pill');
+        const myNotice = document.getElementById('my-profile-existing-notice');
+        const createForm = document.getElementById('create-profile-form');
+        const createTitle = document.getElementById('create-profile-card-title');
+        const createDesc = document.getElementById('create-profile-card-desc');
 
         try {
           const res = await fetch('api/get_profiles.php');
@@ -1628,12 +1665,51 @@
 
           if (json.success && Array.isArray(json.data)) {
             profilesData = {};
+            let myProfile = null;
             json.data.forEach(p => {
               profilesData[p.id] = p;
+              if (currentUser && p.user_id && p.user_id === currentUser.id) {
+                myProfile = p;
+              }
             });
 
             if (countPill) {
               countPill.textContent = `${json.data.length} ${json.data.length === 1 ? 'Profile' : 'Profiles'}`;
+            }
+
+            // Left panel management: If user already has a profile, notify and provide direct Edit action
+            if (myNotice && createForm) {
+              if (myProfile) {
+                myNotice.style.display = 'block';
+                myNotice.innerHTML = `
+                  <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #15803d; letter-spacing: 0.05em;">YOUR ACTIVE PROFILE</div>
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #14532d; margin-top: 3px;">
+                      ${myProfile.name} <span class="status-badge status-available" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 6px;">You</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #475569; margin-top: 4px;">
+                      Member ID: <span style="font-family: monospace; font-weight: 700;">#${myProfile.id.slice(0, 8)}</span>
+                    </div>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold" id="btn-quick-edit-profile" data-id="${myProfile.id}">
+                        ✏️ Edit My Profile
+                      </button>
+                    </div>
+                  </div>
+                `;
+                const qBtn = document.getElementById('btn-quick-edit-profile');
+                if (qBtn) {
+                  qBtn.addEventListener('click', () => openEditProfileModal(myProfile.id));
+                }
+                createForm.style.display = 'none';
+                if (createTitle) createTitle.innerHTML = '<span>👤</span> Your Profile';
+                if (createDesc) createDesc.textContent = 'You have registered your flood response profile. You can edit your nickname and 3D avatar below.';
+              } else {
+                myNotice.style.display = 'none';
+                createForm.style.display = 'block';
+                if (createTitle) createTitle.innerHTML = '<span>➕</span> Create Profile';
+                if (createDesc) createDesc.textContent = 'Add a new member profile to the community.';
+              }
             }
 
             if (!container) return;
@@ -1752,7 +1828,7 @@
 
         // Hair color
         document.querySelectorAll(`#${prefix}-hair-colors .color-swatch-btn`).forEach(b => {
-          b.classList.toggle('active', b.dataset.color.toLowerCase() === config.hairColor.toLowerCase());
+          b.classList.toggle('active', (b.dataset.color || '').toLowerCase() === (config.hairColor || '').toLowerCase());
         });
         // Clothes style
         document.querySelectorAll(`#${prefix}-clothes-styles .customizer-chip-btn`).forEach(b => {
@@ -1760,11 +1836,11 @@
         });
         // Clothes color
         document.querySelectorAll(`#${prefix}-clothes-colors .color-swatch-btn`).forEach(b => {
-          b.classList.toggle('active', b.dataset.color.toLowerCase() === config.clothesColor.toLowerCase());
+          b.classList.toggle('active', (b.dataset.color || '').toLowerCase() === (config.clothesColor || '').toLowerCase());
         });
         // Skin color
         document.querySelectorAll(`#${prefix}-skin-colors .color-swatch-btn`).forEach(b => {
-          b.classList.toggle('active', b.dataset.color.toLowerCase() === config.skinColor.toLowerCase());
+          b.classList.toggle('active', (b.dataset.color || '').toLowerCase() === (config.skinColor || '').toLowerCase());
         });
       }
 
@@ -1787,8 +1863,7 @@
         document.getElementById('edit-profile-name').value = profile.name;
 
         // Parse saved avatar config or defaults into shared object
-        const parsed = parseAvatarData(profile.avatar);
-        Object.assign(editCharConfig, {
+        const defaultCharConfig = {
           gender: 'female',
           feature: 'natural',
           hair: 'ponytail',
@@ -1796,7 +1871,13 @@
           clothes: 'vest',
           clothesColor: '#ea580c',
           skinColor: '#fed7aa'
-        }, parsed || {});
+        };
+        const parsed = parseAvatarData(profile.avatar) || {};
+        Object.assign(editCharConfig, defaultCharConfig);
+        Object.keys(defaultCharConfig).forEach(k => {
+          if (parsed[k]) editCharConfig[k] = parsed[k];
+        });
+        if (parsed.snapshot) editCharConfig.snapshot = parsed.snapshot;
 
         syncCustomizerUI('edit', editCharConfig, () => editChar3D);
 

@@ -27,7 +27,8 @@ if (empty($id)) {
 // Supabase Live Mode
 if (SUPABASE_LIVE_MODE) {
     // 1. Fetch target profile to verify existence and ownership
-    $check = supabase_request("/rest/v1/profiles?id=eq.{$id}&select=id,user_id", 'GET');
+    $safeId = urlencode($id);
+    $check = supabase_request("/rest/v1/profiles?id=eq.{$safeId}&select=id,user_id", 'GET');
     if (!$check['success'] || empty($check['data'])) {
         http_response_code(404);
         echo json_encode(['success' => false, 'error' => 'Profile not found with the specified ID.']);
@@ -43,7 +44,7 @@ if (SUPABASE_LIVE_MODE) {
         exit;
     }
 
-    $res = supabase_request("/rest/v1/profiles?id=eq.{$id}&user_id=eq.{$currentUser['id']}", 'DELETE');
+    $res = supabase_request("/rest/v1/profiles?id=eq.{$safeId}&user_id=eq.{$currentUser['id']}", 'DELETE');
     if ($res['success']) {
         echo json_encode([
             'success' => true,

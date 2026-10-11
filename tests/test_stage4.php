@@ -90,7 +90,7 @@ assert_test("POST delete_parking_space without auth returns 401", $r['code'] ===
 echo "\n[Requirement 2: Authenticate User A and User B]\n";
 
 $ua_login = http_call('POST', "{$baseUrl}/api/auth.php?action=login", [
-    'email'    => 'stage2_test_user1@jodrod-test.org',
+    'email'    => 'stage5_user_a@jodrod-test.org',
     'password' => 'TestPassword123!'
 ], $cookieUserA);
 assert_test("User A login succeeds", $ua_login['code'] === 200, "Code: {$ua_login['code']}");
@@ -98,7 +98,7 @@ $ua_csrf = $ua_login['body']['csrf_token'] ?? '';
 $ua_id = $ua_login['body']['user']['id'] ?? '';
 
 $ub_login = http_call('POST', "{$baseUrl}/api/auth.php?action=login", [
-    'email'    => 'stage2_test_user2@jodrod-test.org',
+    'email'    => 'stage5_user_b@jodrod-test.org',
     'password' => 'TestPassword123!'
 ], $cookieUserB);
 assert_test("User B login succeeds", $ub_login['code'] === 200, "Code: {$ub_login['code']}");
@@ -302,7 +302,7 @@ assert_test("Write request with terminated session rejected (401)", $ua_post_log
 
 // User A logs back in
 $ua_relogin = http_call('POST', "{$baseUrl}/api/auth.php?action=login", [
-    'email'    => 'stage2_test_user1@jodrod-test.org',
+    'email'    => 'stage5_user_a@jodrod-test.org',
     'password' => 'TestPassword123!'
 ], $cookieUserA);
 assert_test("User A re-login succeeds", $ua_relogin['code'] === 200, "Code: {$ua_relogin['code']}");

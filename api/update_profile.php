@@ -58,7 +58,8 @@ $update_fields = [
 // Supabase Live Mode
 if (SUPABASE_LIVE_MODE) {
     // 1. Fetch target profile to verify existence and ownership
-    $check = supabase_request("/rest/v1/profiles?id=eq.{$id}&select=id,name,avatar,user_id", 'GET');
+    $safeId = urlencode($id);
+    $check = supabase_request("/rest/v1/profiles?id=eq.{$safeId}&select=id,name,avatar,user_id", 'GET');
     if (!$check['success'] || empty($check['data'])) {
         http_response_code(404);
         echo json_encode(['success' => false, 'error' => 'Profile not found with the specified ID.']);
@@ -75,13 +76,22 @@ if (SUPABASE_LIVE_MODE) {
     }
 
     // 3. Update profile while scoping by user_id
-    $res = supabase_request("/rest/v1/profiles?id=eq.{$id}&user_id=eq.{$currentUser['id']}", 'PATCH', $update_fields);
+    $res = supabase_request("/rest/v1/profiles?id=eq.{$safeId}&user_id=eq.{$currentUser['id']}", 'PATCH', $update_fields);
     if ($res['success']) {
+        if (empty($res['data'])) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'source'  => 'supabase',
+                'error'   => 'Update was rejected by Supabase permissions or no rows were modified.'
+            ]);
+            exit;
+        }
         echo json_encode([
             'success' => true,
             'source'  => 'supabase',
             'message' => 'Profile updated successfully in Supabase.',
-            'data'    => $res['data'][0] ?? array_merge(['id' => $id, 'user_id' => $currentUser['id']], $update_fields)
+            'data'    => $res['data'][0]
         ], JSON_UNESCAPED_UNICODE);
         exit;
     } else {
