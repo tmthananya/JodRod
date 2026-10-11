@@ -236,8 +236,7 @@ BEGIN
 
     UPDATE public.parking_spaces
     SET available_spaces = v_new_avail,
-        status = v_new_status,
-        updated_at = now()
+        status = v_new_status
     WHERE id = v_space.id;
 
     RETURN jsonb_build_object(
@@ -338,8 +337,7 @@ BEGIN
 
         UPDATE public.parking_spaces
         SET available_spaces = v_new_avail,
-            status = v_new_status,
-            updated_at = now()
+            status = v_new_status
         WHERE id = v_space.id;
     END IF;
 
