@@ -1,11 +1,13 @@
 <?php
 /**
- * API: Create Parking Space Reservation (CREATE)
- * Supabase-Only Source of Truth.
+ * API: Create Reservation (Driver Action)
  * 
- * Atomically creates a reservation record in public.reservations
- * and decrements available_spaces on public.parking_spaces.
- * Enforces one active reservation per car and prevents overbooking.
+ * Securely submits a pending flood parking reservation request for the authenticated driver's vehicle.
+ * Calls atomic Supabase RPC 'request_reservation':
+ * - Validates car belongs to the authenticated user.
+ * - Enforces composite ownership and single active reservation constraint.
+ * - Validates parking space is available and owned by a community host (not a legacy orphan).
+ * - Creates record in 'pending' status WITHOUT decrementing lot capacity.
  */
 header('Content-Type: application/json; charset=UTF-8');
 require_once __DIR__ . '/../config.php';
@@ -19,25 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // 1. Enforce backend authentication guard and CSRF verification
 $currentUser = require_auth();
 require_csrf();
+$uid = $currentUser['id'];
 
-$input = json_decode(file_get_contents('php://input'), true);
-if (!$input) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Invalid JSON payload.']);
-    exit;
-}
-
-$spaceId = trim($input['parking_space_id'] ?? '');
-$carId   = !empty($input['car_id']) ? trim($input['car_id']) : null;
-$notes   = trim($input['notes'] ?? '');
-
-if (empty($spaceId)) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Parking space ID is required for reservation.']);
-    exit;
-}
-
-// 2. Enforce Supabase-Only Storage
 if (!SUPABASE_LIVE_MODE) {
     http_response_code(503);
     echo json_encode([
@@ -47,112 +32,96 @@ if (!SUPABASE_LIVE_MODE) {
     exit;
 }
 
-// Attempt 1: Call atomic database RPC function if installed
-$rpcRes = supabase_request('/rest/v1/rpc/create_reservation', 'POST', [
+$input = json_decode(file_get_contents('php://input'), true);
+if (!$input) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Invalid JSON payload.']);
+    exit;
+}
+
+// Security: Disallow forging user_id
+if (isset($input['user_id']) && $input['user_id'] !== $uid) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Forbidden: user_id cannot be forged. Derived strictly from your session.']);
+    exit;
+}
+
+$spaceId = trim($input['parking_space_id'] ?? '');
+$carId   = trim($input['car_id'] ?? '');
+$notes   = trim($input['notes'] ?? '');
+
+// Input validation
+if (empty($carId)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Vehicle ID (car_id) is required to request a reservation.']);
+    exit;
+}
+
+if (empty($spaceId)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Parking space ID (parking_space_id) is required to request a reservation.']);
+    exit;
+}
+
+// 2. Execute atomic database RPC: request_reservation
+$rpcRes = supabase_request('/rest/v1/rpc/request_reservation', 'POST', [
     'p_parking_space_id' => $spaceId,
-    'p_user_id'          => $currentUser['id'],
+    'p_user_id'          => $uid,
     'p_car_id'           => $carId,
-    'p_notes'            => $notes ?: null
+    'p_notes'            => !empty($notes) ? htmlspecialchars($notes, ENT_QUOTES, 'UTF-8') : null
 ]);
 
-if ($rpcRes['success'] && isset($rpcRes['data']['success'])) {
-    if ($rpcRes['data']['success']) {
-        http_response_code(201);
-        echo json_encode($rpcRes['data'], JSON_UNESCAPED_UNICODE);
-        exit;
-    } else {
-        http_response_code(400);
-        echo json_encode($rpcRes['data'], JSON_UNESCAPED_UNICODE);
-        exit;
+if ($rpcRes['success']) {
+    $data = $rpcRes['data'];
+    if (is_array($data) && isset($data['success'])) {
+        if ($data['success']) {
+            http_response_code(201);
+            echo json_encode([
+                'success' => true,
+                'source'  => 'supabase',
+                'message' => $data['message'] ?? 'Reservation request submitted. Awaiting parking lot owner approval.',
+                'data'    => $data['reservation'] ?? $data
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        } else {
+            $errorMsg = $data['error'] ?? 'Failed to submit reservation request.';
+            $httpCode = 400;
+            if (stripos($errorMsg, 'Forbidden') !== false || stripos($errorMsg, 'does not belong to you') !== false) {
+                $httpCode = 403;
+            } elseif (stripos($errorMsg, 'already has an active reservation') !== false) {
+                $httpCode = 409;
+            } elseif (stripos($errorMsg, 'not found') !== false) {
+                $httpCode = 404;
+            } elseif (stripos($errorMsg, 'full or closed') !== false) {
+                $httpCode = 409;
+            }
+            http_response_code($httpCode);
+            echo json_encode([
+                'success' => false,
+                'error'   => $errorMsg
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
     }
-}
 
-// Attempt 2: Direct PostgREST atomic flow in Supabase
-// Step A: If car_id is provided, verify ownership and active reservation status
-if ($carId !== null) {
-    $carRes = supabase_request("/rest/v1/cars?id=eq.{$carId}&user_id=eq.{$currentUser['id']}&select=id", 'GET');
-    if (!$carRes['success'] || empty($carRes['data'])) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Specified vehicle not found or does not belong to you.']);
-        exit;
-    }
-
-    $activeCarRes = supabase_request("/rest/v1/reservations?car_id=eq.{$carId}&status=eq.confirmed&select=id", 'GET');
-    if ($activeCarRes['success'] && !empty($activeCarRes['data'])) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'This vehicle already has an active reservation.']);
-        exit;
-    }
-}
-
-// Step B: Retrieve live parking space from Supabase
-$spaceRes = supabase_request("/rest/v1/parking_spaces?id=eq.{$spaceId}&select=*", 'GET');
-if (!$spaceRes['success'] || empty($spaceRes['data'])) {
-    http_response_code(404);
-    echo json_encode(['success' => false, 'error' => 'Parking space not found with the specified ID.']);
-    exit;
-}
-
-$space = $spaceRes['data'][0];
-
-// Step C: Capacity & Status Verification
-if ($space['status'] !== 'available' || (int)$space['available_spaces'] <= 0) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'This parking space is currently full or closed.']);
-    exit;
-}
-
-// Step D: Prevent duplicate active reservation for this space if car_id not supplied
-if ($carId === null) {
-    $dupCheck = supabase_request("/rest/v1/reservations?user_id=eq.{$currentUser['id']}&parking_space_id=eq.{$spaceId}&status=eq.confirmed&select=id", 'GET');
-    if ($dupCheck['success'] && !empty($dupCheck['data'])) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'You already have an active reservation for this parking lot.']);
-        exit;
-    }
-}
-
-// Step E: Insert reservation into Supabase public.reservations
-$resRecord = [
-    'user_id'          => $currentUser['id'],
-    'car_id'           => $carId,
-    'parking_space_id' => $spaceId,
-    'status'           => 'confirmed',
-    'notes'            => $notes ?: null
-];
-$insertRes = supabase_request('/rest/v1/reservations', 'POST', $resRecord);
-
-if (!$insertRes['success']) {
-    http_response_code($insertRes['http_code'] ?: 500);
+    http_response_code(201);
     echo json_encode([
-        'success' => false,
-        'error'   => 'Failed to create reservation in Supabase: ' . ($insertRes['error'] ?? 'Database error.')
+        'success' => true,
+        'source'  => 'supabase',
+        'data'    => $data
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$createdRes = $insertRes['data'][0] ?? $resRecord;
+$httpCode = $rpcRes['http_code'] ?: 500;
+$errMsg = $rpcRes['error'] ?? 'Database error while requesting reservation.';
+if ($httpCode === 404) {
+    $errMsg = 'The reservation system is not yet installed in Supabase. Please execute migration 20261011_phase2_create_reservations.sql in the Supabase SQL Editor.';
+}
 
-// Step F: Decrement space availability
-$newAvail = max(0, (int)$space['available_spaces'] - 1);
-$newStatus = ($newAvail === 0) ? 'full' : 'available';
-
-supabase_request("/rest/v1/parking_spaces?id=eq.{$spaceId}", 'PATCH', [
-    'available_spaces' => $newAvail,
-    'status'           => $newStatus
-]);
-
-http_response_code(201);
+http_response_code($httpCode);
 echo json_encode([
-    'success'       => true,
-    'source'        => 'supabase',
-    'message'       => 'Parking spot reserved successfully in Supabase!',
-    'data'          => $createdRes,
-    'reservation'   => $createdRes,
-    'parking_space' => [
-        'id'               => $space['id'],
-        'name'             => $space['name'],
-        'available_spaces' => $newAvail,
-        'status'           => $newStatus
-    ]
+    'success' => false,
+    'error'   => $errMsg
 ], JSON_UNESCAPED_UNICODE);
+exit;

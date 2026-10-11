@@ -536,6 +536,28 @@ if (!empty($_SESSION['auth_user'])) {
       </div>
       <p class="section-subtitle">Register and manage your safe elevated spaces to help neighbors protect their vehicles from flooding.</p>
 
+      <!-- Incoming Requests Section for Parking Space Owners (Phase 2 Owner Approval) -->
+      <div class="form-card" style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+              <span>📬</span> Incoming Parking Requests (Owner Approval)
+            </h3>
+            <p style="font-size: 0.88rem; color: #64748b; margin: 0;">
+              Review and approve reservation requests from neighbors in flood zones. Accepting a request assigns a safe spot and updates lot capacity.
+            </p>
+          </div>
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-refresh-owner-requests" title="Refresh incoming requests">
+            <span>🔄</span> Refresh Requests
+          </button>
+        </div>
+
+        <div id="owner-requests-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 14px;"></div>
+        <div id="owner-incoming-requests-container">
+          <div class="empty-spaces-notice">Loading incoming requests for your parking lots...</div>
+        </div>
+      </div>
+
       <!-- Offer Parking Space Form Card -->
       <div class="form-card">
         <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
@@ -947,7 +969,7 @@ if (!empty($_SESSION['auth_user'])) {
           <select id="reserve-modal-lot-select" class="form-select" required>
             <option value="">-- Choose Parking Lot --</option>
           </select>
-          <div class="form-help">Only parking spaces with open capacity (&gt; 0) and 'available' status can be reserved.</div>
+          <div class="form-help">Only host-offered parking spaces with open capacity (&gt; 0) can receive requests. The owner must approve before spots are locked.</div>
         </div>
         <div class="form-group" style="margin-top: 14px;">
           <label for="reserve-modal-notes" class="form-label">Reservation Notes (Optional)</label>
@@ -956,7 +978,7 @@ if (!empty($_SESSION['auth_user'])) {
         <div class="modal-actions" style="margin-top: 20px;">
           <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-reserve-modal">Cancel</button>
           <button type="submit" class="pixel-btn pixel-btn-green" id="btn-submit-reserve-modal">
-            <span>✅</span> Confirm Reservation
+            <span>📩</span> Request Reservation
           </button>
         </div>
       </form>
@@ -1235,6 +1257,13 @@ if (!empty($_SESSION['auth_user'])) {
         if (hash === '#my-reservations') {
           loadCars();
           loadReservations();
+        }
+
+        // Load owner incoming requests if my-spaces section is shown
+        if (hash === '#my-spaces') {
+          if (typeof loadOwnerRequests === 'function') {
+            loadOwnerRequests();
+          }
         }
 
         // Load profiles if profile section is shown
@@ -2199,10 +2228,25 @@ if (!empty($_SESSION['auth_user'])) {
           reservations.forEach(r => {
             const space = r.parking_spaces || {};
             const spaceName = space.name || 'Flood Parking Lot';
-            const status = r.status || 'confirmed';
-            const isActive = (status === 'confirmed' || status === 'active');
-            const statusClass = isActive ? 'status-available' : 'status-closed';
-            const statusLabel = isActive ? '✅ CONFIRMED' : (status === 'cancelled' ? '🚫 CANCELLED' : status.toUpperCase());
+            const status = (r.status || 'pending').toLowerCase();
+            const isConfirmed = (status === 'confirmed' || status === 'active');
+            const isPending = (status === 'pending');
+            const isRejected = (status === 'rejected');
+            const isCancelled = (status === 'cancelled');
+
+            let statusPill = '';
+            if (isConfirmed) {
+              statusPill = '<span class="status-pill status-available">🟢 CONFIRMED</span>';
+            } else if (isPending) {
+              statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">⏳ PENDING APPROVAL</span>';
+            } else if (isRejected) {
+              statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 REJECTED</span>';
+            } else if (isCancelled) {
+              statusPill = '<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">⚪ CANCELLED</span>';
+            } else {
+              statusPill = `<span class="status-pill">${status.toUpperCase()}</span>`;
+            }
+
             const createdAtFormatted = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
             const lat = space.latitude ? parseFloat(space.latitude).toFixed(5) : 'N/A';
             const lng = space.longitude ? parseFloat(space.longitude).toFixed(5) : 'N/A';
@@ -2215,10 +2259,16 @@ if (!empty($_SESSION['auth_user'])) {
                 </button>
               `;
             }
-            if (isActive) {
+            if (isPending) {
               actionButtons += `
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${spaceName}" style="flex: 1;">
-                  ❌ Cancel Reservation
+                  ❌ Cancel Request
+                </button>
+              `;
+            } else if (isConfirmed) {
+              actionButtons += `
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${spaceName}" style="flex: 1;">
+                  ❌ Cancel Spot
                 </button>
               `;
             }
@@ -2228,7 +2278,7 @@ if (!empty($_SESSION['auth_user'])) {
                 <div>
                   <div class="space-card-header">
                     <h4 class="space-card-title">🚗 ${spaceName}</h4>
-                    <span class="status-pill ${statusClass}">${statusLabel}</span>
+                    ${statusPill}
                   </div>
                   <div class="space-card-body" style="margin-top: 10px;">
                     <div><strong>Reserved On:</strong> ${createdAtFormatted}</div>
@@ -2424,6 +2474,8 @@ if (!empty($_SESSION['auth_user'])) {
               Your reservation for "${displayName}" has been cancelled. The parking spot is now available for other drivers.
             `);
             await loadReservations();
+            if (typeof loadOwnerRequests === 'function') await loadOwnerRequests();
+            if (typeof loadDashboard === 'function') await loadDashboard();
             if (window.parkingMap) {
               window.parkingMap.loadParkingSpaces();
             }
@@ -2432,6 +2484,180 @@ if (!empty($_SESSION['auth_user'])) {
           }
         } catch (err) {
           showReservationAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+        }
+      }
+
+      // ========================================================
+      // OWNER INCOMING REQUESTS CONTROLLER (PHASE 2 OWNER APPROVAL)
+      // ========================================================
+      async function loadOwnerRequests() {
+        const container = document.getElementById('owner-incoming-requests-container');
+        if (!container || !currentUser) return;
+
+        try {
+          container.innerHTML = '<div class="empty-spaces-notice"><span>⏳</span> Loading incoming requests for your parking lots...</div>';
+          const res = await fetch('api/get_reservations.php?as_owner=1');
+          const json = await res.json();
+
+          if (!res.ok || !json.success) {
+            container.innerHTML = `
+              <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
+                ❌ Could not load incoming requests: ${json.error || 'Server error'}
+              </div>
+            `;
+            return;
+          }
+
+          const requests = json.data || [];
+          if (requests.length === 0) {
+            container.innerHTML = `
+              <div class="empty-spaces-notice">
+                <span>📬</span> No incoming reservation requests for your parking lots at this time.
+              </div>
+            `;
+            return;
+          }
+
+          let html = '<div class="spaces-list-container">';
+          requests.forEach(r => {
+            const space = r.parking_spaces || {};
+            const car = r.cars || {};
+            const driver = r.driver_profile || {};
+            const spaceName = space.name || 'Your Parking Lot';
+            const status = (r.status || 'pending').toLowerCase();
+            const isPending = (status === 'pending');
+            const isConfirmed = (status === 'confirmed');
+            const isRejected = (status === 'rejected');
+            const isCancelled = (status === 'cancelled');
+
+            let statusPill = '';
+            if (isPending) {
+              statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">⏳ PENDING APPROVAL</span>';
+            } else if (isConfirmed) {
+              statusPill = '<span class="status-pill status-available">🟢 ACCEPTED</span>';
+            } else if (isRejected) {
+              statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 DECLINED</span>';
+            } else {
+              statusPill = `<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">⚪ ${status.toUpperCase()}</span>`;
+            }
+
+            const createdAt = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+
+            let actionsHtml = '';
+            if (isPending) {
+              actionsHtml = `
+                <div class="owner-req-actions" style="display: flex; gap: 8px; margin-top: 14px;">
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${spaceName}" data-plate="${car.license_plate || 'Vehicle'}" style="flex: 1;">
+                    ✅ Accept
+                  </button>
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${spaceName}" data-plate="${car.license_plate || 'Vehicle'}" style="flex: 1;">
+                    ❌ Decline
+                  </button>
+                </div>
+              `;
+            }
+
+            html += `
+              <article class="space-card" id="owner-req-card-${r.id}">
+                <div>
+                  <div class="space-card-header">
+                    <h4 class="space-card-title">🅿️ ${spaceName}</h4>
+                    ${statusPill}
+                  </div>
+                  <div class="space-card-body" style="margin-top: 10px;">
+                    <div><strong>Driver:</strong> 👤 ${driver.name || 'Neighbor'}</div>
+                    <div><strong>Vehicle:</strong> 🚘 ${car.license_plate || 'Vehicle'} (${car.model || 'Standard'})</div>
+                    <div><strong>Requested At:</strong> ${createdAt}</div>
+                    ${r.notes ? `<div><strong>Notes:</strong> <em>${r.notes}</em></div>` : ''}
+                  </div>
+                </div>
+                ${actionsHtml}
+              </article>
+            `;
+          });
+          html += '</div>';
+
+          container.innerHTML = html;
+        } catch (err) {
+          container.innerHTML = `
+            <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
+              ❌ Network error while loading incoming requests: ${err.message}
+            </div>
+          `;
+        }
+      }
+
+      window.loadOwnerRequests = loadOwnerRequests;
+
+      async function handleOwnerReservationAction(reservationId, action, spaceName, plateName, buttonElement) {
+        if (!reservationId || !action) return;
+
+        const actionText = (action === 'accept') ? 'Accept' : 'Decline';
+        const card = document.getElementById(`owner-req-card-${reservationId}`);
+        const actionButtons = card ? card.querySelectorAll('.btn-owner-approve-res') : [];
+
+        // Disable repeated actions while processing
+        actionButtons.forEach(b => {
+          b.disabled = true;
+        });
+        if (buttonElement) {
+          buttonElement.innerHTML = '<span>⏳</span> Processing...';
+        }
+
+        const alertBox = document.getElementById('owner-requests-alert');
+        if (alertBox) alertBox.style.display = 'none';
+
+        try {
+          const res = await fetch('api/approve_reservation.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify({
+              reservation_id: reservationId,
+              action: action
+            })
+          });
+
+          const json = await res.json();
+
+          if (res.ok && json.success) {
+            if (alertBox) {
+              alertBox.className = 'alert-message success';
+              alertBox.innerHTML = (action === 'accept') 
+                ? `🎉 <strong>Reservation Accepted!</strong><br>Spot assigned for vehicle "${plateName}" at "${spaceName}". Available capacity has been updated.`
+                : `ℹ️ <strong>Reservation Request Declined:</strong><br>Request for vehicle "${plateName}" was rejected and the vehicle released.`;
+              alertBox.style.display = 'block';
+            }
+            await loadOwnerRequests();
+            if (typeof loadDashboard === 'function') await loadDashboard();
+            if (window.parkingMap) window.parkingMap.loadParkingSpaces();
+          } else {
+            if (alertBox) {
+              alertBox.className = 'alert-message error';
+              alertBox.innerHTML = `❌ <strong>Failed to ${actionText.toLowerCase()} reservation:</strong> ${json.error || 'Server error'}`;
+              alertBox.style.display = 'block';
+            }
+            actionButtons.forEach(b => {
+              b.disabled = false;
+            });
+            if (buttonElement) {
+              buttonElement.innerHTML = (action === 'accept') ? '✅ Accept' : '❌ Decline';
+            }
+          }
+        } catch (err) {
+          if (alertBox) {
+            alertBox.className = 'alert-message error';
+            alertBox.innerHTML = `❌ <strong>Network error:</strong> ${err.message}`;
+            alertBox.style.display = 'block';
+          }
+          actionButtons.forEach(b => {
+            b.disabled = false;
+          });
+          if (buttonElement) {
+            buttonElement.innerHTML = (action === 'accept') ? '✅ Accept' : '❌ Decline';
+          }
         }
       }
 
@@ -2495,8 +2721,8 @@ if (!empty($_SESSION['auth_user'])) {
           // Filter owned parking lots: owner_id === currentUser.id
           const myLots = dashboardState.spaces.filter(s => s.owner_id && s.owner_id === currentUser.id);
 
-          // Map active reservations to cars
-          const activeReservations = dashboardState.reservations.filter(r => r.status === 'confirmed' || r.status === 'active');
+          // Map active reservations to cars (pending and confirmed count as active)
+          const activeReservations = dashboardState.reservations.filter(r => r.status === 'confirmed' || r.status === 'active' || r.status === 'pending');
           const carAssignmentMap = {};
           activeReservations.forEach(r => {
             if (r.car_id) {
@@ -2508,7 +2734,7 @@ if (!empty($_SESSION['auth_user'])) {
           const totalCars = dashboardState.cars.length;
           const assignedCarsCount = dashboardState.cars.filter(c => !!carAssignmentMap[c.id]).length;
           const myLotsCount = myLots.length;
-          const activeResCount = activeReservations.length;
+          const activeResCount = dashboardState.reservations.filter(r => r.status === 'confirmed' || r.status === 'active').length;
 
           const statCars = document.getElementById('dash-stat-cars');
           const statAssigned = document.getElementById('dash-stat-assigned');
@@ -2528,6 +2754,11 @@ if (!empty($_SESSION['auth_user'])) {
 
           // Section D: Render My Parking Assignments
           renderDashboardAssignments(dashboardState.cars, carAssignmentMap, dashboardState.reservations);
+
+          // Refresh owner incoming requests
+          if (typeof loadOwnerRequests === 'function') {
+            loadOwnerRequests();
+          }
 
         } catch (err) {
           showDashboardAlert('error', `❌ Network error while loading dashboard: ${err.message}`);
@@ -2556,17 +2787,21 @@ if (!empty($_SESSION['auth_user'])) {
           const lotName = space ? (space.name || 'Assigned Parking Lot') : null;
           const lat = space && space.latitude ? parseFloat(space.latitude).toFixed(4) : null;
           const lng = space && space.longitude ? parseFloat(space.longitude).toFixed(4) : null;
-          const resStatus = res ? (res.status || 'confirmed').toUpperCase() : null;
 
           let assignmentBoxHtml = '';
           if (hasAssignment) {
+            const isPending = (res.status === 'pending');
+            const statusBadge = isPending 
+              ? '<span class="status-pill" style="font-size: 0.7rem; padding: 2px 6px; background: #fef3c7; color: #b45309; border-color: #fde68a;">⏳ PENDING OWNER APPROVAL</span>'
+              : '<span class="status-pill status-available" style="font-size: 0.7rem; padding: 2px 6px;">🟢 RESERVATION CONFIRMED</span>';
+
             assignmentBoxHtml = `
-              <div class="dash-car-assignment-box assigned">
-                <div class="dash-car-assignment-label">Assigned Parking Spot</div>
+              <div class="dash-car-assignment-box ${isPending ? 'pending' : 'assigned'}" style="${isPending ? 'border: 1px dashed #f59e0b; background: #fffbeb;' : ''}">
+                <div class="dash-car-assignment-label">${isPending ? 'Requested Parking Spot' : 'Assigned Parking Spot'}</div>
                 <div class="dash-car-assignment-value">🅿️ ${lotName}</div>
                 ${(lat && lng) ? `<div style="font-size: 0.75rem; color: #64748b; font-family: monospace; margin-top: 2px;">📍 GPS: ${lat}, ${lng}</div>` : ''}
                 <div style="margin-top: 6px;">
-                  <span class="status-pill status-available" style="font-size: 0.7rem; padding: 2px 6px;">🟢 RESERVATION ${resStatus}</span>
+                  ${statusBadge}
                 </div>
               </div>
             `;
@@ -2582,6 +2817,7 @@ if (!empty($_SESSION['auth_user'])) {
 
           let actionButtons = '';
           if (hasAssignment) {
+            const isPending = (res.status === 'pending');
             if (lat && lng) {
               actionButtons += `
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-car-spot" data-lat="${space.latitude}" data-lng="${space.longitude}" title="Locate parking lot on map">
@@ -2590,8 +2826,8 @@ if (!empty($_SESSION['auth_user'])) {
               `;
             }
             actionButtons += `
-              <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-car-res" data-id="${res.id}" data-plate="${car.license_plate}" data-lot="${lotName}" title="Cancel reservation">
-                ❌ Cancel Spot
+              <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-car-res" data-id="${res.id}" data-plate="${car.license_plate}" data-lot="${lotName}" title="${isPending ? 'Cancel request' : 'Cancel reservation'}">
+                ${isPending ? '❌ Cancel Request' : '❌ Cancel Spot'}
               </button>
             `;
           } else {
@@ -2983,8 +3219,8 @@ if (!empty($_SESSION['auth_user'])) {
           reserveCarSelect.innerHTML = '<option value="">-- Choose Car --</option>';
           const cars = dashboardState.cars || [];
           const activeCarIds = new Set(
-            dashboardState.reservations
-              .filter(r => (r.status === 'confirmed' || r.status === 'active') && r.car_id)
+            (dashboardState.reservations || [])
+              .filter(r => (r.status === 'confirmed' || r.status === 'active' || r.status === 'pending') && r.car_id)
               .map(r => r.car_id)
           );
 
@@ -2992,22 +3228,22 @@ if (!empty($_SESSION['auth_user'])) {
             const isAssigned = activeCarIds.has(c.id);
             const opt = document.createElement('option');
             opt.value = c.id;
-            opt.textContent = `${c.license_plate} (${c.model || 'Standard'})${isAssigned ? ' [Already Assigned]' : ''}`;
+            opt.textContent = `${c.license_plate} (${c.model || 'Standard'})${isAssigned ? ' [Active Request / Parked]' : ''}`;
             if (isAssigned) opt.disabled = true;
             if (c.id === preselectedCarId) opt.selected = true;
             reserveCarSelect.appendChild(opt);
           });
         }
 
-        // Populate available parking spaces dropdown
+        // Populate available parking spaces dropdown (eligible host spaces only)
         if (reserveLotSelect) {
           reserveLotSelect.innerHTML = '<option value="">-- Choose Parking Lot --</option>';
-          const availableSpaces = (dashboardState.spaces || []).filter(s => s.status === 'available' && parseInt(s.available_spaces, 10) > 0);
+          const availableSpaces = (dashboardState.spaces || []).filter(s => s.status === 'available' && parseInt(s.available_spaces, 10) > 0 && s.owner_id !== null && s.owner_id !== undefined);
 
           if (availableSpaces.length === 0) {
             const opt = document.createElement('option');
             opt.value = '';
-            opt.textContent = '⚠️ No available parking spaces currently open';
+            opt.textContent = '⚠️ No eligible host parking spaces currently open';
             opt.disabled = true;
             reserveLotSelect.appendChild(opt);
           } else {
@@ -3048,7 +3284,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (!parking_space_id) {
           if (modalReserveAlert) {
             modalReserveAlert.className = 'alert-message error';
-            modalReserveAlert.innerHTML = '⚠️ Please select an available parking lot.';
+            modalReserveAlert.innerHTML = '⚠️ Please select an eligible host parking lot.';
             modalReserveAlert.style.display = 'block';
           }
           return;
@@ -3057,7 +3293,7 @@ if (!empty($_SESSION['auth_user'])) {
         try {
           if (btnSubmitReserveModal) {
             btnSubmitReserveModal.disabled = true;
-            btnSubmitReserveModal.innerHTML = '<span>⏳</span> Confirming Reservation...';
+            btnSubmitReserveModal.innerHTML = '<span>⏳</span> Submitting Request...';
           }
 
           const res = await fetch('api/create_reservation.php', {
@@ -3073,16 +3309,22 @@ if (!empty($_SESSION['auth_user'])) {
           if (res.ok && json.success) {
             closeReserveModal();
             showDashboardAlert('success', `
-              🎉 <strong>Spot Reserved Successfully!</strong><br>
-              Your vehicle has been secured at "${json.parking_space?.name || 'safe parking space'}".
+              🎉 <strong>Reservation Request Submitted!</strong><br>
+              Your request is pending parking space owner approval. Available spots remain open until the owner accepts.
             `);
+            if (typeof showReservationAlert === 'function') {
+              showReservationAlert('success', `
+                🎉 <strong>Reservation Request Submitted!</strong><br>
+                Your request is pending parking space owner approval.
+              `);
+            }
             await loadDashboard();
             if (typeof loadReservations === 'function') await loadReservations();
             if (window.parkingMap) window.parkingMap.loadParkingSpaces();
           } else {
             if (modalReserveAlert) {
               modalReserveAlert.className = 'alert-message error';
-              modalReserveAlert.innerHTML = `❌ ${json.error || 'Failed to complete reservation.'}`;
+              modalReserveAlert.innerHTML = `❌ ${json.error || 'Failed to submit reservation request.'}`;
               modalReserveAlert.style.display = 'block';
             }
           }
@@ -3095,7 +3337,7 @@ if (!empty($_SESSION['auth_user'])) {
         } finally {
           if (btnSubmitReserveModal) {
             btnSubmitReserveModal.disabled = false;
-            btnSubmitReserveModal.innerHTML = '<span>✅</span> Confirm Reservation';
+            btnSubmitReserveModal.innerHTML = '<span>📩</span> Request Reservation';
           }
         }
       });
@@ -3205,6 +3447,22 @@ if (!empty($_SESSION['auth_user'])) {
         const cancelResBtn = e.target.closest('.btn-cancel-reservation, .btn-cancel-car-res');
         if (cancelResBtn) {
           cancelReservation(cancelResBtn.dataset.id, cancelResBtn.dataset.name || cancelResBtn.dataset.lot);
+        }
+
+        const ownerApproveBtn = e.target.closest('.btn-owner-approve-res');
+        if (ownerApproveBtn) {
+          handleOwnerReservationAction(
+            ownerApproveBtn.dataset.id,
+            ownerApproveBtn.dataset.action,
+            ownerApproveBtn.dataset.space,
+            ownerApproveBtn.dataset.plate,
+            ownerApproveBtn
+          );
+        }
+
+        const refreshRequestsBtn = e.target.closest('#btn-refresh-owner-requests');
+        if (refreshRequestsBtn) {
+          loadOwnerRequests();
         }
 
         const toggleLotBtn = e.target.closest('.btn-toggle-lot-status');

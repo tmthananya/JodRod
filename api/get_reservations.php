@@ -1,8 +1,12 @@
 <?php
 /**
  * API: Get Reservations (READ)
- * Supabase-Only Source of Truth.
- * Returns all reservations for the currently authenticated user from public.reservations.
+ * 
+ * Returns reservations scoped strictly to the authenticated user.
+ * Modes:
+ * - Driver View (default): Returns reservations created by the current user.
+ * - Owner View (?as_owner=1): Returns reservations for parking lots owned by the current user.
+ * Supports optional status filtering (?status=pending).
  */
 header('Content-Type: application/json; charset=UTF-8');
 require_once __DIR__ . '/../config.php';
@@ -17,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 $currentUser = require_auth();
 $uid = $currentUser['id'];
 
-// 2. Enforce Supabase-Only Storage
 if (!SUPABASE_LIVE_MODE) {
     http_response_code(503);
     echo json_encode([
@@ -28,38 +31,103 @@ if (!SUPABASE_LIVE_MODE) {
 }
 
 $asOwner = isset($_GET['as_owner']) && ($_GET['as_owner'] === '1' || $_GET['as_owner'] === 'true');
+$statusFilter = isset($_GET['status']) ? strtolower(trim($_GET['status'])) : '';
+$validStatuses = ['pending', 'confirmed', 'rejected', 'cancelled', 'completed'];
 
-if ($asOwner) {
-    // Fetch parking spaces owned by current user
-    $spacesRes = supabase_request("/rest/v1/parking_spaces?owner_id=eq.{$uid}&select=id", 'GET');
-    if ($spacesRes['success'] && is_array($spacesRes['data'])) {
-        $spaceIds = array_column($spacesRes['data'], 'id');
-        if (empty($spaceIds)) {
-            echo json_encode([
-                'success' => true,
-                'source'  => 'supabase',
-                'count'   => 0,
-                'data'    => []
-            ], JSON_UNESCAPED_UNICODE);
-            exit;
-        }
-        $inList = '(' . implode(',', array_map('urlencode', $spaceIds)) . ')';
-        $res = supabase_request("/rest/v1/reservations?parking_space_id=in.{$inList}&select=*,cars(id,license_plate,model),parking_spaces(id,name,capacity,available_spaces,status)&order=created_at.desc", 'GET');
-    } else {
-        $res = $spacesRes;
-    }
-} else {
-    $res = supabase_request("/rest/v1/reservations?user_id=eq.{$uid}&select=*,cars(id,license_plate,model),parking_spaces(id,name,latitude,longitude,capacity,available_spaces,status)&order=created_at.desc", 'GET');
+$statusClause = '';
+if (!empty($statusFilter) && in_array($statusFilter, $validStatuses, true)) {
+    $statusClause = "&status=eq." . urlencode($statusFilter);
 }
 
-if ($res['success'] && is_array($res['data'])) {
-    echo json_encode([
-        'success' => true,
-        'source'  => 'supabase',
-        'count'   => count($res['data']),
-        'data'    => $res['data']
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
+if ($asOwner) {
+    // -------------------------------------------------------------------------
+    // OWNER VIEW: Reservations for parking spaces owned by current user
+    // -------------------------------------------------------------------------
+    $safeUid = urlencode($uid);
+    $spacesRes = supabase_request("/rest/v1/parking_spaces?owner_id=eq.{$safeUid}&select=id", 'GET');
+    
+    if (!$spacesRes['success'] || !is_array($spacesRes['data'])) {
+        http_response_code($spacesRes['http_code'] ?: 500);
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Failed to retrieve owned parking spaces from Supabase: ' . ($spacesRes['error'] ?? 'Database error.')
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $spaceIds = array_column($spacesRes['data'], 'id');
+    if (empty($spaceIds)) {
+        echo json_encode([
+            'success' => true,
+            'source'  => 'supabase',
+            'view'    => 'owner',
+            'count'   => 0,
+            'data'    => []
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $inList = '(' . implode(',', array_map('urlencode', $spaceIds)) . ')';
+    $resUrl = "/rest/v1/reservations?parking_space_id=in.{$inList}{$statusClause}&select=*,cars(id,license_plate,model),parking_spaces(id,name,capacity,available_spaces,status,owner_id)&order=created_at.desc";
+    $res = supabase_request($resUrl, 'GET');
+
+    if ($res['success'] && is_array($res['data'])) {
+        $reservations = $res['data'];
+
+        // Enrich reservations with driver display names and avatars from profiles
+        $driverUserIds = array_values(array_unique(array_filter(array_column($reservations, 'user_id'))));
+        $driverProfiles = [];
+
+        if (!empty($driverUserIds)) {
+            $userInList = '(' . implode(',', array_map('urlencode', $driverUserIds)) . ')';
+            $profRes = supabase_request("/rest/v1/profiles?user_id=in.{$userInList}&select=user_id,name,avatar", 'GET');
+            if ($profRes['success'] && is_array($profRes['data'])) {
+                foreach ($profRes['data'] as $p) {
+                    $driverProfiles[$p['user_id']] = [
+                        'name'   => $p['name'] ?? 'Driver',
+                        'avatar' => $p['avatar'] ?? null
+                    ];
+                }
+            }
+        }
+
+        foreach ($reservations as &$item) {
+            $dUid = $item['user_id'] ?? null;
+            $item['driver_profile'] = $driverProfiles[$dUid] ?? [
+                'name'   => 'Community Driver',
+                'avatar' => null
+            ];
+        }
+        unset($item);
+
+        echo json_encode([
+            'success' => true,
+            'source'  => 'supabase',
+            'view'    => 'owner',
+            'count'   => count($reservations),
+            'data'    => $reservations
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+} else {
+    // -------------------------------------------------------------------------
+    // DRIVER VIEW: Current user's own reservations
+    // -------------------------------------------------------------------------
+    $safeUid = urlencode($uid);
+    $resUrl = "/rest/v1/reservations?user_id=eq.{$safeUid}{$statusClause}&select=*,cars(id,license_plate,model),parking_spaces(id,name,latitude,longitude,capacity,available_spaces,status,owner_id)&order=created_at.desc";
+    $res = supabase_request($resUrl, 'GET');
+
+    if ($res['success'] && is_array($res['data'])) {
+        echo json_encode([
+            'success' => true,
+            'source'  => 'supabase',
+            'view'    => 'driver',
+            'count'   => count($res['data']),
+            'data'    => $res['data']
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 }
 
 http_response_code($res['http_code'] ?: 500);
@@ -67,3 +135,4 @@ echo json_encode([
     'success' => false,
     'error'   => 'Failed to retrieve reservations from Supabase: ' . ($res['error'] ?? 'Table unavailable.')
 ], JSON_UNESCAPED_UNICODE);
+exit;

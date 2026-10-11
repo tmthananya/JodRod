@@ -1,10 +1,13 @@
 <?php
 /**
- * API: Cancel Parking Space Reservation (CANCEL)
- * Supabase-Only Source of Truth.
+ * API: Cancel Parking Space Reservation (Driver or Owner Action)
  * 
- * Verifies reservation ownership, marks the record as 'cancelled'
- * in public.reservations, and restores available_spaces on public.parking_spaces.
+ * Securely cancels a pending or confirmed flood parking reservation.
+ * Calls atomic Supabase RPC 'cancel_reservation':
+ * - Verifies caller is either the driver who reserved the spot OR the lot owner.
+ * - Restores capacity (+1 available spot) ONLY if the reservation was in 'confirmed' status.
+ * - Leaves capacity unchanged if cancelling a 'pending' request.
+ * - Respects the lot's 'closed' status when recalculating status.
  */
 header('Content-Type: application/json; charset=UTF-8');
 require_once __DIR__ . '/../config.php';
@@ -20,6 +23,15 @@ $currentUser = require_auth();
 require_csrf();
 $uid = $currentUser['id'];
 
+if (!SUPABASE_LIVE_MODE) {
+    http_response_code(503);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Database unavailable: Supabase credentials are not configured.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 $input = json_decode(file_get_contents('php://input'), true);
 if (!$input) {
     http_response_code(400);
@@ -34,87 +46,65 @@ if (empty($reservationId)) {
     exit;
 }
 
-// 2. Enforce Supabase-Only Storage
-if (!SUPABASE_LIVE_MODE) {
-    http_response_code(503);
-    echo json_encode([
-        'success' => false,
-        'error'   => 'Database unavailable: Supabase credentials are not configured.'
-    ], JSON_UNESCAPED_UNICODE);
+// Security: Check for client-supplied user_id spoofing
+if (isset($input['user_id']) && $input['user_id'] !== $uid) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Forbidden: user_id cannot be spoofed. Derived strictly from your session.']);
     exit;
 }
 
-// Attempt 1: Call atomic database RPC function if installed
+// 2. Call atomic database RPC function: cancel_reservation
 $rpcRes = supabase_request('/rest/v1/rpc/cancel_reservation', 'POST', [
     'p_reservation_id' => $reservationId,
     'p_user_id'        => $uid
 ]);
 
-if ($rpcRes['success'] && isset($rpcRes['data']['success'])) {
-    if ($rpcRes['data']['success']) {
-        echo json_encode($rpcRes['data'], JSON_UNESCAPED_UNICODE);
-        exit;
-    } else {
-        http_response_code(400);
-        echo json_encode($rpcRes['data'], JSON_UNESCAPED_UNICODE);
-        exit;
+if ($rpcRes['success']) {
+    $data = $rpcRes['data'];
+    if (is_array($data) && isset($data['success'])) {
+        if ($data['success']) {
+            echo json_encode([
+                'success'        => true,
+                'source'         => 'supabase',
+                'message'        => $data['message'] ?? 'Reservation cancelled successfully.',
+                'reservation_id' => $reservationId
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        } else {
+            $errorMsg = $data['error'] ?? 'Cancellation failed.';
+            $httpCode = 400;
+            if (stripos($errorMsg, 'Forbidden') !== false) {
+                $httpCode = 403;
+            } elseif (stripos($errorMsg, 'not found') !== false) {
+                $httpCode = 404;
+            }
+            http_response_code($httpCode);
+            echo json_encode([
+                'success' => false,
+                'error'   => $errorMsg
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
     }
-}
 
-// Attempt 2: Direct PostgREST query flow in Supabase
-$checkRes = supabase_request("/rest/v1/reservations?id=eq.{$reservationId}&select=*", 'GET');
-if (!$checkRes['success'] || empty($checkRes['data'])) {
-    http_response_code(404);
-    echo json_encode(['success' => false, 'error' => 'Reservation record not found.']);
-    exit;
-}
-
-$res = $checkRes['data'][0];
-
-// Ownership check: User can only cancel their own reservation
-if (($res['user_id'] ?? '') !== $uid) {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'error' => 'Forbidden: You do not have permission to cancel this reservation.']);
-    exit;
-}
-
-if (($res['status'] ?? '') !== 'confirmed') {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'This reservation is already ' . ($res['status'] ?? 'inactive') . '.']);
-    exit;
-}
-
-// Cancel reservation in Supabase
-$patchRes = supabase_request("/rest/v1/reservations?id=eq.{$reservationId}&user_id=eq.{$uid}", 'PATCH', [
-    'status' => 'cancelled'
-]);
-
-if (!$patchRes['success']) {
-    http_response_code($patchRes['http_code'] ?: 500);
     echo json_encode([
-        'success' => false,
-        'error'   => 'Failed to update reservation in Supabase: ' . ($patchRes['error'] ?? 'Database error.')
+        'success'        => true,
+        'source'         => 'supabase',
+        'message'        => 'Reservation cancelled successfully.',
+        'reservation_id' => $reservationId
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-// Increment availability on space
-$spaceId = $res['parking_space_id'];
-$spaceRes = supabase_request("/rest/v1/parking_spaces?id=eq.{$spaceId}&select=*", 'GET');
-if ($spaceRes['success'] && !empty($spaceRes['data'])) {
-    $space = $spaceRes['data'][0];
-    $newAvail = min((int)$space['capacity'], (int)$space['available_spaces'] + 1);
-    $newStatus = ($space['status'] === 'full' && $newAvail > 0) ? 'available' : $space['status'];
-
-    supabase_request("/rest/v1/parking_spaces?id=eq.{$spaceId}", 'PATCH', [
-        'available_spaces' => $newAvail,
-        'status'           => $newStatus
-    ]);
+$httpCode = $rpcRes['http_code'] ?: 500;
+$errMsg = $rpcRes['error'] ?? 'Database error while cancelling reservation.';
+if ($httpCode === 404) {
+    $errMsg = 'The reservation system is not yet installed in Supabase. Please execute migration 20261011_phase2_create_reservations.sql in the Supabase SQL Editor.';
 }
 
+http_response_code($httpCode);
 echo json_encode([
-    'success'        => true,
-    'source'         => 'supabase',
-    'message'        => 'Reservation cancelled successfully. Spot restored to available parking.',
-    'reservation_id' => $reservationId
+    'success' => false,
+    'error'   => $errMsg
 ], JSON_UNESCAPED_UNICODE);
+exit;

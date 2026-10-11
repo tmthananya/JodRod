@@ -200,11 +200,17 @@ class ParkingMapController {
             </button>
           </div>
         `;
+      } else if (isCommunity) {
+        popupActionsHtml = `
+          <div style="margin-top: 8px; text-align: center; font-size: 0.75rem; color: #1e40af; font-weight: 700; background: #dbeafe; padding: 6px; border-radius: 4px; border: 1px solid #bfdbfe;">
+            🏛️ Public Community Space<br><span style="font-weight: normal; font-size: 0.7rem; color: #3b82f6;">First-come, first-served (No approval needed)</span>
+          </div>
+        `;
       } else if (isAvailable) {
         popupActionsHtml = `
           <div style="display: flex; gap: 6px; margin-top: 8px;">
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-reserve-space" data-id="${s.id}" data-name="${s.name}" data-available="${s.available_spaces}" style="flex: 1;">
-              🚗 Reserve Spot
+              🚗 Request Spot
             </button>
           </div>
         `;
@@ -242,10 +248,16 @@ class ParkingMapController {
             🗑️ Delete
           </button>
         `;
+      } else if (isCommunity) {
+        cardActionsHtml = `
+          <span style="font-size: 0.75rem; color: #1e40af; font-weight: 700; background: #dbeafe; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; flex: 1; border: 1px solid #bfdbfe;">
+            🏛️ Public Community Space
+          </span>
+        `;
       } else if (isAvailable) {
         cardActionsHtml = `
           <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-reserve-space" data-id="${s.id}" data-name="${s.name}" data-available="${s.available_spaces}" style="flex: 1;">
-            🚗 Reserve Spot
+            🚗 Request Spot
           </button>
         `;
       } else {
@@ -415,13 +427,19 @@ class ParkingMapController {
     }
   }
 
-  // Reserve parking space
+  // Reserve parking space (Phase 2 Owner Approval workflow)
   async reserveParkingSpace(spaceId, spaceName, availableSpots) {
     if (!spaceId) return;
 
     if (!window.currentUser) {
-      alert('⚠️ Please log in to your account before reserving a parking spot.');
+      alert('⚠️ Please log in to your account before requesting a parking spot.');
       window.location.hash = '#home';
+      return;
+    }
+
+    const space = this.spacesData ? this.spacesData[spaceId] : null;
+    if (space && !space.owner_id) {
+      this.showMapAlert('error', '⚠️ Public community spaces operate on a first-come, first-served basis and do not require reservation requests.');
       return;
     }
 
@@ -444,7 +462,7 @@ class ParkingMapController {
         } else {
           const carOptions = cars.map((c, i) => `${i + 1}. ${c.license_plate} (${c.model || 'Standard'})`).join('\n');
           const choice = window.prompt(
-            `🚗 Select which vehicle to park at "${spaceName}":\n\n${carOptions}\n\nEnter number (1-${cars.length}):`,
+            `🚗 Select which vehicle to request parking at "${spaceName}":\n\n${carOptions}\n\nEnter number (1-${cars.length}):`,
             '1'
           );
           if (choice === null) return; // cancelled
@@ -457,13 +475,19 @@ class ParkingMapController {
       }
     } catch (e) {}
 
+    if (!selectedCarId) {
+      this.showMapAlert('error', '⚠️ You must register a vehicle in "My Cars" before requesting a parking spot.');
+      window.location.hash = '#dashboard';
+      return;
+    }
+
     const displayName = spaceName || 'this parking lot';
     const confirmed = window.confirm(
-      `🚗 Confirm Flood Parking Reservation\n\n` +
+      `🚗 Submit Flood Parking Request\n\n` +
       `Parking Lot: ${displayName}\n` +
       selectedCarInfo +
       `Spots Available: ${availableSpots}\n\n` +
-      `Would you like to reserve 1 parking spot?`
+      `Your request will be sent to the parking lot owner for approval. Proceed?`
     );
     if (!confirmed) return;
 
@@ -484,19 +508,20 @@ class ParkingMapController {
 
       if (res.ok && json.success) {
         this.showMapAlert('success', `
-          🎉 <strong>Reservation Confirmed!</strong><br>
-          <span>Spot successfully reserved in Supabase at "${displayName}". View your reservation under <a href="#my-reservations" style="color: #0284c7; font-weight: bold; text-decoration: underline;">My Reservations</a>.</span>
+          🎉 <strong>Reservation Request Submitted!</strong><br>
+          <span>Your request is pending host approval at "${displayName}". Available capacity remains open until the host approves. Track progress in <a href="#my-reservations" style="color: #0284c7; font-weight: bold; text-decoration: underline;">My Reservations</a>.</span>
         `);
 
-        // Refresh spaces to reflect decremented spots
+        // Refresh spaces and reservations
         await this.loadParkingSpaces();
-
-        // Refresh reservations list if user visits reservations section
         if (typeof window.loadReservations === 'function') {
           window.loadReservations();
         }
+        if (typeof window.loadDashboard === 'function') {
+          window.loadDashboard();
+        }
       } else {
-        this.showMapAlert('error', `❌ <strong>Reservation Failed:</strong> ${json.error || 'Server error'}`);
+        this.showMapAlert('error', `❌ <strong>Request Failed:</strong> ${json.error || 'Server error'}`);
       }
     } catch (err) {
       this.showMapAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
