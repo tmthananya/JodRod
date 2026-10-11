@@ -1,0 +1,206 @@
+================================================================================
+JODROD (จอดรถ) - ENTITY RELATIONSHIP (ER) DIAGRAM & SCHEMA ARCHITECTURE
+================================================================================
+Generated: 2026-10-11
+Project: JodRod Flood Parking Platform
+Backend: PHP + Supabase (PostgreSQL / PostgREST)
+
+--------------------------------------------------------------------------------
+1. HIGH-LEVEL RELATIONSHIP OVERVIEW (ASCII DIAGRAM)
+--------------------------------------------------------------------------------
+
+  +-----------------------+
+  |      auth.users       |  (Supabase Authentication)
+  |-----------------------|
+  | PK: id (UUID)         |<-------------------+
+  |     email             |                    |
+  +-----------------------+                    |
+       |             |                         |
+       | 1:1         | 1:N                     | 1:N
+       |             |                         |
+       v             v                         v
+  +-----------+  +-------------+       +-------------------+
+  |  profiles |  |    cars     |       |  parking_spaces   |
+  |-----------|  |-------------|       |-------------------|
+  | PK: id    |  | PK: id      |       | PK: id            |
+  | FK:user_id|  | FK: user_id |       | FK: owner_id (opt)|
+  +-----------+  +-------------+       +-------------------+
+                       |                         |
+                       |                         |
+                       | 1:0..1 (Active)         | 1:N
+                       |                         |
+                       v                         v
+                 +-------------------------------------+
+                 |            reservations             |
+                 |-------------------------------------|
+                 | PK: id (UUID)                       |
+                 | FK: user_id         --> auth.users  |
+                 | FK: parking_space_id--> spaces      |
+                 | COMPOSITE FK:                       |
+                 |     (car_id, user_id)               |
+                 |       --> cars(id, user_id)         |
+                 +-------------------------------------+
+
+
+--------------------------------------------------------------------------------
+2. DETAILED CARDINALITIES & BUSINESS RULES
+--------------------------------------------------------------------------------
+
+[A] auth.users (1) <----> (1) public.profiles
+    - Exactly ONE profile per login account.
+    - Enforced by: UNIQUE (user_id) constraint on profiles.
+    - Profiles store public community display data (name, 3D avatar).
+
+[B] auth.users (1) <----> (0..N) public.cars
+    - One user can register and own MULTIPLE cars.
+    - Foreign key: cars.user_id REFERENCES auth.users(id).
+    - Constraint: UNIQUE (user_id, license_plate) prevents duplicate plates per user.
+    - Security: Each user can only view, edit, or delete their own cars.
+
+[C] auth.users (1) <----> (0..N) public.parking_spaces
+    - One user can register and offer MULTIPLE parking spaces / lots.
+    - Foreign key: parking_spaces.owner_id REFERENCES auth.users(id).
+    - Legacy Community Spaces: owner_id IS NULL (public discovery only; cannot
+      be edited or deleted by arbitrary users).
+    - Security: Only the owner (auth.uid() = owner_id) can edit or delete a lot.
+
+[D] public.cars (1) <----> (0..1) public.reservations (Active)
+    - One car can have at most ONE active reservation ('pending' or 'confirmed')
+      at any given time.
+    - Enforced by PostgreSQL Partial Unique Index:
+      CREATE UNIQUE INDEX uq_active_reservation_per_car 
+      ON public.reservations (car_id) 
+      WHERE status IN ('pending', 'confirmed');
+
+[E] public.parking_spaces (1) <----> (0..N) public.reservations
+    - A parking lot holds multiple confirmed bookings up to its total capacity.
+    - available_spaces tracks open capacity (0 <= available_spaces <= capacity).
+    - When available_spaces reaches 0, parking lot status transitions to 'full'.
+
+[F] Cross-User Vehicle Defense (Composite Foreign Key)
+    - Problem: User A must NEVER be able to reserve User B's car.
+    - Database Enforcement:
+      In public.cars:         UNIQUE (id, user_id)
+      In public.reservations: FOREIGN KEY (car_id, user_id) 
+                              REFERENCES public.cars(id, user_id)
+    - If User A attempts to submit User B's car_id, PostgreSQL immediately throws
+      a foreign key violation error because (car_B_id, user_A_id) does not exist.
+
+
+--------------------------------------------------------------------------------
+3. TABLE SCHEMAS & COLUMN SPECIFICATIONS
+--------------------------------------------------------------------------------
+
+TABLE: auth.users (Managed by Supabase Auth)
+--------------------------------------------------------------------------------
+Column          Type         Constraint / Description
+--------------------------------------------------------------------------------
+id              UUID         PRIMARY KEY
+email           TEXT         User's Google / Gmail login email
+created_at      TIMESTAMPTZ  Account creation timestamp
+
+
+TABLE: public.profiles
+--------------------------------------------------------------------------------
+Column          Type         Constraint / Description
+--------------------------------------------------------------------------------
+id              UUID         PRIMARY KEY DEFAULT gen_random_uuid()
+user_id         UUID         UNIQUE, REFERENCES auth.users(id) ON DELETE CASCADE
+name            TEXT         NOT NULL (Display name)
+avatar          TEXT         Avatar configuration JSON (3D customizer)
+created_at      TIMESTAMPTZ  DEFAULT now()
+updated_at      TIMESTAMPTZ  DEFAULT now()
+
+
+TABLE: public.cars
+--------------------------------------------------------------------------------
+Column          Type         Constraint / Description
+--------------------------------------------------------------------------------
+id              UUID         PRIMARY KEY DEFAULT gen_random_uuid()
+user_id         UUID         NOT NULL, REFERENCES auth.users(id) ON DELETE CASCADE
+license_plate   TEXT         NOT NULL (Vehicle registration plate)
+model           TEXT         Vehicle make / model / color description
+created_at      TIMESTAMPTZ  DEFAULT now()
+updated_at      TIMESTAMPTZ  DEFAULT now()
+CONSTRAINTS:
+  - UNIQUE (user_id, license_plate)
+  - UNIQUE (id, user_id)  [Required for composite FK from reservations]
+
+
+TABLE: public.parking_spaces
+--------------------------------------------------------------------------------
+Column            Type         Constraint / Description
+--------------------------------------------------------------------------------
+id                UUID         PRIMARY KEY DEFAULT gen_random_uuid()
+owner_id          UUID         REFERENCES auth.users(id) ON DELETE SET NULL
+                               (NULL indicates a legacy community parking space)
+name              TEXT         NOT NULL (Parking lot / driveway title)
+latitude          NUMERIC(9,6) NOT NULL (GPS Latitude)
+longitude         NUMERIC(9,6) NOT NULL (GPS Longitude)
+capacity          INTEGER      NOT NULL, CHECK (capacity >= 0)
+available_spaces  INTEGER      NOT NULL, CHECK (available_spaces >= 0 AND <= capacity)
+status            TEXT         NOT NULL, DEFAULT 'available'
+                               CHECK (status IN ('available', 'full', 'closed'))
+created_at        TIMESTAMPTZ  DEFAULT now()
+updated_at        TIMESTAMPTZ  DEFAULT now()
+
+
+TABLE: public.reservations
+--------------------------------------------------------------------------------
+Column            Type         Constraint / Description
+--------------------------------------------------------------------------------
+id                UUID         PRIMARY KEY DEFAULT gen_random_uuid()
+user_id           UUID         NOT NULL, REFERENCES auth.users(id) ON DELETE CASCADE
+car_id            UUID         NOT NULL
+parking_space_id  UUID         NOT NULL, REFERENCES public.parking_spaces(id) ON DELETE CASCADE
+status            TEXT         NOT NULL, DEFAULT 'pending'
+                               CHECK (status IN ('pending', 'confirmed', 'rejected', 'cancelled', 'completed'))
+notes             TEXT         Optional flood emergency notes
+created_at        TIMESTAMPTZ  DEFAULT now()
+updated_at        TIMESTAMPTZ  DEFAULT now()
+CONSTRAINTS & INDEXES:
+  - COMPOSITE FK: (car_id, user_id) REFERENCES public.cars(id, user_id)
+  - PARTIAL UNIQUE INDEX: UNIQUE (car_id) WHERE status IN ('pending', 'confirmed')
+
+
+--------------------------------------------------------------------------------
+4. RESERVATION STATE MACHINE & WORKFLOW
+--------------------------------------------------------------------------------
+
+                      [ Driver selects car & lot ]
+                                   |
+                                   v
+                             +-----------+
+                             |  PENDING  | (available_spaces NOT decreased)
+                             +-----------+
+                               /       \
+             Owner clicks     /         \   Owner clicks
+              "Accept"       /           \   "Decline"
+                            v             v
+                    +-----------+     +------------+
+                    | CONFIRMED |     |  REJECTED  | (car released)
+                    +-----------+     +------------+
+                    (spots - 1)
+                    (if spots=0 -> status='full')
+                          |
+             Driver/Owner |
+             clicks Cancel|
+                          v
+                    +-----------+
+                    | CANCELLED |
+                    +-----------+
+                    (spots + 1)
+                    (if spots>0 -> status='available')
+
+
+--------------------------------------------------------------------------------
+5. LIVE DATABASE STATUS AUDIT (CURRENT LIVE DEPLOYMENT)
+--------------------------------------------------------------------------------
+- public.profiles:        ACTIVE (HTTP 200) - 3 records (2 user, 1 legacy NULL)
+- public.parking_spaces:  ACTIVE (HTTP 200) - 4 records (1 user, 3 legacy NULL)
+- public.cars:            PENDING MIGRATION (HTTP 404 / PGRST205)
+- public.reservations:    PENDING MIGRATION (HTTP 404 / PGRST205)
+
+MIGRATION FILE READY FOR EXECUTION:
+supabase/migrations/20261011_phase1_database_relationships_and_approval.sql
+================================================================================

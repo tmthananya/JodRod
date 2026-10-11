@@ -2267,7 +2267,7 @@ if (!empty($_SESSION['auth_user'])) {
 
         try {
           container.innerHTML = '<div style="font-size: 0.88rem; color: #64748b;">⏳ Loading vehicles from Supabase...</div>';
-          const res = await fetch('api/cars.php');
+          const res = await fetch('api/get_cars.php');
           const json = await res.json();
 
           if (!res.ok || !json.success) {
@@ -2293,9 +2293,14 @@ if (!empty($_SESSION['auth_user'])) {
                   <div style="font-weight: 800; font-size: 1rem; color: #0f172a;">🚘 ${c.license_plate}</div>
                   <div style="font-size: 0.82rem; color: #64748b;">${c.model || 'Standard Vehicle'}</div>
                 </div>
-                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${c.id}" data-plate="${c.license_plate}" title="Delete Vehicle">
-                  🗑️
-                </button>
+                <div style="display: flex; gap: 6px;">
+                  <button type="button" class="pixel-btn pixel-btn-sm btn-edit-car" data-id="${c.id}" data-plate="${c.license_plate}" data-model="${c.model || ''}" title="Edit Vehicle Details">
+                    ✏️ Edit
+                  </button>
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${c.id}" data-plate="${c.license_plate}" title="Delete Vehicle">
+                    🗑️
+                  </button>
+                </div>
               </div>
             `;
           });
@@ -2330,7 +2335,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (!plate) return;
 
         try {
-          const res = await fetch('api/cars.php', {
+          const res = await fetch('api/create_car.php', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -2342,10 +2347,14 @@ if (!empty($_SESSION['auth_user'])) {
           const json = await res.json();
           if (res.ok && json.success) {
             showReservationAlert('success', `🚘 <strong>Vehicle Registered:</strong> "${plate}" has been saved in Supabase.`);
+            if (typeof showDashboardAlert === 'function') {
+              showDashboardAlert('success', `🚘 <strong>Vehicle Registered:</strong> "${plate}" has been saved in Supabase.`);
+            }
             if (plateInput) plateInput.value = '';
             if (modelInput) modelInput.value = '';
             document.getElementById('add-car-form').style.display = 'none';
             await loadCars();
+            if (typeof loadDashboard === 'function') await loadDashboard();
           } else {
             showReservationAlert('error', `❌ <strong>Failed to register vehicle:</strong> ${json.error || 'Server error'}`);
           }
@@ -2360,8 +2369,8 @@ if (!empty($_SESSION['auth_user'])) {
         if (!confirmed) return;
 
         try {
-          const res = await fetch('api/cars.php', {
-            method: 'DELETE',
+          const res = await fetch('api/delete_car.php', {
+            method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'X-CSRF-Token': window.csrfToken || ''
@@ -2371,9 +2380,16 @@ if (!empty($_SESSION['auth_user'])) {
           const json = await res.json();
           if (res.ok && json.success) {
             showReservationAlert('success', `🗑️ Vehicle "${plate}" deleted from Supabase.`);
+            if (typeof showDashboardAlert === 'function') {
+              showDashboardAlert('success', `🗑️ Vehicle "${plate}" deleted from Supabase.`);
+            }
             await loadCars();
+            if (typeof loadDashboard === 'function') await loadDashboard();
           } else {
             showReservationAlert('error', `❌ <strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
+            if (typeof showDashboardAlert === 'function') {
+              showDashboardAlert('error', `❌ <strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
+            }
           }
         } catch (err) {
           showReservationAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
@@ -2456,7 +2472,7 @@ if (!empty($_SESSION['auth_user'])) {
 
         try {
           const [carsRes, spacesRes, reservationsRes, ownerRes] = await Promise.all([
-            fetch('api/cars.php').then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+            fetch('api/get_cars.php').then(r => r.json()).catch(e => ({ success: false, error: e.message })),
             fetch('api/get_parking_spaces.php').then(r => r.json()).catch(e => ({ success: false, error: e.message })),
             fetch('api/get_reservations.php').then(r => r.json()).catch(e => ({ success: false, error: e.message })),
             fetch('api/get_reservations.php?as_owner=1').then(r => r.json()).catch(e => ({ success: false, error: e.message }))
@@ -2906,8 +2922,8 @@ if (!empty($_SESSION['auth_user'])) {
           }
 
           const isEdit = !!id;
-          const url = 'api/cars.php';
-          const method = isEdit ? 'PATCH' : 'POST';
+          const url = isEdit ? 'api/update_car.php' : 'api/create_car.php';
+          const method = 'POST';
           const payload = isEdit ? { id, license_plate, model } : { license_plate, model };
 
           const res = await fetch(url, {
