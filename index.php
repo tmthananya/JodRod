@@ -505,17 +505,22 @@ if (!empty($_SESSION['auth_user'])) {
       <div id="profile-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
 
       <div class="actions-grid" style="align-items: start; margin-bottom: 24px;">
-        <!-- Left: Create Profile Form / Active Profile Card -->
+        <!-- Left: My 3D Avatar & Profile Form -->
         <div class="form-card">
-          <div id="my-profile-existing-notice" style="display: none;"></div>
           <h3 id="create-profile-card-title" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
-            <span>➕</span> Create Profile
+            <span>👤</span> My Profile
           </h3>
           <p id="create-profile-card-desc" style="font-size: 0.88rem; color: #64748b; margin-bottom: 18px;">
-            Add a new member profile to the community.
+            Customize your personal 3D avatar and flood rescue display name.
           </p>
 
           <form id="create-profile-form" novalidate>
+            <input type="hidden" id="my-profile-id" name="id" value="">
+            <div id="my-profile-badge-bar" style="display: none; align-items: center; justify-content: space-between; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 12px; margin-bottom: 14px;">
+              <span style="font-size: 0.8rem; font-weight: 700; color: #166534;">🟢 Your Active 3D Avatar</span>
+              <span style="font-size: 0.75rem; font-family: monospace; color: #475569;" id="my-profile-id-tag">#...</span>
+            </div>
+
             <div class="form-group">
               <label for="create-profile-name" class="form-label">Full Name or Nickname *</label>
               <input type="text" id="create-profile-name" name="name" class="form-input" placeholder="e.g. Somsak P." required>
@@ -619,9 +624,14 @@ if (!empty($_SESSION['auth_user'])) {
               <input type="hidden" id="create-profile-avatar" name="avatar">
             </div>
 
-            <button type="submit" id="btn-submit-profile" class="pixel-btn pixel-btn-green" style="width: 100%; padding: 12px; font-size: 1rem; margin-top: 8px;">
-              <span>💾</span> Save Profile
-            </button>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              <button type="submit" id="btn-submit-profile" class="pixel-btn pixel-btn-green" style="flex: 1; padding: 12px; font-size: 1rem;">
+                <span>💾</span> Save Changes
+              </button>
+              <button type="button" id="btn-delete-my-profile" class="pixel-btn pixel-btn-sm pixel-btn-red" style="display: none; padding: 12px 14px;" title="Permanently delete your profile">
+                🗑️ Delete
+              </button>
+            </div>
           </form>
         </div>
 
@@ -1654,10 +1664,14 @@ if (!empty($_SESSION['auth_user'])) {
       async function loadProfiles() {
         const container = document.getElementById('profiles-list-container');
         const countPill = document.getElementById('profile-count-pill');
-        const myNotice = document.getElementById('my-profile-existing-notice');
-        const createForm = document.getElementById('create-profile-form');
         const createTitle = document.getElementById('create-profile-card-title');
         const createDesc = document.getElementById('create-profile-card-desc');
+        const idInput = document.getElementById('my-profile-id');
+        const nameInput = document.getElementById('create-profile-name');
+        const badgeBar = document.getElementById('my-profile-badge-bar');
+        const idTag = document.getElementById('my-profile-id-tag');
+        const submitBtn = document.getElementById('btn-submit-profile');
+        const deleteBtn = document.getElementById('btn-delete-my-profile');
 
         try {
           const res = await fetch('api/get_profiles.php');
@@ -1673,61 +1687,72 @@ if (!empty($_SESSION['auth_user'])) {
               }
             });
 
-            if (countPill) {
-              countPill.textContent = `${json.data.length} ${json.data.length === 1 ? 'Profile' : 'Profiles'}`;
+            // 1. Sync Left Panel (My Profile & 3D Avatar)
+            if (myProfile) {
+              if (createTitle) createTitle.innerHTML = '<span>👤</span> My Profile';
+              if (createDesc) createDesc.textContent = 'Customize your personal 3D avatar and flood rescue display name.';
+              if (idInput) idInput.value = myProfile.id;
+              if (nameInput) nameInput.value = myProfile.name;
+              if (badgeBar) badgeBar.style.display = 'flex';
+              if (idTag) idTag.textContent = `#${myProfile.id.slice(0, 8)} (${myProfile.id.slice(-4)})`;
+              if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save Changes';
+              if (deleteBtn) deleteBtn.style.display = 'inline-block';
+
+              // Load user's saved avatar config into left 3D canvas
+              const defaultCharConfig = {
+                gender: 'female',
+                feature: 'natural',
+                hair: 'ponytail',
+                hairColor: '#261e1b',
+                clothes: 'vest',
+                clothesColor: '#ea580c',
+                skinColor: '#fed7aa'
+              };
+              const parsed = parseAvatarData(myProfile.avatar) || {};
+              Object.assign(createCharConfig, defaultCharConfig);
+              Object.keys(defaultCharConfig).forEach(k => {
+                if (parsed[k]) createCharConfig[k] = parsed[k];
+              });
+              if (parsed.snapshot) createCharConfig.snapshot = parsed.snapshot;
+
+              syncCustomizerUI('create', createCharConfig, () => createChar3D);
+              if (createChar3D) {
+                createChar3D.updateConfig(createCharConfig);
+              } else {
+                setTimeout(initCreate3D, 150);
+              }
+            } else {
+              if (createTitle) createTitle.innerHTML = '<span>➕</span> Create Profile';
+              if (createDesc) createDesc.textContent = 'Add a new member profile to the community.';
+              if (idInput) idInput.value = '';
+              if (badgeBar) badgeBar.style.display = 'none';
+              if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save Profile';
+              if (deleteBtn) deleteBtn.style.display = 'none';
             }
 
-            // Left panel management: If user already has a profile, notify and provide direct Edit action
-            if (myNotice && createForm) {
-              if (myProfile) {
-                myNotice.style.display = 'block';
-                myNotice.innerHTML = `
-                  <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px;">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #15803d; letter-spacing: 0.05em;">YOUR ACTIVE PROFILE</div>
-                    <div style="font-size: 1.15rem; font-weight: 800; color: #14532d; margin-top: 3px;">
-                      ${myProfile.name} <span class="status-badge status-available" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 6px;">You</span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: #475569; margin-top: 4px;">
-                      Member ID: <span style="font-family: monospace; font-weight: 700;">#${myProfile.id.slice(0, 8)}</span>
-                    </div>
-                    <div style="margin-top: 12px; display: flex; gap: 8px;">
-                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold" id="btn-quick-edit-profile" data-id="${myProfile.id}">
-                        ✏️ Edit My Profile
-                      </button>
-                    </div>
-                  </div>
-                `;
-                const qBtn = document.getElementById('btn-quick-edit-profile');
-                if (qBtn) {
-                  qBtn.addEventListener('click', () => openEditProfileModal(myProfile.id));
-                }
-                createForm.style.display = 'none';
-                if (createTitle) createTitle.innerHTML = '<span>👤</span> Your Profile';
-                if (createDesc) createDesc.textContent = 'You have registered your flood response profile. You can edit your nickname and 3D avatar below.';
-              } else {
-                myNotice.style.display = 'none';
-                createForm.style.display = 'block';
-                if (createTitle) createTitle.innerHTML = '<span>➕</span> Create Profile';
-                if (createDesc) createDesc.textContent = 'Add a new member profile to the community.';
-              }
+            // 2. Sync Right Panel (Community Profiles)
+            // USER REQUIREMENT: Filter out logged-in user from the list
+            const communityProfiles = json.data.filter(p => !currentUser || p.user_id !== currentUser.id);
+
+            if (countPill) {
+              countPill.textContent = `${communityProfiles.length} ${communityProfiles.length === 1 ? 'Neighbor' : 'Neighbors'}`;
             }
 
             if (!container) return;
 
-            if (json.data.length === 0) {
-              container.innerHTML = '<div class="empty-spaces-notice">No profiles created yet. Use the 3D character builder on the left to create one.</div>';
+            if (communityProfiles.length === 0) {
+              container.innerHTML = '<div class="empty-spaces-notice">No other community members registered yet.</div>';
               return;
             }
 
             let html = '';
-            json.data.forEach(p => {
-              const isOwner = Boolean(currentUser && p.user_id && p.user_id === currentUser.id);
+            communityProfiles.forEach(p => {
               html += `
                 <div class="profile-card" id="profile-card-${p.id}">
                   <div class="profile-card-left">
                     ${renderAvatarPortrait(p.avatar)}
                     <div>
-                      <div class="profile-card-name">${p.name} ${isOwner ? '<span class="status-badge status-available" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 6px;">You</span>' : ''}</div>
+                      <div class="profile-card-name">${p.name}</div>
                       ${getAvatarSpecsBadge(p.avatar)}
                       <div style="margin-top: 5px;">
                         <span class="profile-clean-id" title="Full UUID: ${p.id} (Click to copy)" onclick="navigator.clipboard?.writeText('${p.id}'); const h = this.querySelector('.id-copy-hint'); if(h) { h.textContent='✓ Copied!'; setTimeout(()=>h.textContent='📋', 1500); }">
@@ -1738,18 +1763,9 @@ if (!empty($_SESSION['auth_user'])) {
                     </div>
                   </div>
                   <div class="profile-card-actions">
-                    ${isOwner ? `
-                    <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-profile" data-id="${p.id}">
-                      ✏️ Edit
-                    </button>
-                    <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-profile" data-id="${p.id}" data-name="${p.name}">
-                      🗑️ Delete
-                    </button>
-                    ` : `
                     <span style="font-size: 0.75rem; color: #64748b; font-weight: 600; padding: 4px 8px; background: #f8fafc; border-radius: 4px; border: 1px solid #e2e8f0;">
                       👤 Community Member
                     </span>
-                    `}
                   </div>
                 </div>
               `;
@@ -1765,13 +1781,15 @@ if (!empty($_SESSION['auth_user'])) {
 
       loadProfiles();
 
-      // Create Profile Submit
+      // Profile Form Submit (Handles both Create and Update seamlessly on the left)
       const createProfileForm = document.getElementById('create-profile-form');
       if (createProfileForm) {
         createProfileForm.addEventListener('submit', async (e) => {
           e.preventDefault();
 
           const name = document.getElementById('create-profile-name').value.trim();
+          const existingId = document.getElementById('my-profile-id')?.value.trim();
+
           if (!name) {
             showProfileAlert('error', '⚠️ Please enter a profile name.');
             document.getElementById('create-profile-name').focus();
@@ -1792,32 +1810,82 @@ if (!empty($_SESSION['auth_user'])) {
           });
 
           const btn = document.getElementById('btn-submit-profile');
+          const isUpdate = Boolean(existingId);
+
           try {
             btn.disabled = true;
             btn.innerHTML = '<span>⏳</span> Saving...';
 
-            const res = await fetch('api/create_profile.php', {
+            const endpoint = isUpdate ? 'api/update_profile.php' : 'api/create_profile.php';
+            const payload = isUpdate 
+              ? { id: existingId, name, avatar: avatarPayload }
+              : { name, avatar: avatarPayload };
+
+            const res = await fetch(endpoint, {
               method: 'POST',
               headers: { 
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': window.csrfToken || ''
               },
-              body: JSON.stringify({ name, avatar: avatarPayload })
+              body: JSON.stringify(payload)
             });
 
             const json = await res.json();
             if (res.ok && json.success) {
-              showProfileAlert('success', `🎉 <strong>Profile Created Successfully!</strong> Welcome, ${json.data.name}!`);
-              document.getElementById('create-profile-name').value = '';
+              const msg = isUpdate
+                ? `✅ <strong>Profile Updated!</strong> Changes saved for "${json.data.name}".`
+                : `🎉 <strong>Profile Created Successfully!</strong> Welcome, ${json.data.name}!`;
+              showProfileAlert('success', msg);
               await loadProfiles();
             } else {
-              showProfileAlert('error', `❌ <strong>Failed to create profile:</strong> ${json.error || 'Server error'}`);
+              showProfileAlert('error', `❌ <strong>Failed to save profile:</strong> ${json.error || 'Server error'}`);
             }
           } catch (err) {
             showProfileAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
           } finally {
             btn.disabled = false;
-            btn.innerHTML = '<span>💾</span> Save Profile';
+            btn.innerHTML = isUpdate ? '<span>💾</span> Save Changes' : '<span>💾</span> Save Profile';
+          }
+        });
+      }
+
+      // Left Delete Button Handler
+      const btnDeleteMyProfile = document.getElementById('btn-delete-my-profile');
+      if (btnDeleteMyProfile) {
+        btnDeleteMyProfile.addEventListener('click', async () => {
+          const existingId = document.getElementById('my-profile-id')?.value.trim();
+          const name = document.getElementById('create-profile-name')?.value.trim() || 'your profile';
+          if (!existingId) return;
+
+          const confirmed = window.confirm(`Are you sure you want to delete profile "${name}"?\n\nThis will permanently remove your profile and 3D avatar from Supabase.`);
+          if (!confirmed) return;
+
+          try {
+            btnDeleteMyProfile.disabled = true;
+            btnDeleteMyProfile.innerHTML = '<span>⏳</span> Deleting...';
+
+            const res = await fetch('api/delete_profile.php', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': window.csrfToken || ''
+              },
+              body: JSON.stringify({ id: existingId })
+            });
+            const json = await res.json();
+            if (res.ok && json.success) {
+              showProfileAlert('success', `🗑️ <strong>Profile Deleted!</strong> Your profile has been removed.`);
+              document.getElementById('my-profile-id').value = '';
+              document.getElementById('create-profile-name').value = '';
+              await loadProfiles();
+            } else {
+              showProfileAlert('error', `❌ <strong>Failed to delete profile:</strong> ${json.error || 'Server error'}`);
+            }
+          } catch (err) {
+            showProfileAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+          } finally {
+            btnDeleteMyProfile.disabled = false;
+            btnDeleteMyProfile.innerHTML = '🗑️ Delete';
           }
         });
       }

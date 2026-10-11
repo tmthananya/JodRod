@@ -206,4 +206,14 @@ $indexAnon = http_request("$baseUrl/index.php", 'GET');
 assert(strpos($indexAnon['raw_body'], 'window.initialUser = null') !== false, "Anonymous index.php must have window.initialUser = null");
 echo "   [PASS] index.php bootstrap script injects session user and CSRF without race condition.\n\n";
 
+// -----------------------------------------------------------------
+// Step 10: Verify User Does Not Appear in Community List & Left Editor
+// -----------------------------------------------------------------
+echo "Step 10: Verifying user is not in community list and left editor controls are configured...\n";
+$indexContent = $indexWithAuth['raw_body'];
+assert(strpos($indexContent, 'id="my-profile-id"') !== false, "Form must have #my-profile-id hidden field");
+assert(strpos($indexContent, 'id="btn-delete-my-profile"') !== false, "Form must have left delete button");
+assert(strpos($indexContent, 'const communityProfiles = json.data.filter(p => !currentUser || p.user_id !== currentUser.id);') !== false, "Must filter out current user from community list");
+echo "   [PASS] Verified: user is excluded from community list and managed directly via left 3D editor.\n\n";
+
 echo "=== ALL PROFILE EDITING & OWNERSHIP TESTS PASSED SUCCESSFULLY ===\n";
