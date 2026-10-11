@@ -195,6 +195,34 @@ function get_csrf_token() {
 }
 
 /**
+ * Enforce valid CSRF token on write operations.
+ * Exits immediately with HTTP 403 if token is missing or invalid.
+ */
+function require_csrf() {
+    jodrod_session_start();
+    $client_token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (empty($client_token) && function_exists('getallheaders')) {
+        $hdrs = getallheaders();
+        foreach ($hdrs as $k => $v) {
+            if (strcasecmp($k, 'X-CSRF-Token') === 0) {
+                $client_token = $v;
+                break;
+            }
+        }
+    }
+
+    $server_token = $_SESSION['csrf_token'] ?? '';
+    if (empty($client_token) || empty($server_token) || !hash_equals($server_token, $client_token)) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Forbidden: Missing or invalid CSRF token.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+}
+
+/**
  * Stage 1 Backend Authentication & CSRF Guard
  * Reusable helper that verifies the current PHP session contains an authenticated Supabase user.
  * On write requests (POST, PATCH, PUT, DELETE), verifies valid X-CSRF-Token header.
@@ -231,10 +259,10 @@ function require_auth() {
 
         $server_token = $_SESSION['csrf_token'] ?? '';
         if (empty($client_token) || empty($server_token) || !hash_equals($server_token, $client_token)) {
-            http_response_code(401);
+            http_response_code(403);
             echo json_encode([
                 'success' => false,
-                'error'   => 'Unauthorized. Missing or invalid CSRF token.'
+                'error'   => 'Forbidden: Missing or invalid CSRF token.'
             ], JSON_UNESCAPED_UNICODE);
             exit;
         }

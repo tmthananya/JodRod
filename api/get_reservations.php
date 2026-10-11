@@ -27,7 +27,31 @@ if (!SUPABASE_LIVE_MODE) {
     exit;
 }
 
-$res = supabase_request("/rest/v1/reservations?user_id=eq.{$uid}&select=*,cars(id,license_plate,model),parking_spaces(id,name,latitude,longitude,capacity,available_spaces,status)&order=created_at.desc", 'GET');
+$asOwner = isset($_GET['as_owner']) && ($_GET['as_owner'] === '1' || $_GET['as_owner'] === 'true');
+
+if ($asOwner) {
+    // Fetch parking spaces owned by current user
+    $spacesRes = supabase_request("/rest/v1/parking_spaces?owner_id=eq.{$uid}&select=id", 'GET');
+    if ($spacesRes['success'] && is_array($spacesRes['data'])) {
+        $spaceIds = array_column($spacesRes['data'], 'id');
+        if (empty($spaceIds)) {
+            echo json_encode([
+                'success' => true,
+                'source'  => 'supabase',
+                'count'   => 0,
+                'data'    => []
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        $inList = '(' . implode(',', array_map('urlencode', $spaceIds)) . ')';
+        $res = supabase_request("/rest/v1/reservations?parking_space_id=in.{$inList}&select=*,cars(id,license_plate,model),parking_spaces(id,name,capacity,available_spaces,status)&order=created_at.desc", 'GET');
+    } else {
+        $res = $spacesRes;
+    }
+} else {
+    $res = supabase_request("/rest/v1/reservations?user_id=eq.{$uid}&select=*,cars(id,license_plate,model),parking_spaces(id,name,latitude,longitude,capacity,available_spaces,status)&order=created_at.desc", 'GET');
+}
+
 if ($res['success'] && is_array($res['data'])) {
     echo json_encode([
         'success' => true,

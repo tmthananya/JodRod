@@ -50,6 +50,17 @@ if (SUPABASE_LIVE_MODE) {
         exit;
     }
 
+    // 4. Check for active confirmed reservations
+    $resCheck = supabase_request("/rest/v1/reservations?parking_space_id=eq.{$id}&status=eq.confirmed&select=id&limit=1", 'GET');
+    if ($resCheck['success'] && !empty($resCheck['data'])) {
+        http_response_code(409);
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Cannot delete parking lot while it has active vehicle reservations. Please cancel reservations first.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     $res = supabase_request("/rest/v1/parking_spaces?id=eq.{$id}&owner_id=eq.{$currentUser['id']}", 'DELETE');
     if ($res['success']) {
         echo json_encode([

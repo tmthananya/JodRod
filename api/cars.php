@@ -109,7 +109,77 @@ if ($method === 'POST') {
 }
 
 // -------------------------------------------------------------
-// 3. DELETE: Delete a Car
+// 3. PATCH / PUT / UPDATE: Edit a Car
+// -------------------------------------------------------------
+if ($method === 'PATCH' || $method === 'PUT' || ($method === 'POST' && isset($_GET['action']) && $_GET['action'] === 'update')) {
+    require_csrf();
+
+    if (!SUPABASE_LIVE_MODE) {
+        http_response_code(503);
+        echo json_encode(['success' => false, 'error' => 'Database unavailable.']);
+        exit;
+    }
+
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    $carId = trim($input['id'] ?? $_GET['id'] ?? '');
+    $licensePlate = trim($input['license_plate'] ?? '');
+    $model = trim($input['model'] ?? '');
+
+    if (empty($carId)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Car ID is required for update.']);
+        exit;
+    }
+
+    if (empty($licensePlate)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'License plate cannot be empty.']);
+        exit;
+    }
+
+    // Verify ownership
+    $checkCar = supabase_request("/rest/v1/cars?id=eq.{$carId}&user_id=eq.{$uid}&select=id", 'GET');
+    if (!$checkCar['success'] || empty($checkCar['data'])) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Forbidden: Vehicle not found or you do not have permission to edit it.']);
+        exit;
+    }
+
+    // Check duplicate license plate under this user (excluding current car)
+    $dupCheck = supabase_request("/rest/v1/cars?user_id=eq.{$uid}&license_plate=eq." . urlencode($licensePlate) . "&id=neq.{$carId}&select=id", 'GET');
+    if ($dupCheck['success'] && !empty($dupCheck['data'])) {
+        http_response_code(409);
+        echo json_encode(['success' => false, 'error' => 'Another vehicle with this license plate is already registered.']);
+        exit;
+    }
+
+    $updatePayload = [
+        'license_plate' => $licensePlate,
+        'model'         => $model ?: null,
+        'updated_at'    => date('c')
+    ];
+
+    $updateRes = supabase_request("/rest/v1/cars?id=eq.{$carId}&user_id=eq.{$uid}", 'PATCH', $updatePayload);
+    if ($updateRes['success']) {
+        echo json_encode([
+            'success' => true,
+            'source'  => 'supabase',
+            'message' => 'Vehicle updated successfully in Supabase!',
+            'data'    => $updateRes['data'][0] ?? array_merge(['id' => $carId], $updatePayload)
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    http_response_code($updateRes['http_code'] ?: 500);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Failed to update vehicle in Supabase: ' . ($updateRes['error'] ?? 'Database error.')
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// -------------------------------------------------------------
+// 4. DELETE: Delete a Car
 // -------------------------------------------------------------
 if ($method === 'DELETE' || ($method === 'POST' && isset($_GET['action']) && $_GET['action'] === 'delete')) {
     require_csrf();
@@ -126,6 +196,17 @@ if ($method === 'DELETE' || ($method === 'POST' && isset($_GET['action']) && $_G
     if (empty($carId)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Car ID is required.']);
+        exit;
+    }
+
+    // Check if car has active confirmed reservation before deleting
+    $resCheck = supabase_request("/rest/v1/reservations?car_id=eq.{$carId}&status=eq.confirmed&select=id&limit=1", 'GET');
+    if ($resCheck['success'] && !empty($resCheck['data'])) {
+        http_response_code(409);
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Cannot delete vehicle while it has an active parking reservation. Please cancel the reservation first.'
+        ], JSON_UNESCAPED_UNICODE);
         exit;
     }
 

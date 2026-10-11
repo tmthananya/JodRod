@@ -45,8 +45,13 @@ if (!empty($_SESSION['auth_user'])) {
         </div>
       </a>
 
-      <!-- Strictly: Find Parking, My Parking Lots, My Reservations, My Profile -->
+      <!-- Strictly: Dashboard, Find Parking, My Parking Lots, My Reservations, My Profile -->
       <ul class="nav-links" id="site-nav-links" style="display: none;">
+        <li>
+          <a href="#dashboard" class="nav-link" id="nav-dashboard">
+            <span>📊</span> Dashboard
+          </a>
+        </li>
         <li>
           <a href="#map" class="nav-link" id="nav-map">
             <span>🗺️</span> Find Parking
@@ -269,6 +274,132 @@ if (!empty($_SESSION['auth_user'])) {
          NAVIGATION TARGET SECTIONS (MODULAR PLACEHOLDERS)
          ======================================================== -->
     
+    <!-- 0. Dashboard Section: My Cars & My Parking Lots -->
+    <section id="section-dashboard" class="nav-content-section">
+      <div class="dash-header-bar">
+        <div>
+          <h2 class="dash-title"><span>📊</span> My Cars & Parking Lots Dashboard</h2>
+          <p class="dash-subtitle">Real-time flood parking command center: track your vehicles, active spot assignments, and owned parking spaces.</p>
+        </div>
+        <div class="dash-header-actions">
+          <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-dash-add-car">
+            <span>➕</span> Add Vehicle
+          </button>
+          <a href="#my-spaces" class="pixel-btn pixel-btn-blue pixel-btn-sm" id="btn-dash-offer-space">
+            <span>🅿️</span> Offer Parking Lot
+          </a>
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-dash-refresh" title="Reload live data from Supabase">
+            <span>🔄</span> Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Feedback Alert Box -->
+      <div id="dash-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
+
+      <!-- Section A: Overview Metrics Cards -->
+      <div class="dash-section-wrapper">
+        <h3 class="dash-section-heading"><span>📈</span> A. Dashboard Overview</h3>
+        <div class="dash-overview-grid">
+          <div class="dash-metric-card" id="metric-card-cars">
+            <div class="dash-metric-header">
+              <span class="dash-metric-icon">🚘</span>
+              <span class="status-badge status-available" style="font-size: 0.68rem;">Owned</span>
+            </div>
+            <div class="dash-metric-val" id="dash-stat-cars">-</div>
+            <div class="dash-metric-lbl">Total Registered Cars</div>
+          </div>
+
+          <div class="dash-metric-card" id="metric-card-assigned">
+            <div class="dash-metric-header">
+              <span class="dash-metric-icon">🛡️</span>
+              <span class="status-badge status-available" style="font-size: 0.68rem;">Safe</span>
+            </div>
+            <div class="dash-metric-val" id="dash-stat-assigned">-</div>
+            <div class="dash-metric-lbl">Cars with Active Parking Spots</div>
+          </div>
+
+          <div class="dash-metric-card" id="metric-card-lots">
+            <div class="dash-metric-header">
+              <span class="dash-metric-icon">🅿️</span>
+              <span class="status-badge status-available" style="font-size: 0.68rem;">Host</span>
+            </div>
+            <div class="dash-metric-val" id="dash-stat-lots">-</div>
+            <div class="dash-metric-lbl">My Owned Parking Lots</div>
+          </div>
+
+          <div class="dash-metric-card" id="metric-card-reservations">
+            <div class="dash-metric-header">
+              <span class="dash-metric-icon">📋</span>
+              <span class="status-badge status-available" style="font-size: 0.68rem;">Active</span>
+            </div>
+            <div class="dash-metric-val" id="dash-stat-reservations">-</div>
+            <div class="dash-metric-lbl">Active Spot Reservations</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section B: My Cars -->
+      <div class="dash-section-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 class="dash-section-heading" style="margin-bottom: 2px;"><span>🚘</span> B. My Cars</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Manage your vehicles, track their flood parking spot assignment, and reserve safe elevated spaces.</p>
+          </div>
+          <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-dash-add-car-sec">
+            <span>➕</span> Register New Car
+          </button>
+        </div>
+        <div id="dash-cars-container" class="dashboard-cars-grid">
+          <div class="empty-spaces-notice">Loading your vehicles from Supabase...</div>
+        </div>
+      </div>
+
+      <!-- Section C: My Parking Lots -->
+      <div class="dash-section-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 class="dash-section-heading" style="margin-bottom: 2px;"><span>🅿️</span> C. My Parking Lots</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Displays exclusively parking lots owned by you (<code>auth.uid() = owner_id</code>). Manage capacity, availability, and inspect parked cars.</p>
+          </div>
+          <a href="#my-spaces" class="pixel-btn pixel-btn-blue pixel-btn-sm">
+            <span>➕</span> Offer New Lot
+          </a>
+        </div>
+        <div id="dash-lots-container" class="dashboard-lots-grid">
+          <div class="empty-spaces-notice">Loading your parking lots from Supabase...</div>
+        </div>
+      </div>
+
+      <!-- Section D: My Parking Assignments -->
+      <div class="dash-section-wrapper">
+        <div style="margin-bottom: 12px;">
+          <h3 class="dash-section-heading" style="margin-bottom: 2px;"><span>📋</span> D. My Parking Assignments</h3>
+          <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Relational view connecting your registered vehicles to assigned parking lots, spots, and reservation records.</p>
+        </div>
+        <div class="table-responsive-container">
+          <table class="dashboard-table" id="dash-assignments-table">
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>License Plate</th>
+                <th>Parking Lot</th>
+                <th>Location / Spot</th>
+                <th>Status</th>
+                <th>Reserved Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dash-assignments-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: #64748b; padding: 20px;">Loading parking assignments...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- 1. Map Section -->
     <section id="section-map" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -765,6 +896,73 @@ if (!empty($_SESSION['auth_user'])) {
     </div>
   </div>
 
+  <!-- Modal: Register & Edit Vehicle (Car) -->
+  <div id="modal-car" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-car-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-car-title" class="modal-title"><span>🚘</span> <span id="modal-car-title-text">Register Vehicle</span></h3>
+        <button type="button" class="modal-close-btn" id="btn-close-car-modal" title="Close">&times;</button>
+      </div>
+      <div id="modal-car-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 14px;"></div>
+      <form id="form-car-modal" novalidate>
+        <input type="hidden" id="car-modal-id" name="id">
+        <div class="form-group">
+          <label for="car-modal-plate" class="form-label">License Plate *</label>
+          <input type="text" id="car-modal-plate" class="form-input" placeholder="e.g. 1กข-9999" required autocomplete="off">
+          <div class="form-help">Vehicle registration license plate. Must be unique to your account.</div>
+        </div>
+        <div class="form-group" style="margin-top: 14px;">
+          <label for="car-modal-model" class="form-label">Car Make & Model / Color</label>
+          <input type="text" id="car-modal-model" class="form-input" placeholder="e.g. Toyota Hilux (White)" autocomplete="off">
+          <div class="form-help">Optional model description to identify your vehicle in flood relief lots.</div>
+        </div>
+        <div class="modal-actions" style="margin-top: 20px;">
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-car-modal">Cancel</button>
+          <button type="submit" class="pixel-btn pixel-btn-green" id="btn-submit-car-modal">
+            <span>💾</span> Save Vehicle
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Reserve Parking Spot for Vehicle -->
+  <div id="modal-reserve-car" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-reserve-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-reserve-title" class="modal-title"><span>🅿️</span> Reserve Parking Spot for Vehicle</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-reserve-modal" title="Close">&times;</button>
+      </div>
+      <div id="modal-reserve-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 14px;"></div>
+      <form id="form-reserve-car-modal" novalidate>
+        <div class="form-group">
+          <label for="reserve-modal-car-select" class="form-label">Select Vehicle *</label>
+          <select id="reserve-modal-car-select" class="form-select" required>
+            <option value="">-- Choose Car --</option>
+          </select>
+          <div class="form-help">A vehicle can hold at most one active parking spot reservation at a time.</div>
+        </div>
+        <div class="form-group" style="margin-top: 14px;">
+          <label for="reserve-modal-lot-select" class="form-label">Select Available Parking Lot *</label>
+          <select id="reserve-modal-lot-select" class="form-select" required>
+            <option value="">-- Choose Parking Lot --</option>
+          </select>
+          <div class="form-help">Only parking spaces with open capacity (&gt; 0) and 'available' status can be reserved.</div>
+        </div>
+        <div class="form-group" style="margin-top: 14px;">
+          <label for="reserve-modal-notes" class="form-label">Reservation Notes (Optional)</label>
+          <textarea id="reserve-modal-notes" class="form-input" rows="2" placeholder="e.g. Expected parking until flood water recedes..."></textarea>
+        </div>
+        <div class="modal-actions" style="margin-top: 20px;">
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-reserve-modal">Cancel</button>
+          <button type="submit" class="pixel-btn pixel-btn-green" id="btn-submit-reserve-modal">
+            <span>✅</span> Confirm Reservation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ========================================================
        FOOTER
        ======================================================== -->
@@ -959,19 +1157,21 @@ if (!empty($_SESSION['auth_user'])) {
       });
 
       const navLinks = {
+        '#dashboard': document.getElementById('nav-dashboard'),
         '#map': document.getElementById('nav-map'),
         '#my-spaces': document.getElementById('nav-my-spaces'),
         '#my-reservations': document.getElementById('nav-my-reservations'),
-        '#my-car': document.getElementById('nav-my-reservations'),
+        '#my-car': document.getElementById('nav-dashboard'),
         '#profile': document.getElementById('nav-profile')
       };
 
       const sections = {
         '#home': document.getElementById('section-home'),
+        '#dashboard': document.getElementById('section-dashboard'),
         '#map': document.getElementById('section-map'),
         '#my-spaces': document.getElementById('section-my-spaces'),
         '#my-reservations': document.getElementById('section-my-reservations'),
-        '#my-car': document.getElementById('section-my-reservations'),
+        '#my-car': document.getElementById('section-dashboard'),
         '#points': document.getElementById('section-points'),
         '#profile': document.getElementById('section-profile')
       };
@@ -984,7 +1184,7 @@ if (!empty($_SESSION['auth_user'])) {
           return;
         }
 
-        const hash = window.location.hash || '#home';
+        const hash = window.location.hash || '#dashboard';
 
         // Update nav active states
         Object.keys(navLinks).forEach(key => {
@@ -1018,6 +1218,13 @@ if (!empty($_SESSION['auth_user'])) {
           });
         }
 
+        // Refresh dashboard if dashboard section is shown
+        if (hash === '#dashboard' || hash === '#my-car') {
+          if (typeof loadDashboard === 'function') {
+            loadDashboard();
+          }
+        }
+
         // Refresh map dimensions if map section is shown
         if (hash === '#map' && window.parkingMap) {
           window.parkingMap.invalidateSize();
@@ -1025,7 +1232,7 @@ if (!empty($_SESSION['auth_user'])) {
         }
 
         // Load cars and reservations if my-reservations section is shown
-        if (hash === '#my-reservations' || hash === '#my-car') {
+        if (hash === '#my-reservations') {
           loadCars();
           loadReservations();
         }
@@ -1158,6 +1365,9 @@ if (!empty($_SESSION['auth_user'])) {
               if (window.parkingMap) {
                 await window.parkingMap.loadParkingSpaces();
               }
+              if (typeof loadDashboard === 'function') {
+                loadDashboard();
+              }
             } else {
               showAlert('error', `❌ <strong>Failed to create space:</strong> ${result.error || 'Server error'}`);
             }
@@ -1253,6 +1463,9 @@ if (!empty($_SESSION['auth_user'])) {
               // Refresh displayed data and map information
               if (window.parkingMap) {
                 await window.parkingMap.loadParkingSpaces();
+              }
+              if (typeof loadDashboard === 'function') {
+                loadDashboard();
               }
 
               // Auto dismiss modal after short delay so user sees confirmation
@@ -2206,6 +2419,742 @@ if (!empty($_SESSION['auth_user'])) {
         }
       }
 
+      // ========================================================
+      // DASHBOARD CONTROLLER (MY CARS & MY PARKING LOTS)
+      // ========================================================
+      let dashboardState = {
+        cars: [],
+        spaces: [],
+        reservations: [],
+        ownerReservations: []
+      };
+
+      function showDashboardAlert(type, message) {
+        const alertBox = document.getElementById('dash-action-alert');
+        if (!alertBox) return;
+        alertBox.className = `alert-message ${type}`;
+        alertBox.innerHTML = message;
+        alertBox.style.display = 'block';
+        alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function clearDashboardAlert() {
+        const alertBox = document.getElementById('dash-action-alert');
+        if (alertBox) alertBox.style.display = 'none';
+      }
+
+      async function loadDashboard() {
+        if (!currentUser) return;
+
+        const carsContainer = document.getElementById('dash-cars-container');
+        const lotsContainer = document.getElementById('dash-lots-container');
+        const assignmentsTbody = document.getElementById('dash-assignments-tbody');
+
+        if (carsContainer) carsContainer.innerHTML = '<div class="empty-spaces-notice"><span>⏳</span> Loading your vehicles from Supabase...</div>';
+        if (lotsContainer) lotsContainer.innerHTML = '<div class="empty-spaces-notice"><span>⏳</span> Loading your parking lots from Supabase...</div>';
+        if (assignmentsTbody) assignmentsTbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 20px;"><span>⏳</span> Loading parking assignments from Supabase...</td></tr>';
+
+        try {
+          const [carsRes, spacesRes, reservationsRes, ownerRes] = await Promise.all([
+            fetch('api/cars.php').then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+            fetch('api/get_parking_spaces.php').then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+            fetch('api/get_reservations.php').then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+            fetch('api/get_reservations.php?as_owner=1').then(r => r.json()).catch(e => ({ success: false, error: e.message }))
+          ]);
+
+          dashboardState.cars = (carsRes && carsRes.success && Array.isArray(carsRes.data)) ? carsRes.data : [];
+          dashboardState.spaces = (spacesRes && spacesRes.success && Array.isArray(spacesRes.data)) ? spacesRes.data : [];
+          dashboardState.reservations = (reservationsRes && reservationsRes.success && Array.isArray(reservationsRes.data)) ? reservationsRes.data : [];
+          dashboardState.ownerReservations = (ownerRes && ownerRes.success && Array.isArray(ownerRes.data)) ? ownerRes.data : [];
+
+          // Notice if tables need migration
+          if ((!carsRes.success && carsRes.error && (carsRes.error.includes('relation "public.cars" does not exist') || carsRes.error.includes('PGRST205'))) ||
+              (!reservationsRes.success && reservationsRes.error && (reservationsRes.error.includes('relation "public.reservations" does not exist') || reservationsRes.error.includes('PGRST205')))) {
+            showDashboardAlert('error', `
+              ⚠️ <strong>Database Tables Required:</strong> The <code>cars</code> and <code>reservations</code> tables need to be created in your Supabase project. 
+              Please execute the migration script in <code>supabase/migrations/20261011_supabase_only_reservations_and_cars.sql</code> in your Supabase SQL Editor.
+            `);
+          }
+
+          // Filter owned parking lots: owner_id === currentUser.id
+          const myLots = dashboardState.spaces.filter(s => s.owner_id && s.owner_id === currentUser.id);
+
+          // Map active reservations to cars
+          const activeReservations = dashboardState.reservations.filter(r => r.status === 'confirmed' || r.status === 'active');
+          const carAssignmentMap = {};
+          activeReservations.forEach(r => {
+            if (r.car_id) {
+              carAssignmentMap[r.car_id] = r;
+            }
+          });
+
+          // Section A: Metric counts
+          const totalCars = dashboardState.cars.length;
+          const assignedCarsCount = dashboardState.cars.filter(c => !!carAssignmentMap[c.id]).length;
+          const myLotsCount = myLots.length;
+          const activeResCount = activeReservations.length;
+
+          const statCars = document.getElementById('dash-stat-cars');
+          const statAssigned = document.getElementById('dash-stat-assigned');
+          const statLots = document.getElementById('dash-stat-lots');
+          const statRes = document.getElementById('dash-stat-reservations');
+
+          if (statCars) statCars.textContent = totalCars;
+          if (statAssigned) statAssigned.textContent = assignedCarsCount;
+          if (statLots) statLots.textContent = myLotsCount;
+          if (statRes) statRes.textContent = activeResCount;
+
+          // Section B: Render My Cars
+          renderDashboardCars(dashboardState.cars, carAssignmentMap);
+
+          // Section C: Render My Parking Lots
+          renderDashboardLots(myLots, dashboardState.ownerReservations);
+
+          // Section D: Render My Parking Assignments
+          renderDashboardAssignments(dashboardState.cars, carAssignmentMap, dashboardState.reservations);
+
+        } catch (err) {
+          showDashboardAlert('error', `❌ Network error while loading dashboard: ${err.message}`);
+        }
+      }
+      window.loadDashboard = loadDashboard;
+
+      function renderDashboardCars(cars, carAssignmentMap) {
+        const container = document.getElementById('dash-cars-container');
+        if (!container) return;
+
+        if (cars.length === 0) {
+          container.innerHTML = `
+            <div class="empty-spaces-notice" style="grid-column: 1 / -1;">
+              <span>🚘</span> No vehicles registered yet. Click "Register New Car" above to register your vehicle in Supabase.
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        cars.forEach(car => {
+          const res = carAssignmentMap[car.id];
+          const hasAssignment = !!res;
+          const space = res ? (res.parking_spaces || {}) : null;
+          const lotName = space ? (space.name || 'Assigned Parking Lot') : null;
+          const lat = space && space.latitude ? parseFloat(space.latitude).toFixed(4) : null;
+          const lng = space && space.longitude ? parseFloat(space.longitude).toFixed(4) : null;
+          const resStatus = res ? (res.status || 'confirmed').toUpperCase() : null;
+
+          let assignmentBoxHtml = '';
+          if (hasAssignment) {
+            assignmentBoxHtml = `
+              <div class="dash-car-assignment-box assigned">
+                <div class="dash-car-assignment-label">Assigned Parking Spot</div>
+                <div class="dash-car-assignment-value">🅿️ ${lotName}</div>
+                ${(lat && lng) ? `<div style="font-size: 0.75rem; color: #64748b; font-family: monospace; margin-top: 2px;">📍 GPS: ${lat}, ${lng}</div>` : ''}
+                <div style="margin-top: 6px;">
+                  <span class="status-pill status-available" style="font-size: 0.7rem; padding: 2px 6px;">🟢 RESERVATION ${resStatus}</span>
+                </div>
+              </div>
+            `;
+          } else {
+            assignmentBoxHtml = `
+              <div class="dash-car-assignment-box unassigned">
+                <div class="dash-car-assignment-label">Assignment Status</div>
+                <div class="dash-car-assignment-value" style="color: #64748b; font-weight: normal;">⚪ No parking spot assigned</div>
+                <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 3px;">Ready for safe elevated parking assignment.</div>
+              </div>
+            `;
+          }
+
+          let actionButtons = '';
+          if (hasAssignment) {
+            if (lat && lng) {
+              actionButtons += `
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-car-spot" data-lat="${space.latitude}" data-lng="${space.longitude}" title="Locate parking lot on map">
+                  🗺️ View Spot
+                </button>
+              `;
+            }
+            actionButtons += `
+              <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-car-res" data-id="${res.id}" data-plate="${car.license_plate}" data-lot="${lotName}" title="Cancel reservation">
+                ❌ Cancel Spot
+              </button>
+            `;
+          } else {
+            actionButtons += `
+              <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-open-reserve-car" data-car-id="${car.id}" data-plate="${car.license_plate}" title="Reserve available spot for this vehicle">
+                🅿️ Reserve Spot
+              </button>
+            `;
+          }
+
+          actionButtons += `
+            <button type="button" class="pixel-btn pixel-btn-sm btn-edit-car" data-id="${car.id}" data-plate="${car.license_plate}" data-model="${car.model || ''}" title="Edit vehicle details">
+              ✏️ Edit
+            </button>
+            <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${car.id}" data-plate="${car.license_plate}" title="Delete vehicle">
+              🗑️
+            </button>
+          `;
+
+          html += `
+            <article class="dash-car-card" id="dash-car-${car.id}">
+              <div>
+                <div class="dash-car-header">
+                  <div class="dash-car-icon">🚘</div>
+                  <div style="flex: 1; min-width: 0;">
+                    <h4 class="dash-car-title">${car.model || 'Standard Vehicle'}</h4>
+                    <span class="dash-car-plate">${car.license_plate}</span>
+                  </div>
+                  ${hasAssignment 
+                    ? '<span class="status-badge status-available" style="font-size: 0.65rem;">Parked</span>'
+                    : '<span class="status-badge" style="font-size: 0.65rem; background: #e2e8f0; color: #475569;">Unassigned</span>'
+                  }
+                </div>
+                ${assignmentBoxHtml}
+              </div>
+              <div class="dash-card-actions">
+                ${actionButtons}
+              </div>
+            </article>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function renderDashboardLots(myLots, ownerReservations) {
+        const container = document.getElementById('dash-lots-container');
+        if (!container) return;
+
+        if (myLots.length === 0) {
+          container.innerHTML = `
+            <div class="empty-spaces-notice" style="grid-column: 1 / -1;">
+              <span>🅿️</span> You have not registered any parking lots yet. 
+              <a href="#my-spaces" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Offer a parking space</a> to help neighbors keep their cars safe from floodwaters.
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        myLots.forEach(lot => {
+          const cap = parseInt(lot.capacity, 10) || 0;
+          const avail = parseInt(lot.available_spaces, 10) || 0;
+          const occupied = Math.max(0, cap - avail);
+          const isClosed = lot.status === 'closed';
+          const isFull = lot.status === 'full' || avail <= 0;
+
+          // Find reservations for this space from ownerReservations
+          const lotReservations = (ownerReservations || []).filter(r => r.parking_space_id === lot.id && (r.status === 'confirmed' || r.status === 'active'));
+
+          const lat = lot.latitude ? parseFloat(lot.latitude).toFixed(5) : 'N/A';
+          const lng = lot.longitude ? parseFloat(lot.longitude).toFixed(5) : 'N/A';
+
+          let spotRows = '';
+          for (let i = 0; i < cap; i++) {
+            const booking = lotReservations[i];
+            const spotNum = i + 1;
+            if (booking && booking.cars) {
+              spotRows += `
+                <div class="dash-assigned-car-item">
+                  <span><strong>Spot #${spotNum}:</strong> 🚘 ${booking.cars.license_plate} (${booking.cars.model || 'Standard'})</span>
+                  <span class="status-pill status-available" style="font-size: 0.65rem; padding: 1px 5px;">Occupied</span>
+                </div>
+              `;
+            } else if (booking) {
+              spotRows += `
+                <div class="dash-assigned-car-item">
+                  <span><strong>Spot #${spotNum}:</strong> 🚗 Parked Vehicle (Active Reservation)</span>
+                  <span class="status-pill status-available" style="font-size: 0.65rem; padding: 1px 5px;">Occupied</span>
+                </div>
+              `;
+            } else if (isClosed) {
+              spotRows += `
+                <div class="dash-assigned-car-item" style="color: #94a3b8;">
+                  <span><strong>Spot #${spotNum}:</strong> 🚫 Closed</span>
+                  <span class="status-pill status-closed" style="font-size: 0.65rem; padding: 1px 5px;">Unavailable</span>
+                </div>
+              `;
+            } else {
+              spotRows += `
+                <div class="dash-assigned-car-item" style="color: #16a34a;">
+                  <span><strong>Spot #${spotNum}:</strong> 🟢 Available Open Spot</span>
+                  <span class="status-pill status-available" style="font-size: 0.65rem; padding: 1px 5px;">Open</span>
+                </div>
+              `;
+            }
+          }
+
+          html += `
+            <article class="dash-lot-card" id="dash-lot-${lot.id}">
+              <div>
+                <div class="dash-lot-header">
+                  <div>
+                    <h4 class="dash-lot-title">🅿️ ${lot.name}</h4>
+                    <div class="dash-lot-coords">📍 GPS: ${lat}, ${lng}</div>
+                  </div>
+                  <div>
+                    ${isClosed 
+                      ? '<span class="status-pill status-closed">🔴 CLOSED</span>'
+                      : (isFull ? '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🟡 FULL</span>' : '<span class="status-pill status-available">🟢 AVAILABLE</span>')
+                    }
+                  </div>
+                </div>
+
+                <div class="dash-lot-spots-bar">
+                  <div>
+                    <div class="dash-spot-stat-num" style="color: #16a34a;">${avail}</div>
+                    <div class="dash-spot-stat-lbl">Available</div>
+                  </div>
+                  <div>
+                    <div class="dash-spot-stat-num" style="color: #ea580c;">${occupied}</div>
+                    <div class="dash-spot-stat-lbl">Occupied</div>
+                  </div>
+                  <div>
+                    <div class="dash-spot-stat-num" style="color: ${isClosed ? '#dc2626' : '#64748b'};">${isClosed ? 'Closed' : 'Active'}</div>
+                    <div class="dash-spot-stat-lbl">Status</div>
+                  </div>
+                  <div>
+                    <div class="dash-spot-stat-num" style="color: #0f172a;">${cap}</div>
+                    <div class="dash-spot-stat-lbl">Capacity</div>
+                  </div>
+                </div>
+
+                <div class="dash-lot-assigned-cars">
+                  <div style="font-weight: 700; color: #334155; margin-bottom: 6px; font-size: 0.8rem;">
+                    PARKING SPOTS & VEHICLE OCCUPANCY (${occupied}/${cap}):
+                  </div>
+                  <div style="max-height: 120px; overflow-y: auto;">
+                    ${spotRows}
+                  </div>
+                </div>
+              </div>
+
+              <div class="dash-card-actions">
+                <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${lot.name}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
+                  ${isClosed ? '🟢 Reopen Lot' : '⏸️ Close Lot'}
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-edit-lot-dash" data-id="${lot.id}">
+                  ✏️ Edit Lot
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${lot.name}">
+                  🗑️ Delete
+                </button>
+              </div>
+            </article>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function renderDashboardAssignments(cars, carAssignmentMap, allReservations) {
+        const tbody = document.getElementById('dash-assignments-tbody');
+        if (!tbody) return;
+
+        if (cars.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; color: #64748b; padding: 24px;">
+                No registered vehicles found. <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-dash-table-add-car" style="margin-left: 8px;">➕ Add Car</button>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        let rowsHtml = '';
+        cars.forEach(car => {
+          const activeRes = carAssignmentMap[car.id];
+
+          if (activeRes) {
+            const space = activeRes.parking_spaces || {};
+            const lotName = space.name || 'Flood Safe Parking Lot';
+            const lat = space.latitude ? parseFloat(space.latitude).toFixed(4) : '-';
+            const lng = space.longitude ? parseFloat(space.longitude).toFixed(4) : '-';
+            const spotCoords = (lat !== '-' && lng !== '-') ? `${lat}, ${lng}` : 'Assigned';
+            const dateStr = activeRes.created_at ? new Date(activeRes.created_at).toLocaleString() : 'Active';
+
+            rowsHtml += `
+              <tr>
+                <td><strong>🚘 ${car.model || 'Standard'}</strong></td>
+                <td><span class="dash-car-plate" style="font-size: 0.75rem;">${car.license_plate}</span></td>
+                <td><strong>🅿️ ${lotName}</strong></td>
+                <td><span style="font-family: monospace; font-size: 0.8rem;">${spotCoords}</span></td>
+                <td><span class="status-pill status-available">🟢 ACTIVE RESERVATION</span></td>
+                <td style="font-size: 0.82rem; color: #64748b;">${dateStr}</td>
+                <td>
+                  <div style="display: flex; gap: 6px;">
+                    ${(space.latitude && space.longitude) ? `
+                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-car-spot" data-lat="${space.latitude}" data-lng="${space.longitude}" title="View Spot on Map">
+                        🗺️ Map
+                      </button>
+                    ` : ''}
+                    <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-car-res" data-id="${activeRes.id}" data-plate="${car.license_plate}" data-lot="${lotName}" title="Cancel reservation">
+                      ❌ Cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          } else {
+            // Unassigned vehicle row
+            rowsHtml += `
+              <tr style="background: #fafafa;">
+                <td><strong>🚘 ${car.model || 'Standard'}</strong></td>
+                <td><span class="dash-car-plate" style="font-size: 0.75rem;">${car.license_plate}</span></td>
+                <td style="color: #94a3b8; font-style: italic;">None</td>
+                <td style="color: #94a3b8; font-style: italic;">-</td>
+                <td><span class="status-pill status-closed" style="background: #f1f5f9; color: #64748b; border-color: #cbd5e1;">⚪ NO ASSIGNMENT</span></td>
+                <td style="font-size: 0.82rem; color: #94a3b8;">-</td>
+                <td>
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-open-reserve-car" data-car-id="${car.id}" data-plate="${car.license_plate}">
+                    🅿️ Reserve Spot
+                  </button>
+                </td>
+              </tr>
+            `;
+          }
+        });
+
+        // Also append any cancelled reservations for history awareness
+        const cancelledReservations = (allReservations || []).filter(r => r.status === 'cancelled');
+        cancelledReservations.forEach(r => {
+          const space = r.parking_spaces || {};
+          const car = r.cars || {};
+          const lotName = space.name || 'Flood Safe Parking Lot';
+          const plate = car.license_plate || 'Unlinked';
+          const model = car.model || 'Vehicle';
+          const dateStr = r.created_at ? new Date(r.created_at).toLocaleString() : '-';
+
+          rowsHtml += `
+            <tr style="opacity: 0.65; background: #fff5f5;">
+              <td>🚘 ${model}</td>
+              <td><span class="dash-car-plate" style="font-size: 0.75rem;">${plate}</span></td>
+              <td>🅿️ ${lotName}</td>
+              <td>-</td>
+              <td><span class="status-pill status-closed">🚫 CANCELLED</span></td>
+              <td style="font-size: 0.82rem; color: #64748b;">${dateStr}</td>
+              <td style="font-size: 0.8rem; color: #94a3b8;">Cancelled</td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML = rowsHtml;
+      }
+
+      // ========================================================
+      // VEHICLE MODAL CONTROLLER
+      // ========================================================
+      const modalCar = document.getElementById('modal-car');
+      const formCarModal = document.getElementById('form-car-modal');
+      const modalCarAlert = document.getElementById('modal-car-alert');
+      const modalCarTitleText = document.getElementById('modal-car-title-text');
+      const carModalIdInput = document.getElementById('car-modal-id');
+      const carModalPlateInput = document.getElementById('car-modal-plate');
+      const carModalModelInput = document.getElementById('car-modal-model');
+      const btnSubmitCarModal = document.getElementById('btn-submit-car-modal');
+
+      function openCarModal(car = null) {
+        if (!modalCar) return;
+        if (modalCarAlert) modalCarAlert.style.display = 'none';
+
+        if (car && car.id) {
+          if (modalCarTitleText) modalCarTitleText.textContent = 'Edit Vehicle Details';
+          if (carModalIdInput) carModalIdInput.value = car.id;
+          if (carModalPlateInput) carModalPlateInput.value = car.license_plate || '';
+          if (carModalModelInput) carModalModelInput.value = car.model || '';
+        } else {
+          if (modalCarTitleText) modalCarTitleText.textContent = 'Register New Vehicle';
+          if (carModalIdInput) carModalIdInput.value = '';
+          if (carModalPlateInput) carModalPlateInput.value = '';
+          if (carModalModelInput) carModalModelInput.value = '';
+        }
+
+        modalCar.classList.add('active');
+        if (carModalPlateInput) carModalPlateInput.focus();
+      }
+
+      function closeCarModal() {
+        if (modalCar) modalCar.classList.remove('active');
+      }
+
+      document.getElementById('btn-close-car-modal')?.addEventListener('click', closeCarModal);
+      document.getElementById('btn-cancel-car-modal')?.addEventListener('click', closeCarModal);
+      document.getElementById('btn-dash-add-car')?.addEventListener('click', () => openCarModal(null));
+      document.getElementById('btn-dash-add-car-sec')?.addEventListener('click', () => openCarModal(null));
+      document.getElementById('btn-dash-refresh')?.addEventListener('click', loadDashboard);
+
+      formCarModal?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = carModalIdInput ? carModalIdInput.value.trim() : '';
+        const license_plate = carModalPlateInput ? carModalPlateInput.value.trim() : '';
+        const model = carModalModelInput ? carModalModelInput.value.trim() : '';
+
+        if (!license_plate) {
+          if (modalCarAlert) {
+            modalCarAlert.className = 'alert-message error';
+            modalCarAlert.innerHTML = '⚠️ Please enter a license plate.';
+            modalCarAlert.style.display = 'block';
+          }
+          return;
+        }
+
+        try {
+          if (btnSubmitCarModal) {
+            btnSubmitCarModal.disabled = true;
+            btnSubmitCarModal.innerHTML = '<span>⏳</span> Saving...';
+          }
+
+          const isEdit = !!id;
+          const url = 'api/cars.php';
+          const method = isEdit ? 'PATCH' : 'POST';
+          const payload = isEdit ? { id, license_plate, model } : { license_plate, model };
+
+          const res = await fetch(url, {
+            method,
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            closeCarModal();
+            showDashboardAlert('success', `🚘 <strong>Vehicle Saved:</strong> "${license_plate}" has been saved in Supabase.`);
+            await loadDashboard();
+            if (typeof loadCars === 'function') await loadCars();
+          } else {
+            if (modalCarAlert) {
+              modalCarAlert.className = 'alert-message error';
+              modalCarAlert.innerHTML = `❌ ${json.error || 'Failed to save vehicle.'}`;
+              modalCarAlert.style.display = 'block';
+            }
+          }
+        } catch (err) {
+          if (modalCarAlert) {
+            modalCarAlert.className = 'alert-message error';
+            modalCarAlert.innerHTML = `❌ Network error: ${err.message}`;
+            modalCarAlert.style.display = 'block';
+          }
+        } finally {
+          if (btnSubmitCarModal) {
+            btnSubmitCarModal.disabled = false;
+            btnSubmitCarModal.innerHTML = '<span>💾</span> Save Vehicle';
+          }
+        }
+      });
+
+      // ========================================================
+      // SPOT RESERVATION MODAL CONTROLLER
+      // ========================================================
+      const modalReserve = document.getElementById('modal-reserve-car');
+      const formReserveModal = document.getElementById('form-reserve-car-modal');
+      const modalReserveAlert = document.getElementById('modal-reserve-alert');
+      const reserveCarSelect = document.getElementById('reserve-modal-car-select');
+      const reserveLotSelect = document.getElementById('reserve-modal-lot-select');
+      const reserveNotesInput = document.getElementById('reserve-modal-notes');
+      const btnSubmitReserveModal = document.getElementById('btn-submit-reserve-modal');
+
+      function openReserveModal(preselectedCarId = null) {
+        if (!modalReserve) return;
+        if (modalReserveAlert) modalReserveAlert.style.display = 'none';
+        if (reserveNotesInput) reserveNotesInput.value = '';
+
+        // Populate cars dropdown
+        if (reserveCarSelect) {
+          reserveCarSelect.innerHTML = '<option value="">-- Choose Car --</option>';
+          const cars = dashboardState.cars || [];
+          const activeCarIds = new Set(
+            dashboardState.reservations
+              .filter(r => (r.status === 'confirmed' || r.status === 'active') && r.car_id)
+              .map(r => r.car_id)
+          );
+
+          cars.forEach(c => {
+            const isAssigned = activeCarIds.has(c.id);
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = `${c.license_plate} (${c.model || 'Standard'})${isAssigned ? ' [Already Assigned]' : ''}`;
+            if (isAssigned) opt.disabled = true;
+            if (c.id === preselectedCarId) opt.selected = true;
+            reserveCarSelect.appendChild(opt);
+          });
+        }
+
+        // Populate available parking spaces dropdown
+        if (reserveLotSelect) {
+          reserveLotSelect.innerHTML = '<option value="">-- Choose Parking Lot --</option>';
+          const availableSpaces = (dashboardState.spaces || []).filter(s => s.status === 'available' && parseInt(s.available_spaces, 10) > 0);
+
+          if (availableSpaces.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = '⚠️ No available parking spaces currently open';
+            opt.disabled = true;
+            reserveLotSelect.appendChild(opt);
+          } else {
+            availableSpaces.forEach(s => {
+              const opt = document.createElement('option');
+              opt.value = s.id;
+              opt.textContent = `🅿️ ${s.name} (${s.available_spaces}/${s.capacity} spots open)`;
+              reserveLotSelect.appendChild(opt);
+            });
+          }
+        }
+
+        modalReserve.classList.add('active');
+      }
+
+      function closeReserveModal() {
+        if (modalReserve) modalReserve.classList.remove('active');
+      }
+
+      document.getElementById('btn-close-reserve-modal')?.addEventListener('click', closeReserveModal);
+      document.getElementById('btn-cancel-reserve-modal')?.addEventListener('click', closeReserveModal);
+
+      formReserveModal?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const car_id = reserveCarSelect ? reserveCarSelect.value : '';
+        const parking_space_id = reserveLotSelect ? reserveLotSelect.value : '';
+        const notes = reserveNotesInput ? reserveNotesInput.value.trim() : '';
+
+        if (!car_id) {
+          if (modalReserveAlert) {
+            modalReserveAlert.className = 'alert-message error';
+            modalReserveAlert.innerHTML = '⚠️ Please select a vehicle.';
+            modalReserveAlert.style.display = 'block';
+          }
+          return;
+        }
+
+        if (!parking_space_id) {
+          if (modalReserveAlert) {
+            modalReserveAlert.className = 'alert-message error';
+            modalReserveAlert.innerHTML = '⚠️ Please select an available parking lot.';
+            modalReserveAlert.style.display = 'block';
+          }
+          return;
+        }
+
+        try {
+          if (btnSubmitReserveModal) {
+            btnSubmitReserveModal.disabled = true;
+            btnSubmitReserveModal.innerHTML = '<span>⏳</span> Confirming Reservation...';
+          }
+
+          const res = await fetch('api/create_reservation.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify({ car_id, parking_space_id, notes })
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            closeReserveModal();
+            showDashboardAlert('success', `
+              🎉 <strong>Spot Reserved Successfully!</strong><br>
+              Your vehicle has been secured at "${json.parking_space?.name || 'safe parking space'}".
+            `);
+            await loadDashboard();
+            if (typeof loadReservations === 'function') await loadReservations();
+            if (window.parkingMap) window.parkingMap.loadParkingSpaces();
+          } else {
+            if (modalReserveAlert) {
+              modalReserveAlert.className = 'alert-message error';
+              modalReserveAlert.innerHTML = `❌ ${json.error || 'Failed to complete reservation.'}`;
+              modalReserveAlert.style.display = 'block';
+            }
+          }
+        } catch (err) {
+          if (modalReserveAlert) {
+            modalReserveAlert.className = 'alert-message error';
+            modalReserveAlert.innerHTML = `❌ Network error: ${err.message}`;
+            modalReserveAlert.style.display = 'block';
+          }
+        } finally {
+          if (btnSubmitReserveModal) {
+            btnSubmitReserveModal.disabled = false;
+            btnSubmitReserveModal.innerHTML = '<span>✅</span> Confirm Reservation';
+          }
+        }
+      });
+
+      // Quick Toggle Lot Status (Available <-> Closed)
+      async function toggleLotStatus(spaceId, currentStatus, currentCapacity) {
+        if (!spaceId) return;
+        const newStatus = (currentStatus === 'available') ? 'closed' : 'available';
+        const space = (dashboardState.spaces || []).find(s => s.id === spaceId);
+        const name = space ? space.name : 'Parking Space';
+        const cap = space ? parseInt(space.capacity, 10) : parseInt(currentCapacity, 10) || 5;
+        const avail = (newStatus === 'closed') ? 0 : cap;
+
+        try {
+          const res = await fetch('api/update_parking_space.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify({
+              id: spaceId,
+              name,
+              capacity: cap,
+              available_spaces: avail,
+              status: newStatus
+            })
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            showDashboardAlert('success', `🅿️ <strong>Lot Updated:</strong> "${name}" is now marked as <strong>${newStatus.toUpperCase()}</strong>.`);
+            await loadDashboard();
+            if (window.parkingMap) window.parkingMap.loadParkingSpaces();
+          } else {
+            showDashboardAlert('error', `❌ Failed to update status: ${json.error || 'Server error'}`);
+          }
+        } catch (err) {
+          showDashboardAlert('error', `❌ Network error: ${err.message}`);
+        }
+      }
+
+      // Delete Lot with Active Reservation Protection
+      async function deleteParkingLot(spaceId, spaceName) {
+        if (!spaceId) return;
+        const confirmed = window.confirm(
+          `🗑️ Delete Parking Lot\n\n` +
+          `Are you sure you want to delete "${spaceName}"?\n` +
+          `This will permanently remove the lot from the map.`
+        );
+        if (!confirmed) return;
+
+        try {
+          const res = await fetch('api/delete_parking_space.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify({ id: spaceId })
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            showDashboardAlert('success', `🗑️ <strong>Parking Lot Deleted:</strong> "${spaceName}" has been removed.`);
+            await loadDashboard();
+            if (window.parkingMap) window.parkingMap.loadParkingSpaces();
+          } else {
+            showDashboardAlert('error', `❌ <strong>Cannot Delete Lot:</strong> ${json.error || 'Database error'}`);
+          }
+        } catch (err) {
+          showDashboardAlert('error', `❌ Network error: ${err.message}`);
+        }
+      }
+
       // Delegated events for cars, reservations, and profile actions
       document.body.addEventListener('click', (e) => {
         const editBtn = e.target.closest('.btn-edit-profile');
@@ -2223,19 +3172,57 @@ if (!empty($_SESSION['auth_user'])) {
           deleteCar(deleteCarBtn.dataset.id, deleteCarBtn.dataset.plate);
         }
 
-        const cancelResBtn = e.target.closest('.btn-cancel-reservation');
-        if (cancelResBtn) {
-          cancelReservation(cancelResBtn.dataset.id, cancelResBtn.dataset.name);
+        const editCarBtn = e.target.closest('.btn-edit-car');
+        if (editCarBtn) {
+          openCarModal({
+            id: editCarBtn.dataset.id,
+            license_plate: editCarBtn.dataset.plate,
+            model: editCarBtn.dataset.model
+          });
         }
 
-        const viewResMapBtn = e.target.closest('.btn-view-reservation-map');
-        if (viewResMapBtn) {
-          const lat = parseFloat(viewResMapBtn.dataset.lat);
-          const lng = parseFloat(viewResMapBtn.dataset.lng);
+        const openReserveCarBtn = e.target.closest('.btn-open-reserve-car');
+        if (openReserveCarBtn) {
+          openReserveModal(openReserveCarBtn.dataset.carId);
+        }
+
+        const cancelResBtn = e.target.closest('.btn-cancel-reservation, .btn-cancel-car-res');
+        if (cancelResBtn) {
+          cancelReservation(cancelResBtn.dataset.id, cancelResBtn.dataset.name || cancelResBtn.dataset.lot);
+        }
+
+        const toggleLotBtn = e.target.closest('.btn-toggle-lot-status');
+        if (toggleLotBtn) {
+          toggleLotStatus(toggleLotBtn.dataset.id, toggleLotBtn.dataset.status, toggleLotBtn.dataset.capacity);
+        }
+
+        const editLotDashBtn = e.target.closest('.btn-edit-lot-dash');
+        if (editLotDashBtn) {
+          if (window.parkingMap && typeof window.parkingMap.openEditModalById === 'function') {
+            window.parkingMap.openEditModalById(editLotDashBtn.dataset.id);
+          } else {
+            window.location.hash = '#map';
+          }
+        }
+
+        const deleteLotBtn = e.target.closest('.btn-delete-lot');
+        if (deleteLotBtn) {
+          deleteParkingLot(deleteLotBtn.dataset.id, deleteLotBtn.dataset.name);
+        }
+
+        const viewCarSpotBtn = e.target.closest('.btn-view-car-spot, .btn-view-reservation-map');
+        if (viewCarSpotBtn) {
+          const lat = parseFloat(viewCarSpotBtn.dataset.lat);
+          const lng = parseFloat(viewCarSpotBtn.dataset.lng);
           window.location.hash = '#map';
           if (window.parkingMap && window.parkingMap.map) {
             window.parkingMap.map.flyTo([lat, lng], 15, { duration: 1.0 });
           }
+        }
+
+        const tableAddCarBtn = e.target.closest('#btn-dash-table-add-car');
+        if (tableAddCarBtn) {
+          openCarModal(null);
         }
       });
     });
