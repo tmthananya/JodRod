@@ -12,11 +12,13 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-// Target URL using your Mac's current LAN IP and PHP development server port
-const APP_URL = 'http://10.195.22.12:8000';
+// Target URL requested: http://10.195.59.20:8000
+const DEFAULT_URL = 'http://10.195.59.20:8000';
+const ALT_URL = 'http://10.195.22.12:8000';
 
 export default function App() {
   const webViewRef = useRef(null);
+  const [currentUrl, setCurrentUrl] = useState(DEFAULT_URL);
   const [canGoBack, setCanGoBack] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -43,6 +45,12 @@ export default function App() {
     }
   };
 
+  const handleSwitchUrl = (newUrl) => {
+    setHasError(false);
+    setErrorMessage('');
+    setCurrentUrl(newUrl);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
@@ -52,25 +60,35 @@ export default function App() {
           <Text style={styles.errorIcon}>⚠️</Text>
           <Text style={styles.errorTitle}>Cannot Connect to Server</Text>
           <Text style={styles.errorSubtitle}>
-            Attempted to connect to:{'\n'}
-            <Text style={styles.urlText}>{APP_URL}</Text>
+            Target URL:{'\n'}
+            <Text style={styles.urlText}>{currentUrl}</Text>
           </Text>
           <Text style={styles.errorHelp}>
             Please ensure:
-            {'\n'}• Your phone and Mac are connected to the exact same Wi-Fi network.
-            {'\n'}• The PHP server is running on your Mac.
+            {'\n'}• Your phone and Mac are on the exact same Wi-Fi.
+            {'\n'}• The PHP server is running on port 8000.
           </Text>
           {errorMessage ? (
             <Text style={styles.errorDetail}>{errorMessage}</Text>
           ) : null}
-          <TouchableOpacity style={styles.retryButton} onPress={handleReload}>
-            <Text style={styles.retryButtonText}>Retry Connection</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.retryButton} onPress={handleReload}>
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.switchButton}
+              onPress={() => handleSwitchUrl(currentUrl === DEFAULT_URL ? ALT_URL : DEFAULT_URL)}
+            >
+              <Text style={styles.switchButtonText}>
+                Switch to {currentUrl === DEFAULT_URL ? '10.195.22.12' : '10.195.59.20'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       ) : (
         <WebView
           ref={webViewRef}
-          source={{ uri: APP_URL }}
+          source={{ uri: currentUrl }}
           style={styles.webview}
           javaScriptEnabled={true}
           domStorageEnabled={true}
@@ -82,6 +100,7 @@ export default function App() {
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#3b82f6" />
               <Text style={styles.loadingText}>Loading JodRod...</Text>
+              <Text style={styles.loadingSubtext}>{currentUrl}</Text>
             </View>
           )}
           onNavigationStateChange={(navState) => {
@@ -90,7 +109,7 @@ export default function App() {
           onError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
             setHasError(true);
-            setErrorMessage(nativeEvent.description || 'Network error');
+            setErrorMessage(nativeEvent.description || 'Network connection failed');
           }}
           onHttpError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
@@ -125,6 +144,11 @@ const styles = StyleSheet.create({
     color: '#e2e8f0',
     fontSize: 16,
     fontWeight: '600',
+  },
+  loadingSubtext: {
+    marginTop: 6,
+    color: '#64748b',
+    fontSize: 12,
   },
   errorContainer: {
     flex: 1,
@@ -172,15 +196,30 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
   },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
   retryButton: {
     backgroundColor: '#2563eb',
     paddingVertical: 12,
-    paddingHorizontal: 28,
+    paddingHorizontal: 20,
     borderRadius: 8,
   },
   retryButtonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  switchButton: {
+    backgroundColor: '#334155',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  switchButtonText: {
+    color: '#e2e8f0',
+    fontSize: 15,
     fontWeight: '600',
   },
 });
