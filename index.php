@@ -1027,17 +1027,26 @@ if (!empty($_SESSION['auth_user'])) {
   <div id="modal-reserve-car" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-reserve-title">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 id="modal-reserve-title" class="modal-title"><span>🅿️</span> Reserve Parking Spot for Vehicle</h3>
+        <h3 id="modal-reserve-title" class="modal-title"><span>🅿️</span> Request Parking Reservation</h3>
         <button type="button" class="modal-close-btn" id="btn-close-reserve-modal" title="Close">&times;</button>
       </div>
       <div id="modal-reserve-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 14px;"></div>
       <form id="form-reserve-car-modal" novalidate>
         <div class="form-group">
-          <label for="reserve-modal-car-select" class="form-label">Select Vehicle *</label>
+          <label for="reserve-modal-car-select" class="form-label">Select Your Car *</label>
           <select id="reserve-modal-car-select" class="form-select" required>
-            <option value="">-- Choose Car --</option>
+            <option value="">Select your car</option>
           </select>
-          <div class="form-help">A vehicle can hold at most one active parking spot reservation at a time.</div>
+          <div id="reserve-modal-car-help" class="form-help">Select one of your registered flood evacuation vehicles.</div>
+          <!-- Helpful guidance when no cars are registered -->
+          <div id="reserve-modal-no-cars-notice" class="alert-message warning" style="display: none; margin-top: 10px;">
+            <span>🚘</span> You haven't added a car yet.
+            <div style="margin-top: 8px;">
+              <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue" id="btn-modal-go-add-car">
+                ➕ Add a Car in My Vehicles
+              </button>
+            </div>
+          </div>
         </div>
         <div class="form-group" style="margin-top: 14px;">
           <label for="reserve-modal-lot-select" class="form-label">Select Available Parking Lot *</label>
@@ -4076,33 +4085,24 @@ if (!empty($_SESSION['auth_user'])) {
       const reserveNotesInput = document.getElementById('reserve-modal-notes');
       const btnSubmitReserveModal = document.getElementById('btn-submit-reserve-modal');
 
-      function openReserveModal(preselectedCarId = null) {
+      async function openReserveModal(preselectedCarId = null, preselectedLotId = null) {
         if (!modalReserve) return;
         if (modalReserveAlert) modalReserveAlert.style.display = 'none';
         if (reserveNotesInput) reserveNotesInput.value = '';
 
-        // Populate cars dropdown
-        if (reserveCarSelect) {
-          reserveCarSelect.innerHTML = '<option value="">-- Choose Car --</option>';
-          const cars = dashboardState.cars || [];
-          const activeCarIds = new Set(
-            (dashboardState.reservations || [])
-              .filter(r => (r.status === 'confirmed' || r.status === 'active' || r.status === 'pending') && r.car_id)
-              .map(r => r.car_id)
-          );
+        const noCarsNotice = document.getElementById('reserve-modal-no-cars-notice');
+        if (noCarsNotice) noCarsNotice.style.display = 'none';
 
-          cars.forEach(c => {
-            const isAssigned = activeCarIds.has(c.id);
-            const opt = document.createElement('option');
-            opt.value = c.id;
-            opt.textContent = `${c.license_plate} (${c.model || 'Standard'})${isAssigned ? ' [Active Request / Parked]' : ''}`;
-            if (isAssigned) opt.disabled = true;
-            if (c.id === preselectedCarId) opt.selected = true;
-            reserveCarSelect.appendChild(opt);
-          });
+        // 1. Initial loading state for car dropdown
+        if (reserveCarSelect) {
+          reserveCarSelect.disabled = true;
+          reserveCarSelect.innerHTML = '<option value="">⏳ Loading your registered cars...</option>';
+        }
+        if (btnSubmitReserveModal) {
+          btnSubmitReserveModal.disabled = true;
         }
 
-        // Populate available parking spaces dropdown (eligible host spaces only)
+        // 2. Populate available parking spaces dropdown (eligible host spaces only)
         if (reserveLotSelect) {
           reserveLotSelect.innerHTML = '<option value="">-- Choose Parking Lot --</option>';
           const availableSpaces = (dashboardState.spaces || []).filter(s => s.status === 'available' && parseInt(s.available_spaces, 10) > 0 && s.owner_id !== null && s.owner_id !== undefined);
@@ -4118,13 +4118,124 @@ if (!empty($_SESSION['auth_user'])) {
               const opt = document.createElement('option');
               opt.value = s.id;
               opt.textContent = `🅿️ ${s.name} (${s.available_spaces}/${s.capacity} spots open)`;
+              if (s.id === preselectedLotId) {
+                opt.selected = true;
+              }
               reserveLotSelect.appendChild(opt);
             });
           }
         }
 
         modalReserve.classList.add('active');
+
+        // 3. Fetch fresh cars directly from My Cars API (api/get_cars.php)
+        try {
+          const carsRes = await fetch('api/get_cars.php');
+          const carsJson = await carsRes.json();
+
+          if (!carsRes.ok || !carsJson.success || !Array.isArray(carsJson.data)) {
+            if (reserveCarSelect) {
+              reserveCarSelect.disabled = true;
+              reserveCarSelect.innerHTML = '<option value="">❌ Could not load cars</option>';
+            }
+            if (modalReserveAlert) {
+              modalReserveAlert.className = 'alert-message error';
+              modalReserveAlert.innerHTML = `❌ Failed to load your vehicles: ${carsJson.error || 'Server error'}`;
+              modalReserveAlert.style.display = 'block';
+            }
+            return;
+          }
+
+          const cars = carsJson.data;
+          dashboardState.cars = cars; // sync state
+
+          // Determine cars with active or pending reservations to prevent double-booking
+          const activeCarIds = new Set(
+            (dashboardState.reservations || [])
+              .filter(r => (r.status === 'confirmed' || r.status === 'active' || r.status === 'pending') && r.car_id)
+              .map(r => r.car_id)
+          );
+
+          if (cars.length === 0) {
+            if (reserveCarSelect) {
+              reserveCarSelect.innerHTML = '<option value="">Select your car</option>';
+              reserveCarSelect.disabled = true;
+            }
+            if (noCarsNotice) {
+              noCarsNotice.style.display = 'block';
+            }
+            if (btnSubmitReserveModal) {
+              btnSubmitReserveModal.disabled = true;
+            }
+            return;
+          }
+
+          if (reserveCarSelect) {
+            reserveCarSelect.innerHTML = '<option value="">Select your car</option>';
+            let preselectedFound = false;
+
+            cars.forEach(c => {
+              const isAssigned = activeCarIds.has(c.id);
+              const opt = document.createElement('option');
+              opt.value = c.id;
+
+              // Format: Make/Model — License Plate (e.g. "Toyota Yaris — ABC-1234")
+              const modelPart = c.model && c.model.trim() ? c.model.trim() : 'Standard Vehicle';
+              const platePart = c.license_plate && c.license_plate.trim() ? c.license_plate.trim() : 'No Plate';
+              opt.textContent = `${modelPart} — ${platePart}${isAssigned ? ' [Active Request / Parked]' : ''}`;
+
+              if (isAssigned) {
+                opt.disabled = true;
+              }
+
+              if (c.id === preselectedCarId && !isAssigned) {
+                opt.selected = true;
+                preselectedFound = true;
+              }
+              reserveCarSelect.appendChild(opt);
+            });
+
+            reserveCarSelect.disabled = false;
+
+            // Enable submit button only if a valid, selectable car is chosen
+            if (btnSubmitReserveModal) {
+              btnSubmitReserveModal.disabled = !(preselectedFound && reserveCarSelect.value);
+            }
+          }
+
+        } catch (err) {
+          if (reserveCarSelect) {
+            reserveCarSelect.disabled = true;
+            reserveCarSelect.innerHTML = '<option value="">❌ Network error</option>';
+          }
+          if (modalReserveAlert) {
+            modalReserveAlert.className = 'alert-message error';
+            modalReserveAlert.innerHTML = `❌ Network error while loading cars: ${err.message}`;
+            modalReserveAlert.style.display = 'block';
+          }
+        }
       }
+      window.openReserveModal = openReserveModal;
+
+      // Handle car select change to toggle submit button disabled state
+      reserveCarSelect?.addEventListener('change', () => {
+        if (btnSubmitReserveModal) {
+          btnSubmitReserveModal.disabled = !reserveCarSelect.value;
+        }
+      });
+
+      // Handle "Add a Car in My Vehicles" link inside empty state
+      document.getElementById('btn-modal-go-add-car')?.addEventListener('click', () => {
+        closeReserveModal();
+        window.location.hash = '#my-reservations';
+        const addCarForm = document.getElementById('add-car-form');
+        if (addCarForm) {
+          addCarForm.style.display = 'block';
+          addCarForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          const plateInput = document.getElementById('car-plate');
+          if (plateInput) plateInput.focus();
+        }
+      });
 
       function closeReserveModal() {
         if (modalReserve) modalReserve.classList.remove('active');
@@ -4142,7 +4253,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (!car_id) {
           if (modalReserveAlert) {
             modalReserveAlert.className = 'alert-message error';
-            modalReserveAlert.innerHTML = '⚠️ Please select a vehicle.';
+            modalReserveAlert.innerHTML = '⚠️ Please select your registered car.';
             modalReserveAlert.style.display = 'block';
           }
           return;
@@ -4203,7 +4314,7 @@ if (!empty($_SESSION['auth_user'])) {
           }
         } finally {
           if (btnSubmitReserveModal) {
-            btnSubmitReserveModal.disabled = false;
+            btnSubmitReserveModal.disabled = !reserveCarSelect?.value;
             btnSubmitReserveModal.innerHTML = '<span>📩</span> Request Reservation';
           }
         }

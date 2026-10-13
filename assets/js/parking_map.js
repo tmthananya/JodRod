@@ -457,11 +457,17 @@ class ParkingMapController {
       return;
     }
 
+    // Open standard reservation modal with car dropdown
+    if (typeof window.openReserveModal === 'function') {
+      window.openReserveModal(null, spaceId);
+      return;
+    }
+
     // Retrieve user's registered vehicles from Supabase
     let selectedCarId = null;
     let selectedCarInfo = '';
     try {
-      const carsRes = await fetch('api/cars.php');
+      const carsRes = await fetch('api/get_cars.php');
       const carsJson = await carsRes.json();
       if (carsJson.success && Array.isArray(carsJson.data) && carsJson.data.length > 0) {
         const cars = carsJson.data;

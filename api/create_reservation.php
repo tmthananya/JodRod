@@ -63,16 +63,20 @@ if (empty($spaceId)) {
     exit;
 }
 
-// 2. Query driver's car metadata to ensure owner dashboard can view vehicle details across RLS
-$carMetaPrefix = '';
-$carFetch = supabase_request("/rest/v1/cars?id=eq." . urlencode($carId) . "&select=license_plate,model", 'GET');
-if ($carFetch['success'] && !empty($carFetch['data'][0])) {
-    $cPlate = $carFetch['data'][0]['license_plate'] ?? '';
-    $cModel = $carFetch['data'][0]['model'] ?? 'Standard';
-    if (!empty($cPlate)) {
-        $carMetaPrefix = "[Vehicle: {$cPlate} | {$cModel}]";
-    }
+// 2. Validate vehicle ownership: enforce that car strictly belongs to the authenticated user
+$carFetch = supabase_request("/rest/v1/cars?id=eq." . urlencode($carId) . "&user_id=eq." . urlencode($uid) . "&select=id,license_plate,model", 'GET');
+if (!$carFetch['success'] || empty($carFetch['data'][0])) {
+    http_response_code(403);
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Forbidden: The selected vehicle does not belong to your account.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
+
+$cPlate = $carFetch['data'][0]['license_plate'] ?? '';
+$cModel = $carFetch['data'][0]['model'] ?? 'Standard';
+$carMetaPrefix = !empty($cPlate) ? "[Vehicle: {$cPlate} | {$cModel}]" : '';
 
 $finalNotes = $carMetaPrefix;
 if (!empty($notes)) {
