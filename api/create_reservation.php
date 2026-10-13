@@ -106,9 +106,10 @@ if ($rpcRes['success']) {
 
     http_response_code(201);
     echo json_encode([
-        'success' => true,
-        'source'  => 'supabase',
-        'data'    => $data
+        'success'     => true,
+        'source'      => 'supabase',
+        'data'        => $data,
+        'reservation' => $data
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }

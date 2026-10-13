@@ -66,6 +66,15 @@ class ParkingMapController {
         this.goToCity(cityKey);
       });
     });
+
+    // Keep map tiles properly aligned across viewport changes
+    const onResize = () => {
+      if (this.map) {
+        this.map.invalidateSize();
+      }
+    };
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
   }
 
   handleMapClick(lat, lng) {

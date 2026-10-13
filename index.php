@@ -1271,6 +1271,14 @@ if (!empty($_SESSION['auth_user'])) {
           if (typeof loadProfiles === 'function') {
             loadProfiles();
           }
+          setTimeout(() => {
+            if (createChar3D && typeof createChar3D.resize === 'function') {
+              createChar3D.resize();
+            }
+            if (editChar3D && typeof editChar3D.resize === 'function') {
+              editChar3D.resize();
+            }
+          }, 60);
         }
       }
 
@@ -2335,7 +2343,7 @@ if (!empty($_SESSION['auth_user'])) {
             return;
           }
 
-          let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">';
+          let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">';
           cars.forEach(c => {
             html += `
               <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 4px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">

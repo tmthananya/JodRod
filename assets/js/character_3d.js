@@ -739,6 +739,23 @@
       this.render();
     }
 
+    handleResize() {
+      this.resize();
+    }
+
+    resize() {
+      if (!this.canvas || !this.renderer || !this.camera) return;
+      const parent = this.canvas.parentElement;
+      const width = (parent && parent.clientWidth > 0 ? parent.clientWidth : this.canvas.clientWidth) || 340;
+      const height = (parent && parent.clientHeight > 0 ? parent.clientHeight : this.canvas.clientHeight) || 320;
+      if (width > 0 && height > 0) {
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height, false);
+        this.render();
+      }
+    }
+
     bindEvents() {
       const getX = (e) => (e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX);
 
@@ -768,6 +785,14 @@
       this.canvas.addEventListener('touchstart', onStart, { passive: true });
       window.addEventListener('touchmove', onMove, { passive: true });
       window.addEventListener('touchend', onEnd);
+
+      // Responsive resize handling
+      this._onResize = () => this.resize();
+      window.addEventListener('resize', this._onResize);
+      if (typeof ResizeObserver !== 'undefined' && this.canvas.parentElement) {
+        this._resizeObserver = new ResizeObserver(() => this.resize());
+        this._resizeObserver.observe(this.canvas.parentElement);
+      }
     }
 
     animate() {
@@ -823,6 +848,12 @@
     destroy() {
       if (this.animationFrameId) {
         cancelAnimationFrame(this.animationFrameId);
+      }
+      if (this._onResize) {
+        window.removeEventListener('resize', this._onResize);
+      }
+      if (this._resizeObserver) {
+        this._resizeObserver.disconnect();
       }
       if (this.renderer) {
         this.renderer.dispose();
