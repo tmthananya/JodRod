@@ -82,9 +82,9 @@ class ParkingMapController {
     } else {
       const crosshairIcon = L.divIcon({
         className: 'crosshair-marker',
-        html: '<div style="width: 24px; height: 24px; border: 2px solid #0284c7; border-radius: 50%; background: rgba(2, 132, 199, 0.2); box-shadow: 0 0 8px rgba(2, 132, 199, 0.5);"></div>',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        html: '<span>🎯</span>',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
       });
 
       this.selectionMarker = L.marker([lat, lng], {
@@ -171,7 +171,7 @@ class ParkingMapController {
         className: 'custom-parking-pin',
         html: `
           <div class="parking-pin-bubble ${statusClass}" title="${s.name}">
-            <span>P</span>
+            <span>🅿️</span>
           </div>
         `,
         iconSize: [36, 36],
@@ -185,36 +185,39 @@ class ParkingMapController {
       const marker = L.marker([s.latitude, s.longitude], { icon: pinIcon });
 
       // Marker Popup Actions:
+      // - If owner: Edit & Delete
+      // - If not owner & available: Reserve Spot
+      // - If not owner & full/closed: No reserve button, show status pill
       let popupActionsHtml = '';
       if (isOwner) {
         popupActionsHtml = `
           <div style="display: flex; gap: 6px; margin-top: 8px;">
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
-              Edit
+              ✏️ Edit
             </button>
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-space" data-id="${s.id}" data-name="${s.name}" style="flex: 1;">
-              Delete
+              🗑️ Delete
             </button>
           </div>
         `;
       } else if (isCommunity) {
         popupActionsHtml = `
           <div style="margin-top: 8px; text-align: center; font-size: 0.75rem; color: #1e40af; font-weight: 700; background: #dbeafe; padding: 6px; border-radius: 4px; border: 1px solid #bfdbfe;">
-            Public Community Space<br><span style="font-weight: normal; font-size: 0.7rem; color: #3b82f6;">First-come, first-served (No approval needed)</span>
+            🏛️ Public Community Space<br><span style="font-weight: normal; font-size: 0.7rem; color: #3b82f6;">First-come, first-served (No approval needed)</span>
           </div>
         `;
       } else if (isAvailable) {
         popupActionsHtml = `
           <div style="display: flex; gap: 6px; margin-top: 8px;">
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-reserve-space" data-id="${s.id}" data-name="${s.name}" data-available="${s.available_spaces}" style="flex: 1;">
-              Request Spot
+              🚗 Request Spot
             </button>
           </div>
         `;
       } else {
         popupActionsHtml = `
           <div style="margin-top: 8px; text-align: center; font-size: 0.75rem; color: #ef4444; font-weight: 700; background: #fee2e2; padding: 4px; border-radius: 4px;">
-            ${s.status === 'closed' ? 'Lot Closed' : 'Lot Full (0 spots)'}
+            🚫 ${s.status === 'closed' ? 'Lot Closed' : 'Lot Full (0 spots)'}
           </div>
         `;
       }
@@ -239,28 +242,28 @@ class ParkingMapController {
       if (isOwner) {
         cardActionsHtml = `
           <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-gold btn-edit-space" data-id="${s.id}" style="flex: 1;">
-            Edit
+            ✏️ Edit
           </button>
           <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-space" data-id="${s.id}" data-name="${s.name}" style="flex: 1;">
-            Delete
+            🗑️ Delete
           </button>
         `;
       } else if (isCommunity) {
         cardActionsHtml = `
           <span style="font-size: 0.75rem; color: #1e40af; font-weight: 700; background: #dbeafe; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; flex: 1; border: 1px solid #bfdbfe;">
-            Public Community Space
+            🏛️ Public Community Space
           </span>
         `;
       } else if (isAvailable) {
         cardActionsHtml = `
           <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-reserve-space" data-id="${s.id}" data-name="${s.name}" data-available="${s.available_spaces}" style="flex: 1;">
-            Request Spot
+            🚗 Request Spot
           </button>
         `;
       } else {
         cardActionsHtml = `
           <span style="font-size: 0.75rem; color: #ef4444; font-weight: 700; background: #fee2e2; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; flex: 1;">
-            ${s.status === 'closed' ? 'Closed' : 'Lot Full (0 spots)'}
+            🚫 ${s.status === 'closed' ? 'Closed' : 'Lot Full (0 spots)'}
           </span>
         `;
       }
@@ -281,7 +284,7 @@ class ParkingMapController {
           </div>
           <div style="display: flex; gap: 8px; margin-top: 12px;">
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-pin" data-lat="${s.latitude}" data-lng="${s.longitude}" style="flex: 1;">
-              View on Map
+              🗺️ View on Map
             </button>
             ${cardActionsHtml}
           </div>
@@ -327,7 +330,7 @@ class ParkingMapController {
     }
 
     if (!window.currentUser || !space.owner_id || space.owner_id !== window.currentUser.id) {
-      this.showMapAlert('error', 'Forbidden: You do not have permission to edit this parking space.');
+      this.showMapAlert('error', '⚠️ Forbidden: You do not have permission to edit this parking space.');
       return;
     }
 
@@ -384,7 +387,7 @@ class ParkingMapController {
 
     const space = this.spacesData ? this.spacesData[spaceId] : null;
     if (!window.currentUser || !space || !space.owner_id || space.owner_id !== window.currentUser.id) {
-      this.showMapAlert('error', 'Forbidden: You do not have permission to delete this parking space.');
+      this.showMapAlert('error', '⚠️ Forbidden: You do not have permission to delete this parking space.');
       return;
     }
 
@@ -410,17 +413,17 @@ class ParkingMapController {
       if (res.ok && json.success) {
         // Show success message
         this.showMapAlert('success', `
-          <strong>Parking Space Deleted Successfully!</strong><br>
+          🗑️ <strong>Parking Space Deleted Successfully!</strong><br>
           <span>"${displayName}" has been permanently removed from Supabase and the map.</span>
         `);
 
         // Refresh data: removes it from the website and removes its map marker
         await this.loadParkingSpaces();
       } else {
-        this.showMapAlert('error', `<strong>Failed to delete space:</strong> ${json.error || 'Server error'}`);
+        this.showMapAlert('error', `❌ <strong>Failed to delete space:</strong> ${json.error || 'Server error'}`);
       }
     } catch (err) {
-      this.showMapAlert('error', `<strong>Network error:</strong> ${err.message}`);
+      this.showMapAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
     }
   }
 
@@ -429,19 +432,19 @@ class ParkingMapController {
     if (!spaceId) return;
 
     if (!window.currentUser) {
-      alert('Please log in to your account before requesting a parking spot.');
+      alert('⚠️ Please log in to your account before requesting a parking spot.');
       window.location.hash = '#home';
       return;
     }
 
     const space = this.spacesData ? this.spacesData[spaceId] : null;
     if (space && !space.owner_id) {
-      this.showMapAlert('error', 'Public community spaces operate on a first-come, first-served basis and do not require reservation requests.');
+      this.showMapAlert('error', '⚠️ Public community spaces operate on a first-come, first-served basis and do not require reservation requests.');
       return;
     }
 
     if (availableSpots <= 0) {
-      this.showMapAlert('error', 'This parking space is currently full.');
+      this.showMapAlert('error', '⚠️ This parking space is currently full.');
       return;
     }
 
@@ -459,7 +462,7 @@ class ParkingMapController {
         } else {
           const carOptions = cars.map((c, i) => `${i + 1}. ${c.license_plate} (${c.model || 'Standard'})`).join('\n');
           const choice = window.prompt(
-            `Select which vehicle to request parking at "${spaceName}":\n\n${carOptions}\n\nEnter number (1-${cars.length}):`,
+            `🚗 Select which vehicle to request parking at "${spaceName}":\n\n${carOptions}\n\nEnter number (1-${cars.length}):`,
             '1'
           );
           if (choice === null) return; // cancelled
@@ -473,14 +476,14 @@ class ParkingMapController {
     } catch (e) {}
 
     if (!selectedCarId) {
-      this.showMapAlert('error', 'You must register a vehicle in "My Cars" before requesting a parking spot.');
+      this.showMapAlert('error', '⚠️ You must register a vehicle in "My Cars" before requesting a parking spot.');
       window.location.hash = '#dashboard';
       return;
     }
 
     const displayName = spaceName || 'this parking lot';
     const confirmed = window.confirm(
-      `Submit Flood Parking Request\n\n` +
+      `🚗 Submit Flood Parking Request\n\n` +
       `Parking Lot: ${displayName}\n` +
       selectedCarInfo +
       `Spots Available: ${availableSpots}\n\n` +
@@ -505,7 +508,7 @@ class ParkingMapController {
 
       if (res.ok && json.success) {
         this.showMapAlert('success', `
-          <strong>Reservation Request Submitted!</strong><br>
+          🎉 <strong>Reservation Request Submitted!</strong><br>
           <span>Your request is pending host approval at "${displayName}". Available capacity remains open until the host approves. Track progress in <a href="#my-reservations" style="color: #0284c7; font-weight: bold; text-decoration: underline;">My Reservations</a>.</span>
         `);
 
@@ -518,17 +521,17 @@ class ParkingMapController {
           window.loadDashboard();
         }
       } else {
-        this.showMapAlert('error', `<strong>Request Failed:</strong> ${json.error || 'Server error'}`);
+        this.showMapAlert('error', `❌ <strong>Request Failed:</strong> ${json.error || 'Server error'}`);
       }
     } catch (err) {
-      this.showMapAlert('error', `<strong>Network error:</strong> ${err.message}`);
+      this.showMapAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
     }
   }
 
   updateStatusBadge(count) {
     const badge = document.getElementById('map-status-badge');
     if (badge) {
-      badge.innerHTML = `Active Parking Spaces: <strong style="color: #0284c7; margin-left: 4px;">${count}</strong>`;
+      badge.innerHTML = `<span>🅿️</span> Active Parking Spaces: <strong style="color: #0284c7; margin-left: 4px;">${count}</strong>`;
     }
   }
 
