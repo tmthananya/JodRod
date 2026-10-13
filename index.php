@@ -528,41 +528,38 @@ if (!empty($_SESSION['auth_user'])) {
       </div>
     </section>
 
-    <!-- 3. My Parking Lots Section: OFFER PARKING LOT FORM -->
+    <!-- 3. My Parking Lots Section: TWO-STEP OWNER EXPERIENCE -->
     <section id="section-my-spaces" class="nav-content-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>🅿️</span> My Parking Lots & Offer Space</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
+      <!-- Header Bar -->
+      <div class="my-spaces-header-bar">
+        <div>
+          <h2 class="section-title"><span>🅿️</span> My Parking Lots</h2>
+          <p class="section-subtitle">Manage your flood-safe elevated spaces, review driver requests, and offer new lots.</p>
+        </div>
+        <div class="my-spaces-header-actions">
+          <button type="button" class="pixel-btn pixel-btn-green" id="btn-open-offer-lot">
+            <span>🅿️</span> Offer Parking Lot
+          </button>
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-refresh-my-lots" title="Reload live data from Supabase">
+            <span>🔄</span> Refresh
+          </button>
+          <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
+        </div>
       </div>
-      <p class="section-subtitle">Register and manage your safe elevated spaces to help neighbors protect their vehicles from flooding.</p>
 
-      <!-- Incoming Requests Section for Parking Space Owners (Phase 2 Owner Approval) -->
-      <div class="form-card" style="margin-bottom: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-          <div>
-            <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-              <span>📬</span> Incoming Parking Requests (Owner Approval)
-            </h3>
-            <p style="font-size: 0.88rem; color: #64748b; margin: 0;">
-              Review and approve reservation requests from neighbors in flood zones. Accepting a request assigns a safe spot and updates lot capacity.
-            </p>
-          </div>
-          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-refresh-owner-requests" title="Refresh incoming requests">
-            <span>🔄</span> Refresh Requests
+      <!-- Action Feedback Alert Box -->
+      <div id="my-spaces-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
+
+      <!-- Offer Parking Space Form Card (Preserved in full with original behavior & design) -->
+      <div id="offer-parking-form-container" class="form-card my-spaces-offer-box" style="display: none; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span>🅿️</span> Offer Parking Space
+          </h3>
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-close-offer-form" title="Close offer form">
+            ✕ Close Form
           </button>
         </div>
-
-        <div id="owner-requests-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 14px;"></div>
-        <div id="owner-incoming-requests-container">
-          <div class="empty-spaces-notice">Loading incoming requests for your parking lots...</div>
-        </div>
-      </div>
-
-      <!-- Offer Parking Space Form Card -->
-      <div class="form-card">
-        <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
-          <span>🅿️</span> Offer Parking Space
-        </h3>
         <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;">
           Fill in your space details. The location is automatically captured from the interactive map.
         </p>
@@ -630,6 +627,31 @@ if (!empty($_SESSION['auth_user'])) {
           </button>
 
         </form>
+      </div>
+
+      <!-- Hidden compatibility elements for existing legacy hooks -->
+      <div id="owner-incoming-requests-container" style="display: none;"></div>
+      <div id="owner-requests-alert" style="display: none;"></div>
+
+      <!-- ========================================================
+           STEP 1: LIST / GRID OF OWNED PARKING LOTS
+           ======================================================== -->
+      <div id="my-lots-step1-view">
+        <div id="my-lots-list-container">
+          <div class="empty-spaces-notice"><span>⏳</span> Loading your parking lots...</div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           STEP 2: DETAIL VIEW FOR SPECIFIC PARKING LOT
+           ======================================================== -->
+      <div id="my-lots-step2-view" style="display: none;">
+        <div style="margin-bottom: 16px;">
+          <button type="button" class="pixel-btn pixel-btn-sm btn-back-to-lots" id="btn-back-to-my-lots">
+            &larr; Back to My Parking Lots
+          </button>
+        </div>
+        <div id="my-lot-detail-content"></div>
       </div>
     </section>
 
@@ -1424,6 +1446,18 @@ if (!empty($_SESSION['auth_user'])) {
               }
               if (typeof loadDashboard === 'function') {
                 loadDashboard();
+              }
+              if (typeof loadMyParkingLots === 'function') {
+                await loadMyParkingLots();
+              }
+              if (typeof backToLotsList === 'function') {
+                backToLotsList();
+              }
+              const offerContainer = document.getElementById('offer-parking-form-container');
+              if (offerContainer) {
+                setTimeout(() => {
+                  offerContainer.style.display = 'none';
+                }, 1500);
               }
             } else {
               showAlert('error', `❌ <strong>Failed to create space:</strong> ${result.error || 'Server error'}`);
@@ -2540,112 +2574,426 @@ if (!empty($_SESSION['auth_user'])) {
       }
 
       // ========================================================
-      // OWNER INCOMING REQUESTS CONTROLLER (PHASE 2 OWNER APPROVAL)
       // ========================================================
-      async function loadOwnerRequests() {
-        const container = document.getElementById('owner-incoming-requests-container');
-        if (!container || !currentUser) return;
+      // MY PARKING LOTS CONTROLLER (TWO-STEP OWNER EXPERIENCE)
+      // ========================================================
+      let myLotsState = {
+        lots: [],
+        reservations: [],
+        selectedLotId: null
+      };
+
+      function showMySpacesAlert(type, message) {
+        const alertBox = document.getElementById('my-spaces-action-alert');
+        if (!alertBox) return;
+        alertBox.className = `alert-message ${type}`;
+        alertBox.innerHTML = message;
+        alertBox.style.display = 'block';
+        alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function clearMySpacesAlert() {
+        const alertBox = document.getElementById('my-spaces-action-alert');
+        if (alertBox) alertBox.style.display = 'none';
+      }
+
+      async function loadMyParkingLots() {
+        if (!currentUser) {
+          const listContainer = document.getElementById('my-lots-list-container');
+          if (listContainer) {
+            listContainer.innerHTML = '<div class="empty-spaces-notice">Please sign in to view and manage your parking lots.</div>';
+          }
+          return;
+        }
+
+        const listContainer = document.getElementById('my-lots-list-container');
+        if (listContainer && !myLotsState.selectedLotId) {
+          listContainer.innerHTML = '<div class="empty-spaces-notice"><span>⏳</span> Loading your parking lots...</div>';
+        }
 
         try {
-          container.innerHTML = '<div class="empty-spaces-notice"><span>⏳</span> Loading incoming requests for your parking lots...</div>';
-          const res = await fetch('api/get_reservations.php?as_owner=1');
-          const json = await res.json();
+          const [spacesRes, ownerRes] = await Promise.all([
+            fetch('api/get_parking_spaces.php').then(r => r.json()).catch(e => ({ success: false, error: e.message })),
+            fetch('api/get_reservations.php?as_owner=1').then(r => r.json()).catch(e => ({ success: false, error: e.message }))
+          ]);
 
-          if (!res.ok || !json.success) {
-            container.innerHTML = `
-              <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
-                ❌ Could not load incoming requests: ${json.error || 'Server error'}
-              </div>
-            `;
-            return;
-          }
+          const allSpaces = (spacesRes && spacesRes.success && Array.isArray(spacesRes.data)) ? spacesRes.data : [];
+          myLotsState.lots = allSpaces.filter(s => s.owner_id && s.owner_id === currentUser.id);
+          myLotsState.reservations = (ownerRes && ownerRes.success && Array.isArray(ownerRes.data)) ? ownerRes.data : [];
 
-          const requests = json.data || [];
-          if (requests.length === 0) {
-            container.innerHTML = `
-              <div class="empty-spaces-notice">
-                <span>📬</span> No incoming reservation requests for your parking lots at this time.
-              </div>
-            `;
-            return;
-          }
-
-          let html = '<div class="spaces-list-container">';
-          requests.forEach(r => {
-            const space = r.parking_spaces || {};
-            const car = r.cars || {};
-            const driver = r.driver_profile || {};
-            const spaceName = space.name || 'Your Parking Lot';
-            const status = (r.status || 'pending').toLowerCase();
-            const isPending = (status === 'pending');
-            const isConfirmed = (status === 'confirmed');
-            const isRejected = (status === 'rejected');
-            const isCancelled = (status === 'cancelled');
-
-            let statusPill = '';
-            if (isPending) {
-              statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">⏳ PENDING APPROVAL</span>';
-            } else if (isConfirmed) {
-              statusPill = '<span class="status-pill status-available">🟢 ACCEPTED</span>';
-            } else if (isRejected) {
-              statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 DECLINED</span>';
+          // If a specific lot is selected, render Step 2 detail view
+          if (myLotsState.selectedLotId) {
+            const currentLot = myLotsState.lots.find(l => l.id === myLotsState.selectedLotId);
+            if (currentLot) {
+              renderMyLotDetail(currentLot.id);
             } else {
-              statusPill = `<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">⚪ ${status.toUpperCase()}</span>`;
+              // Selected lot no longer exists, revert to Step 1
+              myLotsState.selectedLotId = null;
+              renderMyLotsList(myLotsState.lots, myLotsState.reservations);
             }
+          } else {
+            // Render Step 1 list view
+            renderMyLotsList(myLotsState.lots, myLotsState.reservations);
+          }
+        } catch (err) {
+          if (listContainer) {
+            listContainer.innerHTML = `
+              <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
+                ❌ Network error while loading parking lots: ${err.message}
+              </div>
+            `;
+          }
+        }
+      }
+      window.loadMyParkingLots = loadMyParkingLots;
 
-            const createdAt = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+      // Legacy compatibility alias
+      async function loadOwnerRequests() {
+        return loadMyParkingLots();
+      }
+      window.loadOwnerRequests = loadOwnerRequests;
 
-            let actionsHtml = '';
-            if (isPending) {
-              actionsHtml = `
-                <div class="owner-req-actions" style="display: flex; gap: 8px; margin-top: 14px;">
-                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${spaceName}" data-plate="${car.license_plate || 'Vehicle'}" style="flex: 1;">
-                    ✅ Accept
-                  </button>
-                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${spaceName}" data-plate="${car.license_plate || 'Vehicle'}" style="flex: 1;">
-                    ❌ Decline
-                  </button>
-                </div>
-              `;
-            }
+      function renderMyLotsList(lots, reservations) {
+        const step1View = document.getElementById('my-lots-step1-view');
+        const step2View = document.getElementById('my-lots-step2-view');
+        const container = document.getElementById('my-lots-list-container');
+        if (!container) return;
 
-            html += `
-              <article class="space-card" id="owner-req-card-${r.id}">
-                <div>
-                  <div class="space-card-header">
-                    <h4 class="space-card-title">🅿️ ${spaceName}</h4>
+        if (step1View) step1View.style.display = 'block';
+        if (step2View) step2View.style.display = 'none';
+
+        if (lots.length === 0) {
+          container.innerHTML = `
+            <div class="empty-spaces-notice">
+              <div style="font-size: 2.2rem; margin-bottom: 8px;">🅿️</div>
+              <h4 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No Parking Lots Registered</h4>
+              <p style="color: #64748b; font-size: 0.88rem; max-width: 480px; margin: 0 auto 16px;">
+                You haven't listed any elevated parking spaces yet. Help your community during flood emergencies by offering safe ground for neighbors' vehicles.
+              </p>
+              <button type="button" class="pixel-btn pixel-btn-green" id="btn-empty-offer-lot">
+                <span>➕</span> Offer Parking Lot
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '<div class="my-lots-grid">';
+        lots.forEach(lot => {
+          const cap = parseInt(lot.capacity, 10) || 0;
+          const avail = parseInt(lot.available_spaces, 10) || 0;
+          const occupied = Math.max(0, cap - avail);
+          const isClosed = lot.status === 'closed';
+          const isFull = lot.status === 'full' || avail <= 0;
+
+          const lat = lot.latitude ? parseFloat(lot.latitude).toFixed(5) : 'N/A';
+          const lng = lot.longitude ? parseFloat(lot.longitude).toFixed(5) : 'N/A';
+
+          const pendingCount = (reservations || []).filter(r => r.parking_space_id === lot.id && r.status === 'pending').length;
+          const confirmedCount = (reservations || []).filter(r => r.parking_space_id === lot.id && (r.status === 'confirmed' || r.status === 'active')).length;
+
+          let statusPill = '';
+          if (isClosed) {
+            statusPill = '<span class="status-pill status-closed">🔴 CLOSED</span>';
+          } else if (isFull) {
+            statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🟡 FULL</span>';
+          } else {
+            statusPill = '<span class="status-pill status-available">🟢 AVAILABLE</span>';
+          }
+
+          html += `
+            <article class="my-lot-card" id="my-lot-card-${lot.id}">
+              <div>
+                <div class="my-lot-card-header">
+                  <div>
+                    <h3 class="my-lot-card-title">🅿️ ${lot.name}</h3>
+                    <div class="my-lot-card-coords">📍 GPS: ${lat}, ${lng}</div>
+                  </div>
+                  <div>
                     ${statusPill}
                   </div>
-                  <div class="space-card-body" style="margin-top: 10px;">
-                    <div><strong>Driver:</strong> 👤 ${driver.name || 'Neighbor'}</div>
-                    <div><strong>Vehicle:</strong> 🚘 ${car.license_plate || 'Vehicle'} (${car.model || 'Standard'})</div>
-                    <div><strong>Requested At:</strong> ${createdAt}</div>
-                    ${r.notes ? `<div><strong>Notes:</strong> <em>${r.notes}</em></div>` : ''}
+                </div>
+
+                <!-- Capacity & Availability Metrics -->
+                <div class="my-lot-metrics-bar" style="margin: 12px 0;">
+                  <div class="my-lot-metric-item">
+                    <div class="my-lot-metric-num" style="color: #16a34a;">${avail}</div>
+                    <div class="my-lot-metric-lbl">Available</div>
+                  </div>
+                  <div class="my-lot-metric-item">
+                    <div class="my-lot-metric-num" style="color: #ea580c;">${occupied}</div>
+                    <div class="my-lot-metric-lbl">Occupied</div>
+                  </div>
+                  <div class="my-lot-metric-item">
+                    <div class="my-lot-metric-num" style="color: #b45309;">${pendingCount}</div>
+                    <div class="my-lot-metric-lbl">Pending</div>
+                  </div>
+                  <div class="my-lot-metric-item">
+                    <div class="my-lot-metric-num" style="color: #0f172a;">${cap}</div>
+                    <div class="my-lot-metric-lbl">Capacity</div>
                   </div>
                 </div>
-                ${actionsHtml}
-              </article>
-            `;
-          });
-          html += '</div>';
 
-          container.innerHTML = html;
-        } catch (err) {
-          container.innerHTML = `
-            <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
-              ❌ Network error while loading incoming requests: ${err.message}
+                <!-- Badges Summary -->
+                <div class="my-lot-badges-row">
+                  ${pendingCount > 0 
+                    ? `<span class="status-pill" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">⏳ ${pendingCount} Pending Request${pendingCount > 1 ? 's' : ''}</span>`
+                    : '<span style="font-size: 0.74rem; color: #94a3b8;">No pending requests</span>'
+                  }
+                  <span class="status-pill status-available" style="font-size: 0.75rem;">🟢 ${confirmedCount} Confirmed Booking${confirmedCount > 1 ? 's' : ''}</span>
+                </div>
+              </div>
+
+              <!-- Action Bar -->
+              <div class="my-lot-card-actions">
+                <button type="button" class="pixel-btn pixel-btn-blue btn-manage-lot" data-lot-id="${lot.id}" style="width: 100%; padding: 10px; font-weight: 800;">
+                  <span>📋</span> Manage Lot & Requests &rarr;
+                </button>
+                <div class="my-lot-card-subactions">
+                  <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${lot.name}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
+                    ${isClosed ? '🟢 Reopen' : '⏸️ Close'}
+                  </button>
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-edit-lot-dash" data-id="${lot.id}">
+                    ✏️ Edit
+                  </button>
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${lot.name}">
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        });
+        html += '</div>';
+
+        container.innerHTML = html;
+      }
+
+      function selectLotDetail(lotId) {
+        myLotsState.selectedLotId = lotId;
+        renderMyLotDetail(lotId);
+        const section = document.getElementById('section-my-spaces');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      window.selectLotDetail = selectLotDetail;
+
+      function backToLotsList() {
+        myLotsState.selectedLotId = null;
+        renderMyLotsList(myLotsState.lots, myLotsState.reservations);
+        const section = document.getElementById('section-my-spaces');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      window.backToLotsList = backToLotsList;
+
+      function renderMyLotDetail(lotId) {
+        const step1View = document.getElementById('my-lots-step1-view');
+        const step2View = document.getElementById('my-lots-step2-view');
+        const detailContainer = document.getElementById('my-lot-detail-content');
+        if (!detailContainer) return;
+
+        const lot = (myLotsState.lots || []).find(l => l.id === lotId);
+        if (!lot) {
+          backToLotsList();
+          return;
+        }
+
+        if (step1View) step1View.style.display = 'none';
+        if (step2View) step2View.style.display = 'block';
+
+        const cap = parseInt(lot.capacity, 10) || 0;
+        const avail = parseInt(lot.available_spaces, 10) || 0;
+        const occupied = Math.max(0, cap - avail);
+        const isClosed = lot.status === 'closed';
+        const isFull = lot.status === 'full' || avail <= 0;
+
+        const lat = lot.latitude ? parseFloat(lot.latitude).toFixed(5) : 'N/A';
+        const lng = lot.longitude ? parseFloat(lot.longitude).toFixed(5) : 'N/A';
+
+        // Filter requests strictly for this lot
+        const pendingReqs = (myLotsState.reservations || []).filter(r => r.parking_space_id === lot.id && r.status === 'pending');
+        const confirmedBookings = (myLotsState.reservations || []).filter(r => r.parking_space_id === lot.id && (r.status === 'confirmed' || r.status === 'active'));
+
+        let statusPill = '';
+        if (isClosed) {
+          statusPill = '<span class="status-pill status-closed">🔴 CLOSED</span>';
+        } else if (isFull) {
+          statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🟡 FULL</span>';
+        } else {
+          statusPill = '<span class="status-pill status-available">🟢 AVAILABLE</span>';
+        }
+
+        // Render Pending Requests HTML
+        let pendingHtml = '';
+        if (pendingReqs.length > 0) {
+          pendingHtml = `
+            <div class="my-lot-req-grid">
+              ${pendingReqs.map(r => {
+                const driverName = r.driver_profile?.name || 'Community Driver';
+                const car = r.cars || {};
+                const plate = car.license_plate || 'Unlinked Vehicle';
+                const model = car.model ? ` (${car.model})` : '';
+                const createdStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+                return `
+                  <div class="dash-lot-req-card" id="owner-req-card-${r.id}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                      <div>
+                        <div style="font-weight: 800; color: #0f172a; font-size: 0.95rem;">👤 ${driverName}</div>
+                        <div style="font-size: 0.85rem; color: #334155; margin-top: 3px;">
+                          🚘 <span class="dash-car-plate" style="font-size: 0.78rem;">${plate}</span>${model}
+                        </div>
+                      </div>
+                      <span class="status-pill" style="font-size: 0.65rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
+                        ⏳ PENDING
+                      </span>
+                    </div>
+                    <div class="dash-req-meta" style="margin-top: 8px;">
+                      <span><strong>Requested Spaces:</strong> 1 spot</span>
+                      <span><strong>Submitted:</strong> ${createdStr}</span>
+                    </div>
+                    ${r.notes ? `<div style="font-size: 0.78rem; color: #64748b; font-style: italic; margin-top: 6px; background: #ffffff; padding: 4px 8px; border-radius: 3px;">Note: "${r.notes}"</div>` : ''}
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${lot.name}" data-plate="${plate}" style="flex: 1; padding: 8px;">
+                        ✅ Accept
+                      </button>
+                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${lot.name}" data-plate="${plate}" style="flex: 1; padding: 8px;">
+                        ❌ Decline
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        } else {
+          pendingHtml = `
+            <div class="dash-empty-notice">
+              <span>📬</span> No pending reservation requests for this parking lot.
             </div>
           `;
         }
-      }
 
-      window.loadOwnerRequests = loadOwnerRequests;
+        // Render Confirmed Bookings HTML
+        let confirmedHtml = '';
+        if (confirmedBookings.length > 0) {
+          confirmedHtml = `
+            <div class="my-lot-req-grid">
+              ${confirmedBookings.map((r, idx) => {
+                const driverName = r.driver_profile?.name || 'Community Driver';
+                const car = r.cars || {};
+                const plate = car.license_plate || 'Unlinked Vehicle';
+                const model = car.model ? ` (${car.model})` : '';
+                const updatedStr = r.updated_at ? new Date(r.updated_at).toLocaleString() : (r.created_at ? new Date(r.created_at).toLocaleString() : 'Confirmed');
+                return `
+                  <div class="dash-lot-booking-card" id="owner-booking-card-${r.id}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                      <div>
+                        <div style="font-weight: 800; color: #0f172a; font-size: 0.95rem;">
+                          <span>Spot #${idx + 1}:</span> 👤 ${driverName}
+                        </div>
+                        <div style="font-size: 0.85rem; color: #334155; margin-top: 3px;">
+                          🚘 <span class="dash-car-plate" style="font-size: 0.78rem;">${plate}</span>${model}
+                        </div>
+                      </div>
+                      <span class="status-pill status-available" style="font-size: 0.65rem; padding: 3px 6px;">
+                        🟢 ACCEPTED
+                      </span>
+                    </div>
+                    <div class="dash-req-meta" style="margin-top: 8px;">
+                      <span><strong>Lot:</strong> ${lot.name}</span>
+                      <span><strong>Spaces:</strong> 1 space</span>
+                      <span><strong>Confirmed At:</strong> ${updatedStr}</span>
+                    </div>
+                    ${r.notes ? `<div style="font-size: 0.78rem; color: #64748b; font-style: italic; margin-top: 6px; background: #ffffff; padding: 4px 8px; border-radius: 3px;">Note: "${r.notes}"</div>` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        } else {
+          confirmedHtml = `
+            <div class="dash-empty-notice">
+              <span>🚘</span> No vehicles currently parked in this lot (0 / ${cap} spots occupied).
+            </div>
+          `;
+        }
+
+        detailContainer.innerHTML = `
+          <!-- Lot Header Panel -->
+          <div class="my-lot-detail-header-card">
+            <div class="my-lot-detail-title-row">
+              <div>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0;">🅿️ ${lot.name}</h3>
+                <div style="font-size: 0.82rem; color: #64748b; font-family: monospace; margin-top: 4px;">📍 GPS: ${lat}, ${lng}</div>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                ${statusPill}
+                <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${lot.name}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
+                  ${isClosed ? '🟢 Reopen Lot' : '⏸️ Close Lot'}
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-edit-lot-dash" data-id="${lot.id}">
+                  ✏️ Edit
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${lot.name}">
+                  🗑️ Delete
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-sm btn-view-car-spot" data-lat="${lot.latitude}" data-lng="${lot.longitude}">
+                  🗺️ Map
+                </button>
+              </div>
+            </div>
+
+            <!-- Capacity Stats -->
+            <div class="my-lot-metrics-bar" style="margin-top: 14px;">
+              <div class="my-lot-metric-item">
+                <div class="my-lot-metric-num" style="color: #16a34a;">${avail}</div>
+                <div class="my-lot-metric-lbl">Available Spots</div>
+              </div>
+              <div class="my-lot-metric-item">
+                <div class="my-lot-metric-num" style="color: #ea580c;">${occupied}</div>
+                <div class="my-lot-metric-lbl">Occupied Spots</div>
+              </div>
+              <div class="my-lot-metric-item">
+                <div class="my-lot-metric-num" style="color: #b45309;">${pendingReqs.length}</div>
+                <div class="my-lot-metric-lbl">Pending Requests</div>
+              </div>
+              <div class="my-lot-metric-item">
+                <div class="my-lot-metric-num" style="color: #0f172a;">${cap}</div>
+                <div class="my-lot-metric-lbl">Total Capacity</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: Pending Reservation Requests -->
+          <div class="my-lot-detail-section">
+            <div class="my-lot-detail-section-title">
+              <h3><span>📬</span> Pending Requests (${pendingReqs.length})</h3>
+              ${pendingReqs.length > 0 ? '<span class="status-badge" style="background:#fef3c7; color:#b45309; font-size:0.7rem;">Action Needed</span>' : ''}
+            </div>
+            <p class="my-lot-detail-section-desc">
+              Review and approve reservation requests specifically for "${lot.name}". Accepting a request decreases available capacity by 1.
+            </p>
+            ${pendingHtml}
+          </div>
+
+          <!-- Section 2: Confirmed Bookings -->
+          <div class="my-lot-detail-section">
+            <div class="my-lot-detail-section-title">
+              <h3><span>🛡️</span> Confirmed Bookings (${confirmedBookings.length} / ${cap})</h3>
+              <span class="status-badge status-available" style="font-size:0.7rem;">${occupied} Spots Filled</span>
+            </div>
+            <p class="my-lot-detail-section-desc">
+              Vehicles currently holding an accepted spot in "${lot.name}".
+            </p>
+            ${confirmedHtml}
+          </div>
+        `;
+      }
 
       async function handleOwnerReservationAction(reservationId, action, spaceName, plateName, buttonElement) {
         if (!reservationId || !action) return;
 
         const actionText = (action === 'accept') ? 'Accept' : 'Decline';
-        const card = document.getElementById(`owner-req-card-${reservationId}`);
+        const card = document.getElementById(`owner-req-card-${reservationId}`) || (buttonElement ? buttonElement.closest('.dash-lot-req-card, .space-card') : null);
         const actionButtons = card ? card.querySelectorAll('.btn-owner-approve-res') : [];
 
         // Disable repeated actions while processing
@@ -2656,7 +3004,7 @@ if (!empty($_SESSION['auth_user'])) {
           buttonElement.innerHTML = '<span>⏳</span> Processing...';
         }
 
-        const alertBox = document.getElementById('owner-requests-alert');
+        const alertBox = document.getElementById('my-spaces-action-alert') || document.getElementById('owner-requests-alert');
         if (alertBox) alertBox.style.display = 'none';
 
         try {
@@ -2681,8 +3029,9 @@ if (!empty($_SESSION['auth_user'])) {
                 ? `🎉 <strong>Reservation Accepted!</strong><br>Spot assigned for vehicle "${plateName}" at "${spaceName}". Available capacity has been updated.`
                 : `ℹ️ <strong>Reservation Request Declined:</strong><br>Request for vehicle "${plateName}" was rejected and the vehicle released.`;
               alertBox.style.display = 'block';
+              alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
-            await loadOwnerRequests();
+            if (typeof loadMyParkingLots === 'function') await loadMyParkingLots();
             if (typeof loadDashboard === 'function') await loadDashboard();
             if (window.parkingMap) window.parkingMap.loadParkingSpaces();
           } else {
@@ -2690,6 +3039,7 @@ if (!empty($_SESSION['auth_user'])) {
               alertBox.className = 'alert-message error';
               alertBox.innerHTML = `❌ <strong>Failed to ${actionText.toLowerCase()} reservation:</strong> ${json.error || 'Server error'}`;
               alertBox.style.display = 'block';
+              alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
             actionButtons.forEach(b => {
               b.disabled = false;
@@ -2703,6 +3053,7 @@ if (!empty($_SESSION['auth_user'])) {
             alertBox.className = 'alert-message error';
             alertBox.innerHTML = `❌ <strong>Network error:</strong> ${err.message}`;
             alertBox.style.display = 'block';
+            alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
           actionButtons.forEach(b => {
             b.disabled = false;
@@ -3098,6 +3449,9 @@ if (!empty($_SESSION['auth_user'])) {
               </div>
 
               <div class="dash-card-actions" style="margin-top: 12px;">
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-manage-lot" data-lot-id="${lot.id}">
+                  📋 Manage Lot & Requests
+                </button>
                 <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${lot.name}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
                   ${isClosed ? '🟢 Reopen Lot' : '⏸️ Close Lot'}
                 </button>
@@ -3576,9 +3930,51 @@ if (!empty($_SESSION['auth_user'])) {
           );
         }
 
-        const refreshRequestsBtn = e.target.closest('#btn-refresh-owner-requests');
-        if (refreshRequestsBtn) {
-          loadOwnerRequests();
+        const manageLotBtn = e.target.closest('.btn-manage-lot, .btn-select-lot');
+        if (manageLotBtn) {
+          const lotId = manageLotBtn.dataset.lotId || manageLotBtn.dataset.id;
+          if (lotId) {
+            window.location.hash = '#my-spaces';
+            if (typeof selectLotDetail === 'function') {
+              selectLotDetail(lotId);
+            }
+          }
+        }
+
+        const backToLotsBtn = e.target.closest('#btn-back-to-my-lots, .btn-back-to-lots');
+        if (backToLotsBtn) {
+          if (typeof backToLotsList === 'function') {
+            backToLotsList();
+          }
+        }
+
+        const openOfferBtn = e.target.closest('#btn-open-offer-lot, #btn-empty-offer-lot, #btn-toggle-offer-form');
+        if (openOfferBtn) {
+          const offerContainer = document.getElementById('offer-parking-form-container');
+          if (offerContainer) {
+            const isHidden = (offerContainer.style.display === 'none' || !offerContainer.style.display);
+            offerContainer.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+              offerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              const nameInput = document.getElementById('offer-name');
+              if (nameInput) nameInput.focus();
+            }
+          }
+        }
+
+        const closeOfferBtn = e.target.closest('#btn-close-offer-form');
+        if (closeOfferBtn) {
+          const offerContainer = document.getElementById('offer-parking-form-container');
+          if (offerContainer) {
+            offerContainer.style.display = 'none';
+          }
+        }
+
+        const refreshMyLotsBtn = e.target.closest('#btn-refresh-my-lots, #btn-refresh-owner-requests');
+        if (refreshMyLotsBtn) {
+          if (typeof loadMyParkingLots === 'function') {
+            loadMyParkingLots();
+          }
         }
 
         const toggleLotBtn = e.target.closest('.btn-toggle-lot-status');
