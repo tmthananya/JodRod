@@ -15,23 +15,27 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
+// Target port and route matching desktop app
+const APP_PORT = '8088';
+const APP_ROUTE = '/#map';
+
 // Known hosts
 const CURRENT_MAC_IP = '192.168.1.44';
-const HOME_WIFI_IP = '192.168.70.187';
+const LOCALHOST_IP = '127.0.0.1';
 const HOTSPOT_IP = '172.20.10.2';
-const LOCALHOST_IP = 'localhost';
+const HOME_WIFI_IP = '192.168.70.187';
 
 /**
  * Automatically determine the best initial URL based on platform & environment:
- * - Desktop Web: http://localhost:8000 (or current host)
+ * - Desktop Web: http://127.0.0.1:8088/#map (or current host)
  * - Mobile Expo Go: dynamically detects Metro server IP from bundle scriptURL
  */
 function getInitialUrl() {
   if (Platform.OS === 'web') {
     if (typeof window !== 'undefined' && window.location && window.location.hostname) {
-      return `http://${window.location.hostname}:8000`;
+      return `http://${window.location.hostname}:${APP_PORT}${APP_ROUTE}`;
     }
-    return `http://${LOCALHOST_IP}:8000`;
+    return `http://${LOCALHOST_IP}:${APP_PORT}${APP_ROUTE}`;
   }
 
   // On Mobile (iOS / Android), extract host IP where Metro bundled the app from
@@ -39,12 +43,12 @@ function getInitialUrl() {
   if (scriptURL) {
     const match = scriptURL.match(/^https?:\/\/([^:/]+)/);
     if (match && match[1] && match[1] !== 'localhost' && match[1] !== '127.0.0.1') {
-      return `http://${match[1]}:8000`;
+      return `http://${match[1]}:${APP_PORT}${APP_ROUTE}`;
     }
   }
 
   // Fallback to active Mac IP
-  return `http://${CURRENT_MAC_IP}:8000`;
+  return `http://${CURRENT_MAC_IP}:${APP_PORT}${APP_ROUTE}`;
 }
 
 export default function App() {
@@ -91,7 +95,7 @@ export default function App() {
       if (url.includes(':')) {
         url = `http://${url}`;
       } else {
-        url = `http://${url}:8000`;
+        url = `http://${url}:${APP_PORT}${APP_ROUTE}`;
       }
     }
     handleSwitchUrl(url);
@@ -152,48 +156,48 @@ export default function App() {
             <TouchableOpacity
               style={[styles.presetChip, currentUrl.includes(CURRENT_MAC_IP) && styles.presetChipActive]}
               onPress={() => {
-                handleSwitchUrl(`http://${CURRENT_MAC_IP}:8000`);
+                handleSwitchUrl(`http://${CURRENT_MAC_IP}:${APP_PORT}${APP_ROUTE}`);
                 setShowConfig(false);
               }}
             >
-              <Text style={styles.presetChipText}>Wi-Fi ({CURRENT_MAC_IP})</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.presetChip, currentUrl.includes(HOME_WIFI_IP) && styles.presetChipActive]}
-              onPress={() => {
-                handleSwitchUrl(`http://${HOME_WIFI_IP}:8000`);
-                setShowConfig(false);
-              }}
-            >
-              <Text style={styles.presetChipText}>Alt Wi-Fi ({HOME_WIFI_IP})</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.presetChip, currentUrl.includes(HOTSPOT_IP) && styles.presetChipActive]}
-              onPress={() => {
-                handleSwitchUrl(`http://${HOTSPOT_IP}:8000`);
-                setShowConfig(false);
-              }}
-            >
-              <Text style={styles.presetChipText}>Hotspot ({HOTSPOT_IP})</Text>
+              <Text style={styles.presetChipText}>Phone Wi-Fi ({CURRENT_MAC_IP}:{APP_PORT})</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.presetChip, currentUrl.includes(LOCALHOST_IP) && styles.presetChipActive]}
               onPress={() => {
-                handleSwitchUrl(`http://${LOCALHOST_IP}:8000`);
+                handleSwitchUrl(`http://${LOCALHOST_IP}:${APP_PORT}${APP_ROUTE}`);
                 setShowConfig(false);
               }}
             >
-              <Text style={styles.presetChipText}>localhost (Desktop)</Text>
+              <Text style={styles.presetChipText}>Desktop ({LOCALHOST_IP}:{APP_PORT})</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.presetChip, currentUrl.includes(HOTSPOT_IP) && styles.presetChipActive]}
+              onPress={() => {
+                handleSwitchUrl(`http://${HOTSPOT_IP}:${APP_PORT}${APP_ROUTE}`);
+                setShowConfig(false);
+              }}
+            >
+              <Text style={styles.presetChipText}>Hotspot ({HOTSPOT_IP}:{APP_PORT})</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.presetChip, currentUrl.includes(HOME_WIFI_IP) && styles.presetChipActive]}
+              onPress={() => {
+                handleSwitchUrl(`http://${HOME_WIFI_IP}:${APP_PORT}${APP_ROUTE}`);
+                setShowConfig(false);
+              }}
+            >
+              <Text style={styles.presetChipText}>Alt Wi-Fi ({HOME_WIFI_IP})</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.inputRow}>
             <TextInput
               style={styles.ipInput}
-              placeholder="e.g. 192.168.1.50 or IP:8000"
+              placeholder="e.g. 192.168.1.44:8088 or IP"
               placeholderTextColor="#64748b"
               value={customInput}
               onChangeText={setCustomInput}
@@ -217,12 +221,12 @@ export default function App() {
           </Text>
 
           <View style={styles.helpBox}>
-            <Text style={styles.helpHeader}>Quick Fix Tips:</Text>
+            <Text style={styles.helpHeader}>Quick Connection Tips:</Text>
             <Text style={styles.helpText}>
               • Make sure your phone & Mac are on the <Text style={styles.helpBold}>same Wi-Fi</Text>.{'\n'}
-              • If using iPhone Hotspot, select <Text style={styles.helpBold}>{CURRENT_MAC_IP}</Text> below.{'\n'}
-              • If on home Wi-Fi, select <Text style={styles.helpBold}>{HOME_WIFI_IP}</Text>.{'\n'}
-              • PHP server must be running on port 8000 on your Mac.
+              • Your desktop URL is <Text style={styles.helpBold}>http://{LOCALHOST_IP}:{APP_PORT}{APP_ROUTE}</Text>.{'\n'}
+              • For your phone, tap <Text style={styles.helpBold}>{CURRENT_MAC_IP}:{APP_PORT}</Text> below.{'\n'}
+              • PHP server is running on port {APP_PORT}.
             </Text>
           </View>
 
@@ -235,27 +239,21 @@ export default function App() {
             <View style={styles.presetGrid}>
               <TouchableOpacity
                 style={styles.errorPresetBtn}
-                onPress={() => handleSwitchUrl(`http://${CURRENT_MAC_IP}:8000`)}
+                onPress={() => handleSwitchUrl(`http://${CURRENT_MAC_IP}:${APP_PORT}${APP_ROUTE}`)}
               >
-                <Text style={styles.errorPresetBtnText}>Wi-Fi ({CURRENT_MAC_IP}:8000)</Text>
+                <Text style={styles.errorPresetBtnText}>Phone on Wi-Fi ({CURRENT_MAC_IP}:{APP_PORT})</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.errorPresetBtn}
-                onPress={() => handleSwitchUrl(`http://${HOME_WIFI_IP}:8000`)}
+                onPress={() => handleSwitchUrl(`http://${LOCALHOST_IP}:${APP_PORT}${APP_ROUTE}`)}
               >
-                <Text style={styles.errorPresetBtnText}>Alt Wi-Fi ({HOME_WIFI_IP}:8000)</Text>
+                <Text style={styles.errorPresetBtnText}>Desktop Local ({LOCALHOST_IP}:{APP_PORT})</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.errorPresetBtn}
-                onPress={() => handleSwitchUrl(`http://${HOTSPOT_IP}:8000`)}
+                onPress={() => handleSwitchUrl(`http://${HOTSPOT_IP}:${APP_PORT}${APP_ROUTE}`)}
               >
-                <Text style={styles.errorPresetBtnText}>Hotspot ({HOTSPOT_IP}:8000)</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.errorPresetBtn}
-                onPress={() => handleSwitchUrl(`http://${LOCALHOST_IP}:8000`)}
-              >
-                <Text style={styles.errorPresetBtnText}>localhost:8000 (Desktop)</Text>
+                <Text style={styles.errorPresetBtnText}>Hotspot ({HOTSPOT_IP}:{APP_PORT})</Text>
               </TouchableOpacity>
             </View>
           </View>
