@@ -4,24 +4,57 @@ import {
   SafeAreaView,
   View,
   Text,
+  TextInput,
   ActivityIndicator,
   TouchableOpacity,
   BackHandler,
   Platform,
-  StatusBar
+  StatusBar,
+  NativeModules,
+  Linking
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-// Target URL requested: http://10.195.59.20:8000
-const DEFAULT_URL = 'http://10.195.59.20:8000';
-const ALT_URL = 'http://10.195.22.12:8000';
+// Known hosts
+const CURRENT_MAC_IP = '192.168.1.44';
+const HOME_WIFI_IP = '192.168.70.187';
+const HOTSPOT_IP = '172.20.10.2';
+const LOCALHOST_IP = 'localhost';
+
+/**
+ * Automatically determine the best initial URL based on platform & environment:
+ * - Desktop Web: http://localhost:8000 (or current host)
+ * - Mobile Expo Go: dynamically detects Metro server IP from bundle scriptURL
+ */
+function getInitialUrl() {
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+      return `http://${window.location.hostname}:8000`;
+    }
+    return `http://${LOCALHOST_IP}:8000`;
+  }
+
+  // On Mobile (iOS / Android), extract host IP where Metro bundled the app from
+  const scriptURL = NativeModules?.SourceCode?.scriptURL;
+  if (scriptURL) {
+    const match = scriptURL.match(/^https?:\/\/([^:/]+)/);
+    if (match && match[1] && match[1] !== 'localhost' && match[1] !== '127.0.0.1') {
+      return `http://${match[1]}:8000`;
+    }
+  }
+
+  // Fallback to active Mac IP
+  return `http://${CURRENT_MAC_IP}:8000`;
+}
 
 export default function App() {
   const webViewRef = useRef(null);
-  const [currentUrl, setCurrentUrl] = useState(DEFAULT_URL);
+  const [currentUrl, setCurrentUrl] = useState(getInitialUrl());
+  const [customInput, setCustomInput] = useState('');
   const [canGoBack, setCanGoBack] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showConfig, setShowConfig] = useState(false);
 
   // Handle Android physical back button
   useEffect(() => {
@@ -51,39 +84,185 @@ export default function App() {
     setCurrentUrl(newUrl);
   };
 
+  const handleApplyCustom = () => {
+    let url = customInput.trim();
+    if (!url) return;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      if (url.includes(':')) {
+        url = `http://${url}`;
+      } else {
+        url = `http://${url}:8000`;
+      }
+    }
+    handleSwitchUrl(url);
+    setShowConfig(false);
+  };
+
+  // Render Web-compatible container on Desktop browsers (Expo Web)
+  if (Platform.OS === 'web') {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
+        <View style={styles.webHeader}>
+          <Text style={styles.webTitle}>🚗 JodRod (Desktop Mode)</Text>
+          <View style={styles.webActions}>
+            <Text style={styles.webUrlText}>{currentUrl}</Text>
+            <TouchableOpacity
+              style={styles.openBrowserBtn}
+              onPress={() => Linking.openURL(currentUrl)}
+            >
+              <Text style={styles.openBrowserBtnText}>Open Directly in Tab ↗</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <iframe
+          src={currentUrl}
+          style={{ width: '100%', height: 'calc(100vh - 44px)', border: 'none' }}
+          title="JodRod Web"
+        />
+      </SafeAreaView>
+    );
+  }
+
+  // Render Native Mobile Container (iOS / Android in Expo Go)
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
-      
+
+      {/* Top Quick Bar (Tap to change IP) */}
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          style={styles.topBarInfo}
+          onPress={() => setShowConfig(!showConfig)}
+        >
+          <Text style={styles.topBarLabel}>Server:</Text>
+          <Text style={styles.topBarUrl} numberOfLines={1}>{currentUrl}</Text>
+          <Text style={styles.topBarChevron}>{showConfig ? '▲' : '▼'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.reloadMiniBtn} onPress={handleReload}>
+          <Text style={styles.reloadMiniText}>🔄</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Collapsible IP Switcher */}
+      {showConfig && (
+        <View style={styles.configDrawer}>
+          <Text style={styles.configTitle}>Select or Enter Server IP:</Text>
+          <View style={styles.presetRow}>
+            <TouchableOpacity
+              style={[styles.presetChip, currentUrl.includes(CURRENT_MAC_IP) && styles.presetChipActive]}
+              onPress={() => {
+                handleSwitchUrl(`http://${CURRENT_MAC_IP}:8000`);
+                setShowConfig(false);
+              }}
+            >
+              <Text style={styles.presetChipText}>Wi-Fi ({CURRENT_MAC_IP})</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.presetChip, currentUrl.includes(HOME_WIFI_IP) && styles.presetChipActive]}
+              onPress={() => {
+                handleSwitchUrl(`http://${HOME_WIFI_IP}:8000`);
+                setShowConfig(false);
+              }}
+            >
+              <Text style={styles.presetChipText}>Alt Wi-Fi ({HOME_WIFI_IP})</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.presetChip, currentUrl.includes(HOTSPOT_IP) && styles.presetChipActive]}
+              onPress={() => {
+                handleSwitchUrl(`http://${HOTSPOT_IP}:8000`);
+                setShowConfig(false);
+              }}
+            >
+              <Text style={styles.presetChipText}>Hotspot ({HOTSPOT_IP})</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.presetChip, currentUrl.includes(LOCALHOST_IP) && styles.presetChipActive]}
+              onPress={() => {
+                handleSwitchUrl(`http://${LOCALHOST_IP}:8000`);
+                setShowConfig(false);
+              }}
+            >
+              <Text style={styles.presetChipText}>localhost (Desktop)</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.ipInput}
+              placeholder="e.g. 192.168.1.50 or IP:8000"
+              placeholderTextColor="#64748b"
+              value={customInput}
+              onChangeText={setCustomInput}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <TouchableOpacity style={styles.applyBtn} onPress={handleApplyCustom}>
+              <Text style={styles.applyBtnText}>Connect</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
       {hasError ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorIcon}>⚠️</Text>
           <Text style={styles.errorTitle}>Cannot Connect to Server</Text>
           <Text style={styles.errorSubtitle}>
-            Target URL:{'\n'}
+            Attempted URL:{'\n'}
             <Text style={styles.urlText}>{currentUrl}</Text>
           </Text>
-          <Text style={styles.errorHelp}>
-            Please ensure:
-            {'\n'}• Your phone and Mac are on the exact same Wi-Fi.
-            {'\n'}• The PHP server is running on port 8000.
-          </Text>
+
+          <View style={styles.helpBox}>
+            <Text style={styles.helpHeader}>Quick Fix Tips:</Text>
+            <Text style={styles.helpText}>
+              • Make sure your phone & Mac are on the <Text style={styles.helpBold}>same Wi-Fi</Text>.{'\n'}
+              • If using iPhone Hotspot, select <Text style={styles.helpBold}>{CURRENT_MAC_IP}</Text> below.{'\n'}
+              • If on home Wi-Fi, select <Text style={styles.helpBold}>{HOME_WIFI_IP}</Text>.{'\n'}
+              • PHP server must be running on port 8000 on your Mac.
+            </Text>
+          </View>
+
           {errorMessage ? (
             <Text style={styles.errorDetail}>{errorMessage}</Text>
           ) : null}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.retryButton} onPress={handleReload}>
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.switchButton}
-              onPress={() => handleSwitchUrl(currentUrl === DEFAULT_URL ? ALT_URL : DEFAULT_URL)}
-            >
-              <Text style={styles.switchButtonText}>
-                Switch to {currentUrl === DEFAULT_URL ? '10.195.22.12' : '10.195.59.20'}
-              </Text>
-            </TouchableOpacity>
+
+          <View style={styles.presetBox}>
+            <Text style={styles.presetTitle}>Tap to Switch Server:</Text>
+            <View style={styles.presetGrid}>
+              <TouchableOpacity
+                style={styles.errorPresetBtn}
+                onPress={() => handleSwitchUrl(`http://${CURRENT_MAC_IP}:8000`)}
+              >
+                <Text style={styles.errorPresetBtnText}>Wi-Fi ({CURRENT_MAC_IP}:8000)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.errorPresetBtn}
+                onPress={() => handleSwitchUrl(`http://${HOME_WIFI_IP}:8000`)}
+              >
+                <Text style={styles.errorPresetBtnText}>Alt Wi-Fi ({HOME_WIFI_IP}:8000)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.errorPresetBtn}
+                onPress={() => handleSwitchUrl(`http://${HOTSPOT_IP}:8000`)}
+              >
+                <Text style={styles.errorPresetBtnText}>Hotspot ({HOTSPOT_IP}:8000)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.errorPresetBtn}
+                onPress={() => handleSwitchUrl(`http://${LOCALHOST_IP}:8000`)}
+              >
+                <Text style={styles.errorPresetBtnText}>localhost:8000 (Desktop)</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+
+          <TouchableOpacity style={styles.retryButton} onPress={handleReload}>
+            <Text style={styles.retryButtonText}>🔄 Retry Connection</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <WebView
@@ -109,13 +288,13 @@ export default function App() {
           onError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
             setHasError(true);
-            setErrorMessage(nativeEvent.description || 'Network connection failed');
+            setErrorMessage(nativeEvent.description || 'Connection refused or timed out');
           }}
           onHttpError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
             if (nativeEvent.statusCode >= 400) {
               setHasError(true);
-              setErrorMessage(`HTTP Error: ${nativeEvent.statusCode}`);
+              setErrorMessage(`Server HTTP Error: ${nativeEvent.statusCode}`);
             }
           }}
         />
@@ -128,6 +307,136 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#0f172a',
+  },
+  webHeader: {
+    height: 44,
+    backgroundColor: '#0f172a',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1e293b',
+  },
+  webTitle: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  webActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  webUrlText: {
+    color: '#94a3b8',
+    fontSize: 12,
+  },
+  openBrowserBtn: {
+    backgroundColor: '#2563eb',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  openBrowserBtnText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  topBar: {
+    height: 38,
+    backgroundColor: '#0f172a',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1e293b',
+  },
+  topBarInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  topBarLabel: {
+    color: '#64748b',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  topBarUrl: {
+    color: '#38bdf8',
+    fontSize: 12,
+    fontWeight: '600',
+    flexShrink: 1,
+  },
+  topBarChevron: {
+    color: '#94a3b8',
+    fontSize: 10,
+  },
+  reloadMiniBtn: {
+    padding: 6,
+  },
+  reloadMiniText: {
+    fontSize: 14,
+  },
+  configDrawer: {
+    backgroundColor: '#1e293b',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#334155',
+  },
+  configTitle: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  presetRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 10,
+  },
+  presetChip: {
+    backgroundColor: '#334155',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  presetChipActive: {
+    backgroundColor: '#2563eb',
+  },
+  presetChipText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  ipInput: {
+    flex: 1,
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    color: '#ffffff',
+    fontSize: 13,
+  },
+  applyBtn: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 14,
+    justifyContent: 'center',
+    borderRadius: 6,
+  },
+  applyBtnText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '600',
   },
   webview: {
     flex: 1,
@@ -154,71 +463,93 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: 20,
     backgroundColor: '#0f172a',
   },
   errorIcon: {
-    fontSize: 48,
-    marginBottom: 16,
+    fontSize: 44,
+    marginBottom: 12,
   },
   errorTitle: {
     color: '#f87171',
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 6,
     textAlign: 'center',
   },
   errorSubtitle: {
     color: '#cbd5e1',
-    fontSize: 14,
+    fontSize: 13,
     textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 20,
+    marginBottom: 14,
+    lineHeight: 18,
   },
   urlText: {
-    color: '#60a5fa',
+    color: '#38bdf8',
     fontWeight: '600',
   },
-  errorHelp: {
-    color: '#94a3b8',
-    fontSize: 13,
-    lineHeight: 20,
-    textAlign: 'left',
+  helpBox: {
     alignSelf: 'stretch',
     backgroundColor: '#1e293b',
-    padding: 16,
+    padding: 14,
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: 14,
+  },
+  helpHeader: {
+    color: '#f1f5f9',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  helpText: {
+    color: '#94a3b8',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  helpBold: {
+    color: '#38bdf8',
+    fontWeight: '600',
   },
   errorDetail: {
     color: '#fca5a5',
     fontSize: 12,
-    marginBottom: 16,
+    marginBottom: 12,
     textAlign: 'center',
   },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 12,
+  presetBox: {
+    alignSelf: 'stretch',
+    marginBottom: 16,
+  },
+  presetTitle: {
+    color: '#94a3b8',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  presetGrid: {
+    gap: 8,
+  },
+  errorPresetBtn: {
+    backgroundColor: '#334155',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  errorPresetBtnText: {
+    color: '#e2e8f0',
+    fontSize: 13,
+    fontWeight: '600',
   },
   retryButton: {
     backgroundColor: '#2563eb',
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 28,
     borderRadius: 8,
   },
   retryButtonText: {
     color: '#ffffff',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  switchButton: {
-    backgroundColor: '#334155',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  switchButtonText: {
-    color: '#e2e8f0',
     fontSize: 15,
     fontWeight: '600',
   },
