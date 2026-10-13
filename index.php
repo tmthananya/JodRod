@@ -455,19 +455,30 @@ if (!empty($_SESSION['auth_user'])) {
       </div>
     </section>
 
-    <!-- 2. My Reservations Section -->
+    <!-- 2. My Reservations Section: TWO-STEP DRIVER EXPERIENCE -->
     <section id="section-my-reservations" class="nav-content-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>📋</span> My Reservations</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
+      <!-- Header Bar -->
+      <div class="my-res-header-bar">
+        <div>
+          <h2 class="section-title"><span>📋</span> My Reservations</h2>
+          <p class="section-subtitle">View and manage your safe flood parking reservations, status updates, and vehicles.</p>
+        </div>
+        <div class="my-res-header-actions">
+          <a href="#map" class="pixel-btn pixel-btn-blue" id="btn-header-find-parking">
+            <span>🗺️</span> Find Parking
+          </a>
+          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-refresh-my-reservations" title="Reload live data from Supabase">
+            <span>🔄</span> Refresh
+          </button>
+          <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
+        </div>
       </div>
-      <p class="section-subtitle">View and manage your safe flood parking reservations.</p>
 
       <!-- Reservation Action Alert Box -->
-      <div id="reservation-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 16px;"></div>
+      <div id="reservation-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
 
-      <!-- My Vehicles Card -->
-      <div class="form-card" style="margin-bottom: 20px;">
+      <!-- My Vehicles Card (Preserved in full with original behavior & design) -->
+      <div class="form-card my-res-vehicles-box">
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
@@ -505,26 +516,48 @@ if (!empty($_SESSION['auth_user'])) {
         </div>
       </div>
 
-      <div class="form-card" style="margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-          <div>
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
-              <span>🚗</span> Reserve a Parking Lot
-            </h3>
-            <p style="font-size: 0.88rem; color: #64748b; margin: 0;">
-              Find an available elevated parking lot offered by a neighbor and request a spot before water rises.
-            </p>
+      <!-- ========================================================
+           STEP 1: LIST / GRID OF MY RESERVATIONS
+           ======================================================== -->
+      <div id="my-res-step1-view">
+        <!-- Compact Summary Metrics Bar -->
+        <div class="my-res-metrics-bar" id="my-res-summary-metrics" style="display: none;">
+          <div class="my-res-metric-item">
+            <span class="my-res-metric-num" id="res-metric-total">0</span>
+            <span class="my-res-metric-label">Total Reservations</span>
           </div>
-          <a href="#map" class="pixel-btn pixel-btn-blue pixel-btn-sm">
-            <span>🔍</span> Browse Available Lots on Map &rarr;
-          </a>
+          <div class="my-res-metric-item">
+            <span class="my-res-metric-num" id="res-metric-pending" style="color: #b45309;">0</span>
+            <span class="my-res-metric-label">Pending Approval</span>
+          </div>
+          <div class="my-res-metric-item">
+            <span class="my-res-metric-num" id="res-metric-confirmed" style="color: #15803d;">0</span>
+            <span class="my-res-metric-label">Confirmed Spots</span>
+          </div>
+          <div class="my-res-metric-item">
+            <span class="my-res-metric-num" id="res-metric-history" style="color: #64748b;">0</span>
+            <span class="my-res-metric-label">Past / Historical</span>
+          </div>
+        </div>
+
+        <!-- Reservations List / Grid Container -->
+        <div id="reservations-list-container">
+          <div class="empty-spaces-notice">
+            <span>⏳</span> Loading your reservations...
+          </div>
         </div>
       </div>
 
-      <div id="reservations-list-container">
-        <div class="empty-spaces-notice">
-          <span>📋</span> You do not have any active parking reservations. Browse available lots on the map to reserve a safe spot.
+      <!-- ========================================================
+           STEP 2: DETAIL VIEW FOR SPECIFIC RESERVATION
+           ======================================================== -->
+      <div id="my-res-step2-view" style="display: none;">
+        <div style="margin-bottom: 16px;">
+          <button type="button" class="pixel-btn pixel-btn-sm btn-back-to-reservations" id="btn-back-to-my-reservations">
+            &larr; Back to My Reservations
+          </button>
         </div>
+        <div id="my-reservation-detail-content"></div>
       </div>
     </section>
 
@@ -2261,8 +2294,18 @@ if (!empty($_SESSION['auth_user'])) {
       }
 
       // ========================================================
-      // RESERVATION MANAGEMENT CONTROLLER
+      // RESERVATION MANAGEMENT CONTROLLER: TWO-STEP UX
       // ========================================================
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
       function showReservationAlert(type, message) {
         const alertBox = document.getElementById('reservation-action-alert');
         if (alertBox) {
@@ -2272,6 +2315,11 @@ if (!empty($_SESSION['auth_user'])) {
           alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }
+
+      let myResState = {
+        reservations: [],
+        selectedReservationId: null
+      };
 
       async function loadReservations() {
         const container = document.getElementById('reservations-list-container');
@@ -2283,6 +2331,8 @@ if (!empty($_SESSION['auth_user'])) {
               <span>🔒</span> Please log in to view and manage your reservations.
             </div>
           `;
+          const metricsBox = document.getElementById('my-res-summary-metrics');
+          if (metricsBox) metricsBox.style.display = 'none';
           return;
         }
 
@@ -2300,89 +2350,42 @@ if (!empty($_SESSION['auth_user'])) {
             return;
           }
 
-          const reservations = json.data || [];
-          if (reservations.length === 0) {
-            container.innerHTML = `
-              <div class="empty-spaces-notice">
-                <span>📋</span> You do not have any flood parking reservations yet. Browse available lots on the map to reserve a safe spot.
-              </div>
-            `;
-            return;
+          myResState.reservations = json.data || [];
+
+          // Compute compact summary metrics
+          const total = myResState.reservations.length;
+          const pending = myResState.reservations.filter(r => (r.status || 'pending').toLowerCase() === 'pending').length;
+          const confirmed = myResState.reservations.filter(r => {
+            const s = (r.status || '').toLowerCase();
+            return s === 'confirmed' || s === 'active';
+          }).length;
+          const history = total - pending - confirmed;
+
+          const elTotal = document.getElementById('res-metric-total');
+          const elPending = document.getElementById('res-metric-pending');
+          const elConfirmed = document.getElementById('res-metric-confirmed');
+          const elHistory = document.getElementById('res-metric-history');
+          const metricsBox = document.getElementById('my-res-summary-metrics');
+
+          if (elTotal) elTotal.textContent = total;
+          if (elPending) elPending.textContent = pending;
+          if (elConfirmed) elConfirmed.textContent = confirmed;
+          if (elHistory) elHistory.textContent = history;
+          if (metricsBox) metricsBox.style.display = total > 0 ? 'flex' : 'none';
+
+          // If currently in detail view and reservation still exists, re-render detail; else render list
+          if (myResState.selectedReservationId) {
+            const currentItem = myResState.reservations.find(r => r.id === myResState.selectedReservationId);
+            if (currentItem) {
+              renderMyReservationDetail(myResState.selectedReservationId);
+              return;
+            }
           }
 
-          let cardsHtml = '<div class="spaces-list-container">';
-          reservations.forEach(r => {
-            const space = r.parking_spaces || {};
-            const spaceName = space.name || 'Flood Parking Lot';
-            const status = (r.status || 'pending').toLowerCase();
-            const isConfirmed = (status === 'confirmed' || status === 'active');
-            const isPending = (status === 'pending');
-            const isRejected = (status === 'rejected');
-            const isCancelled = (status === 'cancelled');
+          // Otherwise render list view
+          myResState.selectedReservationId = null;
+          renderMyReservationsList(myResState.reservations);
 
-            let statusPill = '';
-            if (isConfirmed) {
-              statusPill = '<span class="status-pill status-available">🟢 CONFIRMED</span>';
-            } else if (isPending) {
-              statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">⏳ PENDING APPROVAL</span>';
-            } else if (isRejected) {
-              statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 REJECTED</span>';
-            } else if (isCancelled) {
-              statusPill = '<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">⚪ CANCELLED</span>';
-            } else {
-              statusPill = `<span class="status-pill">${status.toUpperCase()}</span>`;
-            }
-
-            const createdAtFormatted = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
-            const lat = space.latitude ? parseFloat(space.latitude).toFixed(5) : 'N/A';
-            const lng = space.longitude ? parseFloat(space.longitude).toFixed(5) : 'N/A';
-
-            let actionButtons = '';
-            if (space.latitude && space.longitude) {
-              actionButtons += `
-                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-reservation-map" data-lat="${space.latitude}" data-lng="${space.longitude}" style="flex: 1;">
-                  🗺️ View on Map
-                </button>
-              `;
-            }
-            if (isPending) {
-              actionButtons += `
-                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${spaceName}" style="flex: 1;">
-                  ❌ Cancel Request
-                </button>
-              `;
-            } else if (isConfirmed) {
-              actionButtons += `
-                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${spaceName}" style="flex: 1;">
-                  ❌ Cancel Spot
-                </button>
-              `;
-            }
-
-            cardsHtml += `
-              <article class="space-card" id="reservation-card-${r.id}">
-                <div>
-                  <div class="space-card-header">
-                    <h4 class="space-card-title">🚗 ${spaceName}</h4>
-                    ${statusPill}
-                  </div>
-                  <div class="space-card-body" style="margin-top: 10px;">
-                    <div><strong>Reserved On:</strong> ${createdAtFormatted}</div>
-                    ${r.cars ? `<div><strong>Vehicle:</strong> 🚘 ${r.cars.license_plate} (${r.cars.model || 'Standard'})</div>` : ''}
-                    <div><strong>Coordinates:</strong> <span style="font-family: monospace;">${lat}, ${lng}</span></div>
-                    <div><strong>Lot Status:</strong> ${space.status || 'Active'} (${space.available_spaces ?? '?'} / ${space.capacity ?? '?'} spots open)</div>
-                    ${r.notes ? `<div><strong>Notes:</strong> <em>${r.notes}</em></div>` : ''}
-                  </div>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
-                  ${actionButtons}
-                </div>
-              </article>
-            `;
-          });
-          cardsHtml += '</div>';
-
-          container.innerHTML = cardsHtml;
         } catch (err) {
           container.innerHTML = `
             <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
@@ -2392,6 +2395,397 @@ if (!empty($_SESSION['auth_user'])) {
         }
       }
 
+      function renderMyReservationsList(reservations) {
+        const step1View = document.getElementById('my-res-step1-view');
+        const step2View = document.getElementById('my-res-step2-view');
+        const container = document.getElementById('reservations-list-container');
+        if (!container) return;
+
+        if (step1View) step1View.style.display = 'block';
+        if (step2View) step2View.style.display = 'none';
+
+        if (!reservations || reservations.length === 0) {
+          container.innerHTML = `
+            <div class="empty-spaces-notice">
+              <span style="font-size: 1.5rem; display: block; margin-bottom: 8px;">📋</span>
+              <strong>No flood parking reservations found.</strong><br>
+              Browse available high-ground parking lots on the interactive map to protect your vehicle.
+              <div style="margin-top: 14px;">
+                <a href="#map" class="pixel-btn pixel-btn-blue">
+                  <span>🗺️</span> Find Parking on Map &rarr;
+                </a>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '<div class="my-res-grid">';
+        reservations.forEach(r => {
+          const space = r.parking_spaces || {};
+          const spaceName = space.name || 'Flood Safe Parking Lot';
+          const status = (r.status || 'pending').toLowerCase();
+          const isConfirmed = (status === 'confirmed' || status === 'active');
+          const isPending = (status === 'pending');
+          const isRejected = (status === 'rejected');
+          const isCancelled = (status === 'cancelled');
+          const isCompleted = (status === 'completed');
+
+          let statusPill = '';
+          if (isConfirmed) {
+            statusPill = '<span class="status-pill status-available">🟢 CONFIRMED</span>';
+          } else if (isPending) {
+            statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">⏳ PENDING APPROVAL</span>';
+          } else if (isRejected) {
+            statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 REJECTED</span>';
+          } else if (isCancelled) {
+            statusPill = '<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">⚪ CANCELLED</span>';
+          } else if (isCompleted) {
+            statusPill = '<span class="status-pill" style="background:#f0fdf4; color:#15803d; border-color:#86efac;">⭐ COMPLETED</span>';
+          } else {
+            statusPill = `<span class="status-pill">${escapeHtml(status.toUpperCase())}</span>`;
+          }
+
+          const car = r.cars || {};
+          const plate = car.license_plate || 'Unlinked Vehicle';
+          const model = car.model ? ` (${car.model})` : '';
+          const createdAtFormatted = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+          const lat = space.latitude ? parseFloat(space.latitude).toFixed(4) : null;
+          const lng = space.longitude ? parseFloat(space.longitude).toFixed(4) : null;
+
+          html += `
+            <article class="my-res-card" id="my-res-card-${r.id}" data-res-id="${r.id}">
+              <div>
+                <div class="my-res-card-header">
+                  <h4 class="my-res-card-title">🚗 ${escapeHtml(spaceName)}</h4>
+                  ${statusPill}
+                </div>
+                <div class="my-res-card-body" style="margin-top: 10px;">
+                  <div><strong>Vehicle:</strong> 🚘 <span class="dash-car-plate" style="font-size: 0.74rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}</div>
+                  <div><strong>Requested:</strong> 📅 ${createdAtFormatted}</div>
+                  ${lat && lng ? `<div><strong>Location:</strong> 📍 <span style="font-family: monospace; font-size: 0.8rem;">${lat}, ${lng}</span></div>` : ''}
+                </div>
+              </div>
+              <div class="my-res-card-actions">
+                <button type="button" class="pixel-btn pixel-btn-blue btn-select-res" data-res-id="${r.id}" style="width: 100%;">
+                  <span>📋</span> View Details & Manage &rarr;
+                </button>
+              </div>
+            </article>
+          `;
+        });
+        html += '</div>';
+
+        container.innerHTML = html;
+      }
+
+      function selectReservationDetail(resId) {
+        myResState.selectedReservationId = resId;
+        renderMyReservationDetail(resId);
+        const section = document.getElementById('section-my-reservations');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      window.selectReservationDetail = selectReservationDetail;
+
+      function backToReservationsList() {
+        myResState.selectedReservationId = null;
+        renderMyReservationsList(myResState.reservations);
+        const section = document.getElementById('section-my-reservations');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      window.backToReservationsList = backToReservationsList;
+
+      function renderMyReservationDetail(resId) {
+        const step1View = document.getElementById('my-res-step1-view');
+        const step2View = document.getElementById('my-res-step2-view');
+        const detailContainer = document.getElementById('my-reservation-detail-content');
+        if (!detailContainer) return;
+
+        const r = (myResState.reservations || []).find(item => item.id === resId);
+        if (!r) {
+          backToReservationsList();
+          return;
+        }
+
+        if (step1View) step1View.style.display = 'none';
+        if (step2View) step2View.style.display = 'block';
+
+        const space = r.parking_spaces || {};
+        const spaceName = space.name || 'Flood Safe Parking Lot';
+        const car = r.cars || {};
+        const plate = car.license_plate || 'Unlinked Vehicle';
+        const model = car.model || 'Standard Vehicle';
+        const status = (r.status || 'pending').toLowerCase();
+        const isConfirmed = (status === 'confirmed' || status === 'active');
+        const isPending = (status === 'pending');
+        const isRejected = (status === 'rejected');
+        const isCancelled = (status === 'cancelled');
+        const isCompleted = (status === 'completed');
+
+        const owner = r.owner_profile || {};
+        const ownerName = owner.name || (space.owner_id ? 'Community Lot Owner' : 'Community Emergency Lot');
+
+        const createdAtFormatted = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+        const updatedAtFormatted = r.updated_at ? new Date(r.updated_at).toLocaleString() : createdAtFormatted;
+        const lat = space.latitude ? parseFloat(space.latitude).toFixed(5) : 'N/A';
+        const lng = space.longitude ? parseFloat(space.longitude).toFixed(5) : 'N/A';
+
+        let statusPill = '';
+        if (isConfirmed) {
+          statusPill = '<span class="status-pill status-available">🟢 CONFIRMED</span>';
+        } else if (isPending) {
+          statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">⏳ PENDING APPROVAL</span>';
+        } else if (isRejected) {
+          statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 REJECTED</span>';
+        } else if (isCancelled) {
+          statusPill = '<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">⚪ CANCELLED</span>';
+        } else if (isCompleted) {
+          statusPill = '<span class="status-pill" style="background:#f0fdf4; color:#15803d; border-color:#86efac;">⭐ COMPLETED</span>';
+        } else {
+          statusPill = `<span class="status-pill">${escapeHtml(status.toUpperCase())}</span>`;
+        }
+
+        // Timeline Step 2 & 3 calculation
+        let step2Class = 'my-res-timeline-step';
+        let step2Dot = '2';
+        let step2Title = 'Owner Review';
+        let step2Desc = 'Awaiting decision';
+
+        let step3Class = 'my-res-timeline-step';
+        let step3Dot = '3';
+        let step3Title = 'Safe Parking Spot';
+        let step3Desc = 'High ground verification';
+
+        if (isPending) {
+          step2Class += ' pending active';
+          step2Dot = '⏳';
+          step2Title = 'Under Review';
+          step2Desc = 'Owner reviewing request';
+          step3Title = 'Pending Approval';
+          step3Desc = 'Spot held once approved';
+        } else if (isConfirmed) {
+          step2Class += ' completed';
+          step2Dot = '✓';
+          step2Title = 'Approved';
+          step2Desc = 'Owner accepted request';
+          step3Class += ' completed';
+          step3Dot = '🛡️';
+          step3Title = 'Spot Secured';
+          step3Desc = 'Protected high ground';
+        } else if (isRejected) {
+          step2Class += ' declined';
+          step2Dot = '✕';
+          step2Title = 'Declined';
+          step2Desc = 'Owner declined request';
+          step3Class += ' declined';
+          step3Dot = '✕';
+          step3Title = 'Request Closed';
+          step3Desc = 'Vehicle released';
+        } else if (isCancelled) {
+          step2Class += ' cancelled';
+          step2Dot = '—';
+          step2Title = 'Cancelled';
+          step2Desc = 'Request cancelled';
+          step3Class += ' cancelled';
+          step3Dot = '⚪';
+          step3Title = 'Space Returned';
+          step3Desc = 'Restored to community';
+        } else if (isCompleted) {
+          step2Class += ' completed';
+          step2Dot = '✓';
+          step2Title = 'Completed';
+          step2Desc = 'Assistance verified';
+          step3Class += ' completed';
+          step3Dot = '⭐';
+          step3Title = 'Points Awarded';
+          step3Desc = 'Relief logged';
+        }
+
+        // Action card content based on current status
+        let actionBannerHtml = '';
+        let actionButtonsHtml = '';
+
+        if (isPending) {
+          actionBannerHtml = `
+            <div class="my-res-action-banner banner-pending">
+              ⏳ <strong>Awaiting Owner Approval:</strong> Your request has been sent to the parking lot owner. 
+              Once approved, your vehicle spot will be confirmed. You may cancel this request anytime if your evacuation route changes.
+            </div>
+          `;
+          actionButtonsHtml = `
+            <button type="button" class="pixel-btn pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${escapeHtml(spaceName)}">
+              <span>❌</span> Cancel Request
+            </button>
+            ${space.latitude && space.longitude ? `
+              <button type="button" class="pixel-btn pixel-btn-blue btn-view-reservation-map" data-lat="${space.latitude}" data-lng="${space.longitude}">
+                <span>🗺️</span> View Lot on Map
+              </button>
+            ` : ''}
+          `;
+        } else if (isConfirmed) {
+          actionBannerHtml = `
+            <div class="my-res-action-banner banner-confirmed">
+              🟢 <strong>Reservation Confirmed:</strong> Your flood parking space is secured on high ground. 
+              If you no longer need this space, please cancel promptly so your spot is returned to neighbors in need.
+            </div>
+          `;
+          actionButtonsHtml = `
+            <button type="button" class="pixel-btn pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${escapeHtml(spaceName)}">
+              <span>❌</span> Cancel Spot
+            </button>
+            ${space.latitude && space.longitude ? `
+              <button type="button" class="pixel-btn pixel-btn-blue btn-view-reservation-map" data-lat="${space.latitude}" data-lng="${space.longitude}">
+                <span>🗺️</span> View Lot on Map
+              </button>
+            ` : ''}
+          `;
+        } else if (isRejected) {
+          actionBannerHtml = `
+            <div class="my-res-action-banner banner-rejected">
+              🔴 <strong>Request Declined:</strong> The parking lot owner declined this reservation request 
+              (the lot may have filled or become inaccessible). Your vehicle has been released so you can find another high-ground parking space immediately.
+            </div>
+          `;
+          actionButtonsHtml = `
+            <a href="#map" class="pixel-btn pixel-btn-blue">
+              <span>🔍</span> Find Another Parking Lot on Map &rarr;
+            </a>
+          `;
+        } else if (isCancelled) {
+          actionBannerHtml = `
+            <div class="my-res-action-banner banner-cancelled">
+              ⚪ <strong>Reservation Cancelled:</strong> This reservation was cancelled and the parking spot was returned to open community capacity.
+            </div>
+          `;
+          actionButtonsHtml = `
+            <a href="#map" class="pixel-btn pixel-btn-blue">
+              <span>🔍</span> Browse Available Parking Lots on Map &rarr;
+            </a>
+          `;
+        } else if (isCompleted) {
+          actionBannerHtml = `
+            <div class="my-res-action-banner banner-confirmed">
+              ⭐ <strong>Parking Stay Completed:</strong> Flood emergency assistance was successfully completed and logged.
+            </div>
+          `;
+          actionButtonsHtml = `
+            <a href="#map" class="pixel-btn pixel-btn-blue">
+              <span>🗺️</span> Return to Map &rarr;
+            </a>
+          `;
+        }
+
+        detailContainer.innerHTML = `
+          <!-- Header Detail Card -->
+          <article class="my-res-detail-header-card">
+            <div class="my-res-detail-title-row">
+              <div>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">
+                  🚗 ${escapeHtml(spaceName)}
+                </h3>
+                <div style="font-size: 0.8rem; color: #64748b; font-family: monospace;">
+                  📍 Coordinates: ${lat}, ${lng}
+                </div>
+              </div>
+              <div>
+                ${statusPill}
+              </div>
+            </div>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.82rem; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-top: 6px;">
+              <span><strong>Requested:</strong> ${createdAtFormatted}</span>
+              ${r.updated_at ? `<span><strong>Last Updated:</strong> ${updatedAtFormatted}</span>` : ''}
+              <span><strong>Reservation ID:</strong> <span style="font-family: monospace;">#${r.id.substring(0, 8)}</span></span>
+            </div>
+          </article>
+
+          <!-- 2-Column Info Grid -->
+          <div class="my-res-detail-grid">
+            <!-- Card 1: Reserved Vehicle Details -->
+            <div class="my-res-detail-card">
+              <h4 class="my-res-detail-card-title">
+                <span>🚘</span> Reserved Vehicle
+              </h4>
+              <div class="my-res-info-list">
+                <div class="my-res-info-row">
+                  <span class="my-res-info-label">License Plate</span>
+                  <span class="my-res-info-value"><span class="dash-car-plate">${escapeHtml(plate)}</span></span>
+                </div>
+                <div class="my-res-info-row">
+                  <span class="my-res-info-label">Car Model</span>
+                  <span class="my-res-info-value">${escapeHtml(model)}</span>
+                </div>
+                <div class="my-res-info-row">
+                  <span class="my-res-info-label">Spaces Requested</span>
+                  <span class="my-res-info-value">1 Vehicle Spot</span>
+                </div>
+                <div class="my-res-info-row">
+                  <span class="my-res-info-label">Lot Status</span>
+                  <span class="my-res-info-value">${space.status ? escapeHtml(space.status.toUpperCase()) : 'ACTIVE'}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Parking Space & Owner Details -->
+            <div class="my-res-detail-card">
+              <h4 class="my-res-detail-card-title">
+                <span>🅿️</span> Parking Space & Owner
+              </h4>
+              <div class="my-res-info-list">
+                <div class="my-res-info-row">
+                  <span class="my-res-info-label">Offered By</span>
+                  <span class="my-res-info-value">👤 ${escapeHtml(ownerName)}</span>
+                </div>
+                <div class="my-res-info-row">
+                  <span class="my-res-info-label">Lot Capacity</span>
+                  <span class="my-res-info-value">${space.available_spaces ?? '?'} / ${space.capacity ?? '?'} spaces open</span>
+                </div>
+                <div class="my-res-info-row">
+                  <span class="my-res-info-label">Emergency Notes</span>
+                  <span class="my-res-info-value">${r.notes ? escapeHtml(r.notes) : '<em>None provided</em>'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline Card -->
+          <div class="my-res-timeline-card">
+            <h4 class="my-res-detail-card-title">
+              <span>⏱️</span> Reservation Status Timeline
+            </h4>
+            <div class="my-res-timeline">
+              <!-- Step 1: Requested -->
+              <div class="my-res-timeline-step completed">
+                <div class="my-res-timeline-dot">✓</div>
+                <div class="my-res-timeline-title">Request Sent</div>
+                <div class="my-res-timeline-desc">${createdAtFormatted}</div>
+              </div>
+
+              <!-- Step 2: Owner Review -->
+              <div class="${step2Class}">
+                <div class="my-res-timeline-dot">${step2Dot}</div>
+                <div class="my-res-timeline-title">${step2Title}</div>
+                <div class="my-res-timeline-desc">${step2Desc}</div>
+              </div>
+
+              <!-- Step 3: Spot Secured -->
+              <div class="${step3Class}">
+                <div class="my-res-timeline-dot">${step3Dot}</div>
+                <div class="my-res-timeline-title">${step3Title}</div>
+                <div class="my-res-timeline-desc">${step3Desc}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Card -->
+          <div class="my-res-action-card">
+            ${actionBannerHtml}
+            <div class="my-res-action-buttons-row">
+              ${actionButtonsHtml}
+            </div>
+          </div>
+        `;
+      }
+      window.renderMyReservationDetail = renderMyReservationDetail;
       window.loadReservations = loadReservations;
 
       // ========================================================
@@ -3506,6 +3900,9 @@ if (!empty($_SESSION['auth_user'])) {
                 <td style="font-size: 0.82rem; color: #64748b;">${dateStr}</td>
                 <td>
                   <div style="display: flex; gap: 6px;">
+                    <button type="button" class="pixel-btn pixel-btn-sm btn-view-res-dash" data-res-id="${activeRes.id}" title="View Details in My Reservations">
+                      📋 Details
+                    </button>
                     ${(space.latitude && space.longitude) ? `
                       <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-car-spot" data-lat="${space.latitude}" data-lng="${space.longitude}" title="View Spot on Map">
                         🗺️ Map
@@ -4009,6 +4406,44 @@ if (!empty($_SESSION['auth_user'])) {
         const tableAddCarBtn = e.target.closest('#btn-dash-table-add-car');
         if (tableAddCarBtn) {
           openCarModal(null);
+        }
+
+        const selectResBtn = e.target.closest('.btn-select-res, .my-res-card');
+        if (selectResBtn) {
+          // If clicked inside another button or link inside the card, let that specific handler run
+          if (e.target.closest('button, a') && !e.target.closest('.btn-select-res')) {
+            // let default or specific handler execute
+          } else {
+            const resId = selectResBtn.dataset.resId || selectResBtn.dataset.id;
+            if (resId && typeof selectReservationDetail === 'function') {
+              selectReservationDetail(resId);
+            }
+          }
+        }
+
+        const backToResBtn = e.target.closest('#btn-back-to-my-reservations, .btn-back-to-reservations');
+        if (backToResBtn) {
+          if (typeof backToReservationsList === 'function') {
+            backToReservationsList();
+          }
+        }
+
+        const refreshMyResBtn = e.target.closest('#btn-refresh-my-reservations');
+        if (refreshMyResBtn) {
+          if (typeof loadReservations === 'function') {
+            loadReservations();
+          }
+        }
+
+        const viewResDashBtn = e.target.closest('.btn-view-res-dash');
+        if (viewResDashBtn) {
+          const resId = viewResDashBtn.dataset.resId || viewResDashBtn.dataset.id;
+          if (resId) {
+            window.location.hash = '#my-reservations';
+            if (typeof selectReservationDetail === 'function') {
+              selectReservationDetail(resId);
+            }
+          }
         }
       });
     });

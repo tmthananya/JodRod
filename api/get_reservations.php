@@ -136,7 +136,42 @@ if ($asOwner) {
 
     if ($res['success'] && is_array($res['data'])) {
         $driverRes = $res['data'];
+
+        // Enrich reservations with owner profiles
+        $ownerUserIds = array_values(array_unique(array_filter(array_map(function($r) {
+            return $r['parking_spaces']['owner_id'] ?? null;
+        }, $driverRes))));
+        $ownerProfiles = [];
+
+        if (!empty($ownerUserIds)) {
+            $ownerInList = '(' . implode(',', array_map('urlencode', $ownerUserIds)) . ')';
+            $profRes = supabase_request("/rest/v1/profiles?user_id=in.{$ownerInList}&select=user_id,name,avatar", 'GET');
+            if ($profRes['success'] && is_array($profRes['data'])) {
+                foreach ($profRes['data'] as $p) {
+                    $ownerProfiles[$p['user_id']] = [
+                        'name'   => $p['name'] ?? 'Parking Lot Owner',
+                        'avatar' => $p['avatar'] ?? null
+                    ];
+                }
+            }
+        }
+
         foreach ($driverRes as &$item) {
+            $oUid = $item['parking_spaces']['owner_id'] ?? null;
+            if ($oUid && isset($ownerProfiles[$oUid])) {
+                $item['owner_profile'] = $ownerProfiles[$oUid];
+            } elseif ($oUid) {
+                $item['owner_profile'] = [
+                    'name'   => 'Community Lot Owner',
+                    'avatar' => null
+                ];
+            } else {
+                $item['owner_profile'] = [
+                    'name'   => 'Community Emergency Space',
+                    'avatar' => null
+                ];
+            }
+
             if (empty($item['cars']) || empty($item['cars']['license_plate'])) {
                 if (!empty($item['notes']) && preg_match('/\[Vehicle:\s*([^\]|]+)(?:\s*\|\s*([^\]]+))?\]/i', $item['notes'], $m)) {
                     $item['cars'] = [

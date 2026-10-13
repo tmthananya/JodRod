@@ -2386,3 +2386,412 @@ textarea.form-input:focus {
   }
 }
 
+/* ==========================================================================
+   MY RESERVATIONS TWO-STEP UX & RESPONSIVE LAYOUT
+   Preserves 16-bit pixel game aesthetic
+   ========================================================================== */
+
+.my-res-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.my-res-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.my-res-vehicles-box {
+  background: var(--bg-card);
+  border: 3px solid var(--border-pixel);
+  box-shadow: var(--shadow-pixel);
+  margin-bottom: 24px;
+}
+
+/* Compact Summary Metrics Bar */
+.my-res-metrics-bar {
+  display: flex;
+  background: var(--bg-card);
+  border: 3px solid var(--border-pixel);
+  box-shadow: var(--shadow-pixel-sm);
+  border-radius: 4px;
+  padding: 10px 14px;
+  justify-content: space-around;
+  text-align: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.my-res-metric-item {
+  flex: 1;
+  min-width: 120px;
+}
+
+.my-res-metric-num {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #0f172a;
+}
+
+.my-res-metric-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Step 1: Reservations Grid & Card */
+.my-res-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.my-res-card {
+  background: var(--bg-card);
+  border: 3px solid var(--border-pixel);
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: var(--shadow-pixel-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.my-res-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-pixel);
+  border-color: var(--color-blue);
+}
+
+.my-res-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.my-res-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  word-break: break-word;
+  margin: 0;
+}
+
+.my-res-card-body {
+  font-size: 0.86rem;
+  color: #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.my-res-card-body strong {
+  color: #0f172a;
+}
+
+.my-res-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* Step 2: Detail View Header & Content */
+.my-res-detail-header-card {
+  background: var(--bg-card);
+  border: 3px solid var(--border-pixel);
+  border-radius: 6px;
+  padding: 18px;
+  box-shadow: var(--shadow-pixel-sm);
+  margin-bottom: 20px;
+}
+
+.my-res-detail-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.my-res-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.my-res-detail-card {
+  background: var(--bg-card);
+  border: 3px solid var(--border-pixel);
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: var(--shadow-pixel-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.my-res-detail-card-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.my-res-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #334155;
+}
+
+.my-res-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  border-bottom: 1px dashed #e2e8f0;
+  padding-bottom: 6px;
+}
+
+.my-res-info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.my-res-info-label {
+  font-weight: 700;
+  color: #64748b;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.my-res-info-value {
+  font-weight: 600;
+  color: #0f172a;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Status Timeline (Retro Pixel Steps) */
+.my-res-timeline-card {
+  background: var(--bg-card);
+  border: 3px solid var(--border-pixel);
+  border-radius: 6px;
+  padding: 18px;
+  box-shadow: var(--shadow-pixel-sm);
+  margin-bottom: 20px;
+}
+
+.my-res-timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.my-res-timeline::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  right: 20px;
+  height: 4px;
+  background: #e2e8f0;
+  border: 1px solid var(--border-pixel);
+  z-index: 1;
+}
+
+.my-res-timeline-step {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.my-res-timeline-dot {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border-pixel);
+  border-radius: 4px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  box-shadow: 1px 1px 0px var(--border-pixel);
+}
+
+.my-res-timeline-step.completed .my-res-timeline-dot {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.my-res-timeline-step.active .my-res-timeline-dot {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.my-res-timeline-step.pending .my-res-timeline-dot {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.my-res-timeline-step.declined .my-res-timeline-dot {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.my-res-timeline-step.cancelled .my-res-timeline-dot {
+  background: #94a3b8;
+  color: #ffffff;
+}
+
+.my-res-timeline-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.my-res-timeline-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+/* Status-Specific Action Card */
+.my-res-action-card {
+  background: var(--bg-card);
+  border: 3px solid var(--border-pixel);
+  border-radius: 6px;
+  padding: 18px;
+  box-shadow: var(--shadow-pixel-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.my-res-action-banner {
+  padding: 12px 14px;
+  border-radius: 4px;
+  border: 2px solid var(--border-pixel);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.my-res-action-banner.banner-pending {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.my-res-action-banner.banner-confirmed {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #14532d;
+}
+
+.my-res-action-banner.banner-rejected {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.my-res-action-banner.banner-cancelled {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.my-res-action-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.my-res-action-buttons-row button,
+.my-res-action-buttons-row a {
+  flex: 1;
+  min-width: 160px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .my-res-header-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .my-res-header-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .my-res-header-actions button,
+  .my-res-header-actions a {
+    flex: 1;
+    text-align: center;
+  }
+  .my-res-metrics-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .my-res-grid,
+  .my-res-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .my-res-timeline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .my-res-timeline::before {
+    top: 10px;
+    bottom: 10px;
+    left: 14px;
+    width: 4px;
+    height: auto;
+    right: auto;
+  }
+  .my-res-timeline-step {
+    flex-direction: row;
+    text-align: left;
+    gap: 12px;
+  }
+  .my-res-action-buttons-row {
+    flex-direction: column;
+  }
+  .my-res-action-buttons-row button,
+  .my-res-action-buttons-row a {
+    width: 100%;
+  }
+}
+
