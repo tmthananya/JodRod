@@ -648,11 +648,13 @@ if (!empty($_SESSION['auth_user'])) {
 
     <!-- 5. Profile Section -->
     <section id="section-profile" class="nav-content-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>👤</span> My Profile</h2>
+      <div class="profile-header-bar">
+        <div>
+          <h2 class="section-title">My Profile</h2>
+          <p class="section-subtitle">Manage your player identity and custom 3D avatar for flood parking.</p>
+        </div>
         <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
       </div>
-      <p class="section-subtitle">Manage your personal community profile (acting as both Driver and Parking Owner with a single account).</p>
 
       <!-- Profile Action Alert Box -->
       <div id="profile-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
@@ -663,10 +665,10 @@ if (!empty($_SESSION['auth_user'])) {
           <!-- 1. View Mode: Active Profile Summary -->
           <div id="my-profile-view-box" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
-                <span>👤</span> My Profile
+              <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">
+                Player Profile
               </h3>
-              <span class="status-badge status-available" style="font-size: 0.72rem; padding: 3px 8px;">🟢 Active</span>
+              <span class="status-badge status-available" style="font-size: 0.72rem; padding: 3px 8px;">Active</span>
             </div>
             <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 16px;">
               Your active flood parking identity and custom 3D avatar.
@@ -691,14 +693,14 @@ if (!empty($_SESSION['auth_user'])) {
             </div>
 
             <button type="button" id="btn-open-my-profile-editor" class="pixel-btn pixel-btn-blue" style="width: 100%; padding: 12px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-              <span>✏️</span> Edit My Profile
+              Edit My Profile
             </button>
           </div>
 
           <!-- 2. Editor Mode: Editable details form -->
           <div id="my-profile-editor-box">
-            <h3 id="create-profile-card-title" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
-              <span>👤</span> My Profile
+            <h3 id="create-profile-card-title" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+              Edit Profile
             </h3>
             <p id="create-profile-card-desc" style="font-size: 0.88rem; color: #64748b; margin-bottom: 18px;">
               Customize your personal 3D avatar and flood rescue display name.
@@ -707,122 +709,140 @@ if (!empty($_SESSION['auth_user'])) {
             <form id="create-profile-form" novalidate>
               <input type="hidden" id="my-profile-id" name="id" value="">
               <div id="my-profile-badge-bar" style="display: none; align-items: center; justify-content: space-between; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 12px; margin-bottom: 14px;">
-                <span style="font-size: 0.8rem; font-weight: 700; color: #166534;">🟢 Editing Your Active Profile</span>
+                <span style="font-size: 0.8rem; font-weight: 700; color: #166534;">Editing Active Profile</span>
                 <span style="font-size: 0.75rem; font-family: monospace; color: #475569;" id="my-profile-id-tag">#...</span>
               </div>
 
               <div class="form-group">
-                <label for="create-profile-name" class="form-label">Full Name or Nickname *</label>
+                <label for="create-profile-name" class="form-label">Display Name *</label>
                 <input type="text" id="create-profile-name" name="name" class="form-input" placeholder="e.g. Somsak P." required>
-                <div class="form-help">Your display name for flood parking.</div>
+                <div class="form-help">Your public display name for flood parking.</div>
               </div>
 
-              <!-- 3D Character Customizer -->
-              <div class="form-group">
+              <!-- 3D Character Customizer Studio -->
+              <div class="form-group" style="margin-top: 18px;">
                 <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
-                  <span>🎮 Custom 3D Character</span>
+                  <span>3D Character Studio</span>
                   <span style="font-size: 0.72rem; color: #0284c7; font-weight: 700;">LIVE 3D VIEWPORT</span>
                 </label>
 
-                <!-- 3D Viewport -->
+                <!-- 3D Viewport Frame -->
                 <div class="character-3d-viewport" id="create-3d-viewport">
                   <canvas id="create-character-canvas"></canvas>
-                  <div class="viewport-hint">🖱️ Drag to rotate 360°</div>
-                  <div class="viewport-badge">3D GAME AVATAR</div>
+                  <div class="viewport-hint">Drag to rotate 360°</div>
+                  <div class="viewport-badge">3D AVATAR</div>
                 </div>
 
-                <!-- Customizer Controls -->
-                <div class="character-customizer-controls">
-                  <!-- Gender Choice -->
-                  <div class="customizer-group">
-                    <div class="customizer-label"><span>👤 Character Gender</span></div>
-                    <div class="gender-options-row" id="create-gender-options">
-                      <button type="button" class="gender-chip-btn active" data-gender="female">👩 Female</button>
-                      <button type="button" class="gender-chip-btn" data-gender="male">👨 Male</button>
+                <!-- Logical Customizer Category Tabs -->
+                <div class="customizer-tabs-nav" id="create-customizer-tabs" role="tablist">
+                  <button type="button" class="customizer-tab-btn active" data-tab="body" role="tab" aria-selected="true">Face & Body</button>
+                  <button type="button" class="customizer-tab-btn" data-tab="hair" role="tab" aria-selected="false">Hairstyle</button>
+                  <button type="button" class="customizer-tab-btn" data-tab="outfit" role="tab" aria-selected="false">Outfit</button>
+                </div>
+
+                <!-- Customizer Category Panels Container -->
+                <div class="character-customizer-controls" id="create-customizer-panels">
+                  
+                  <!-- Category 1: Face & Body -->
+                  <div class="customizer-tab-panel" id="create-tab-body" data-tab="body">
+                    <!-- Gender Choice -->
+                    <div class="customizer-group">
+                      <div class="customizer-label"><span>Gender</span></div>
+                      <div class="gender-options-row" id="create-gender-options">
+                        <button type="button" class="gender-chip-btn active" data-gender="female">Female</button>
+                        <button type="button" class="gender-chip-btn" data-gender="male">Male</button>
+                      </div>
+                    </div>
+
+                    <!-- Gender Feature (Feminine Accent or Facial Feature) -->
+                    <div class="customizer-group" id="create-feature-group">
+                      <div class="customizer-label"><span id="create-feature-label">Feminine Accent</span></div>
+                      <div class="customizer-options-row" id="create-feature-options"></div>
+                    </div>
+
+                    <!-- Skin Tone -->
+                    <div class="customizer-group">
+                      <div class="customizer-label"><span>Skin Tone</span></div>
+                      <div class="color-swatch-row" id="create-skin-colors">
+                        <button type="button" class="color-swatch-btn" data-color="#ffedd5" style="background: #ffedd5;" title="Fair"></button>
+                        <button type="button" class="color-swatch-btn active" data-color="#fed7aa" style="background: #fed7aa;" title="Warm Peach"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#fcd34d" style="background: #fcd34d;" title="Golden"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Tan"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#78350f" style="background: #78350f;" title="Deep"></button>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Gender Feature (Feminine Accent or Facial Feature) -->
-                  <div class="customizer-group" id="create-feature-group">
-                    <div class="customizer-label"><span id="create-feature-label">✨ Feminine Accent</span></div>
-                    <div class="customizer-options-row" id="create-feature-options"></div>
-                  </div>
+                  <!-- Category 2: Hairstyle -->
+                  <div class="customizer-tab-panel" id="create-tab-hair" data-tab="hair" style="display: none;">
+                    <!-- Hair Style (Dynamically tailored to gender) -->
+                    <div class="customizer-group">
+                      <div class="customizer-label"><span>Hair Style</span></div>
+                      <div class="customizer-options-row" id="create-hair-styles"></div>
+                    </div>
 
-                  <!-- Hair Style (Dynamically tailored to gender) -->
-                  <div class="customizer-group">
-                    <div class="customizer-label"><span>💇 Hair Style</span></div>
-                    <div class="customizer-options-row" id="create-hair-styles"></div>
-                  </div>
-
-                  <!-- Hair Color -->
-                  <div class="customizer-group">
-                    <div class="customizer-label"><span>🎨 Hair Color</span></div>
-                    <div class="color-swatch-row" id="create-hair-colors">
-                      <button type="button" class="color-swatch-btn active" data-color="#261e1b" style="background: #261e1b;" title="Black"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#5c3a21" style="background: #5c3a21;" title="Brown"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Blonde"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#991b1b" style="background: #991b1b;" title="Red"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Blue"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#94a3b8" style="background: #94a3b8;" title="Silver"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#ec4899" style="background: #ec4899;" title="Pink"></button>
+                    <!-- Hair Color -->
+                    <div class="customizer-group">
+                      <div class="customizer-label"><span>Hair Color</span></div>
+                      <div class="color-swatch-row" id="create-hair-colors">
+                        <button type="button" class="color-swatch-btn active" data-color="#261e1b" style="background: #261e1b;" title="Black"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#5c3a21" style="background: #5c3a21;" title="Brown"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Blonde"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#991b1b" style="background: #991b1b;" title="Red"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Blue"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#94a3b8" style="background: #94a3b8;" title="Silver"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#ec4899" style="background: #ec4899;" title="Pink"></button>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Clothes Style (10 Relief Outfits) -->
-                  <div class="customizer-group">
-                    <div class="customizer-label"><span>👕 Clothes / Outfit (10 Styles)</span></div>
-                    <div class="customizer-options-row" id="create-clothes-styles">
-                      <button type="button" class="customizer-chip-btn active" data-clothes="vest">🦺 Rescue Vest</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="jacket">🧥 Flood Jacket</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="raincoat">🌧️ Rain Poncho</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="wetsuit">🤿 Wetsuit</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="parka">❄️ Storm Parka</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="scrubs">🩺 Medic Scrubs</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="overalls">👖 Overalls</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="tee">👕 Casual Tee</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="uniform">🥋 Uniform</button>
-                      <button type="button" class="customizer-chip-btn" data-clothes="hoodie">🥷 Hoodie</button>
+                  <!-- Category 3: Outfit -->
+                  <div class="customizer-tab-panel" id="create-tab-outfit" data-tab="outfit" style="display: none;">
+                    <!-- Clothes Style (10 Relief Outfits) -->
+                    <div class="customizer-group">
+                      <div class="customizer-label"><span>Relief Outfit</span></div>
+                      <div class="customizer-options-row" id="create-clothes-styles">
+                        <button type="button" class="customizer-chip-btn active" data-clothes="vest">Rescue Vest</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="jacket">Flood Jacket</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="raincoat">Rain Poncho</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="wetsuit">Wetsuit</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="parka">Storm Parka</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="scrubs">Medic Scrubs</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="overalls">Overalls</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="tee">Casual Tee</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="uniform">Rescue Uniform</button>
+                        <button type="button" class="customizer-chip-btn" data-clothes="hoodie">Hoodie</button>
+                      </div>
+                    </div>
+
+                    <!-- Clothes Color -->
+                    <div class="customizer-group">
+                      <div class="customizer-label"><span>Outfit Color</span></div>
+                      <div class="color-swatch-row" id="create-clothes-colors">
+                        <button type="button" class="color-swatch-btn active" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Orange"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#059669" style="background: #059669;" title="Rescue Green"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
+                        <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Navy Blue"></button>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Clothes Color -->
-                  <div class="customizer-group">
-                    <div class="customizer-label"><span>🌈 Clothes Color</span></div>
-                    <div class="color-swatch-row" id="create-clothes-colors">
-                      <button type="button" class="color-swatch-btn active" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Orange"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#059669" style="background: #059669;" title="Rescue Green"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Navy Blue"></button>
-                    </div>
-                  </div>
-
-                  <!-- Skin Tone -->
-                  <div class="customizer-group">
-                    <div class="customizer-label"><span>🧑‍🦱 Skin Tone</span></div>
-                    <div class="color-swatch-row" id="create-skin-colors">
-                      <button type="button" class="color-swatch-btn" data-color="#ffedd5" style="background: #ffedd5;" title="Fair"></button>
-                      <button type="button" class="color-swatch-btn active" data-color="#fed7aa" style="background: #fed7aa;" title="Warm Peach"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#fcd34d" style="background: #fcd34d;" title="Golden"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#d97706" style="background: #d97706;" title="Tan"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#78350f" style="background: #78350f;" title="Deep"></button>
-                    </div>
-                  </div>
                 </div>
 
                 <input type="hidden" id="create-profile-avatar" name="avatar">
               </div>
 
-              <div style="display: flex; gap: 10px; margin-top: 14px;">
+              <div style="display: flex; gap: 10px; margin-top: 16px;">
                 <button type="submit" id="btn-submit-profile" class="pixel-btn pixel-btn-green" style="flex: 1; padding: 12px; font-size: 1rem;">
-                  <span>💾</span> Save
+                  Save Profile
                 </button>
                 <button type="button" id="btn-cancel-profile-edit" class="pixel-btn pixel-btn-sm" style="display: none; padding: 12px 18px; background: #f1f5f9; border-color: #cbd5e1; color: #475569;">
                   Cancel
                 </button>
                 <button type="button" id="btn-delete-my-profile" class="pixel-btn pixel-btn-sm pixel-btn-red" style="display: none; padding: 12px 14px;" title="Permanently delete your profile">
-                  🗑️ Delete
+                  Delete Profile
                 </button>
               </div>
             </form>
@@ -833,9 +853,9 @@ if (!empty($_SESSION['auth_user'])) {
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
             <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-              <span>👥</span> Community Profiles
+              Community Members
             </h3>
-            <span class="status-pill status-available" id="profile-count-pill">0 Profiles</span>
+            <span class="status-pill status-available" id="profile-count-pill">0 Members</span>
           </div>
 
           <div id="profiles-list-container">
@@ -1530,46 +1550,46 @@ if (!empty($_SESSION['auth_user'])) {
       let createChar3D = null;
       let editChar3D = null;
 
-      // Gender-specific hairstyles and features
+      // Gender-specific hairstyles and features (clean text labels)
       const GENDER_DATA = {
         female: {
           defaultHair: 'ponytail',
           defaultFeature: 'natural',
           hairstyles: [
-            { id: 'ponytail', label: '🎀 Ponytail' },
-            { id: 'bob', label: '💁 Bob' },
-            { id: 'twintails', label: '👧 Twin Tails' },
-            { id: 'wavy', label: '🌊 Long Wavy' },
-            { id: 'cap', label: '🧢 Cap' },
-            { id: 'beanie', label: '🧶 Beanie' },
-            { id: 'helmet', label: '👷 Helmet' }
+            { id: 'ponytail', label: 'Ponytail' },
+            { id: 'bob', label: 'Bob' },
+            { id: 'twintails', label: 'Twin Tails' },
+            { id: 'wavy', label: 'Long Wavy' },
+            { id: 'cap', label: 'Cap' },
+            { id: 'beanie', label: 'Beanie' },
+            { id: 'helmet', label: 'Helmet' }
           ],
-          featureLabel: '✨ Feminine Accent',
+          featureLabel: 'Feminine Accent',
           features: [
-            { id: 'natural', label: '🌸 Natural Glow' },
-            { id: 'ribbon', label: '🎀 Hair Ribbon' },
-            { id: 'flower', label: '🌺 Relief Flower' },
-            { id: 'headband', label: '🩱 Sport Headband' }
+            { id: 'natural', label: 'Natural Glow' },
+            { id: 'ribbon', label: 'Hair Ribbon' },
+            { id: 'flower', label: 'Relief Flower' },
+            { id: 'headband', label: 'Sport Headband' }
           ]
         },
         male: {
           defaultHair: 'spiky',
           defaultFeature: 'stubble',
           hairstyles: [
-            { id: 'spiky', label: '⚡ Spiky' },
-            { id: 'short', label: '✂️ Short Crop' },
-            { id: 'quiff', label: '🌪️ Quiff' },
-            { id: 'buzz', label: '🪖 Buzz Cut' },
-            { id: 'cap', label: '🧢 Cap' },
-            { id: 'beanie', label: '🧶 Beanie' },
-            { id: 'helmet', label: '👷 Helmet' }
+            { id: 'spiky', label: 'Spiky' },
+            { id: 'short', label: 'Short Crop' },
+            { id: 'quiff', label: 'Quiff' },
+            { id: 'buzz', label: 'Buzz Cut' },
+            { id: 'cap', label: 'Cap' },
+            { id: 'beanie', label: 'Beanie' },
+            { id: 'helmet', label: 'Helmet' }
           ],
-          featureLabel: '🧔 Facial Feature',
+          featureLabel: 'Facial Feature',
           features: [
-            { id: 'clean', label: '🪒 Clean Shaven' },
-            { id: 'stubble', label: '🧔 Rescuer Stubble' },
-            { id: 'mustache', label: '👨 Hero Mustache' },
-            { id: 'goatee', label: '🧔‍♂️ Goatee' }
+            { id: 'clean', label: 'Clean Shaven' },
+            { id: 'stubble', label: 'Rescuer Stubble' },
+            { id: 'mustache', label: 'Hero Mustache' },
+            { id: 'goatee', label: 'Goatee' }
           ]
         }
       };
@@ -1741,6 +1761,30 @@ if (!empty($_SESSION['auth_user'])) {
       setupCustomizerListeners('create', createCharConfig, () => createChar3D);
       setupCustomizerListeners('edit', editCharConfig, () => editChar3D);
 
+      // Category tab switcher for 3D Customizer Studio
+      const customizerTabButtons = document.querySelectorAll('#create-customizer-tabs .customizer-tab-btn');
+      if (customizerTabButtons.length > 0) {
+        customizerTabButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            customizerTabButtons.forEach(b => {
+              b.classList.toggle('active', b === btn);
+              b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+            });
+            document.querySelectorAll('#create-customizer-panels .customizer-tab-panel').forEach(panel => {
+              if (panel.dataset.tab === targetTab) {
+                panel.style.display = 'block';
+              } else {
+                panel.style.display = 'none';
+              }
+            });
+            if (createChar3D && typeof createChar3D.handleResize === 'function') {
+              createChar3D.handleResize();
+            }
+          });
+        });
+      }
+
       // Initialize 3D when on profile section
       setTimeout(initCreate3D, 200);
 
@@ -1777,7 +1821,6 @@ if (!empty($_SESSION['auth_user'])) {
       function getAvatarSpecsBadge(avatarRaw) {
         const data = parseAvatarData(avatarRaw);
         if (data) {
-          const genderIcon = data.gender === 'female' ? '👩' : '👨';
           const outfitLabels = {
             vest: 'Rescue Vest',
             jacket: 'Flood Jacket',
@@ -1802,9 +1845,10 @@ if (!empty($_SESSION['auth_user'])) {
           };
           const outfitName = outfitLabels[data.clothes] || (data.clothes ? data.clothes.charAt(0).toUpperCase() + data.clothes.slice(1) : 'Rescue');
           const featureName = featureLabels[data.feature] ? ` &bull; ${featureLabels[data.feature]}` : '';
-          return `<span class="profile-card-specs-tag">${genderIcon} 3D &bull; ${outfitName}${featureName}</span>`;
+          const genderName = data.gender === 'female' ? 'Female' : 'Male';
+          return `<span class="profile-card-specs-tag">3D &bull; ${genderName} &bull; ${outfitName}${featureName}</span>`;
         }
-        return `<span class="profile-card-specs-tag">🎮 3D Community Member</span>`;
+        return `<span class="profile-card-specs-tag">3D Community Member</span>`;
       }
 
       function showProfileAlert(type, message) {
@@ -1865,7 +1909,7 @@ if (!empty($_SESSION['auth_user'])) {
               if (nameInput) nameInput.value = myProfile.name;
               if (badgeBar) badgeBar.style.display = 'flex';
               if (idTag) idTag.textContent = `#${myProfile.id.slice(0, 8)} (${myProfile.id.slice(-4)})`;
-              if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save';
+              if (submitBtn) submitBtn.innerHTML = 'Save Profile';
               if (cancelBtn) cancelBtn.style.display = 'inline-block';
               if (deleteBtn) deleteBtn.style.display = 'inline-block';
 
@@ -1889,7 +1933,7 @@ if (!empty($_SESSION['auth_user'])) {
               if (isEditingProfile) {
                 if (viewBox) viewBox.style.display = 'none';
                 if (editorBox) editorBox.style.display = 'block';
-                if (createTitle) createTitle.innerHTML = '<span>✏️</span> Edit My Profile';
+                if (createTitle) createTitle.innerHTML = 'Edit My Profile';
                 if (createDesc) createDesc.textContent = 'Modify your display name, 3D avatar, and relief style.';
                 syncCustomizerUI('create', createCharConfig, () => createChar3D);
                 if (createChar3D) {
@@ -1906,11 +1950,11 @@ if (!empty($_SESSION['auth_user'])) {
               isEditingProfile = false;
               if (viewBox) viewBox.style.display = 'none';
               if (editorBox) editorBox.style.display = 'block';
-              if (createTitle) createTitle.innerHTML = '<span>➕</span> Create My Profile';
+              if (createTitle) createTitle.innerHTML = 'Create My Profile';
               if (createDesc) createDesc.textContent = 'Customize your 3D avatar and set your display name for flood parking.';
               if (idInput) idInput.value = '';
               if (badgeBar) badgeBar.style.display = 'none';
-              if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save';
+              if (submitBtn) submitBtn.innerHTML = 'Save Profile';
               if (cancelBtn) cancelBtn.style.display = 'none';
               if (deleteBtn) deleteBtn.style.display = 'none';
 
@@ -1934,7 +1978,7 @@ if (!empty($_SESSION['auth_user'])) {
             });
 
             if (countPill) {
-              countPill.textContent = `${sortedProfiles.length} ${sortedProfiles.length === 1 ? 'Profile' : 'Profiles'}`;
+              countPill.textContent = `${sortedProfiles.length} ${sortedProfiles.length === 1 ? 'Member' : 'Members'}`;
             }
 
             if (!container) return;
@@ -1958,9 +2002,9 @@ if (!empty($_SESSION['auth_user'])) {
                       </div>
                       ${getAvatarSpecsBadge(p.avatar)}
                       <div style="margin-top: 5px;">
-                        <span class="profile-clean-id" title="Full UUID: ${p.id} (Click to copy)" onclick="navigator.clipboard?.writeText('${p.id}'); const h = this.querySelector('.id-copy-hint'); if(h) { h.textContent='✓ Copied!'; setTimeout(()=>h.textContent='📋', 1500); }">
+                        <span class="profile-clean-id" title="Full UUID: ${p.id} (Click to copy)" onclick="navigator.clipboard?.writeText('${p.id}'); const h = this.querySelector('.id-copy-hint'); if(h) { h.textContent='Copied!'; setTimeout(()=>h.textContent='Copy', 1500); }">
                           <span class="id-hash">#</span>${p.id.slice(0, 8)}
-                          <span class="id-copy-hint" title="Copy UUID">📋</span>
+                          <span class="id-copy-hint" title="Copy UUID">Copy</span>
                         </span>
                       </div>
                     </div>
@@ -1999,9 +2043,9 @@ if (!empty($_SESSION['auth_user'])) {
 
           if (viewBox) viewBox.style.display = 'none';
           if (editorBox) editorBox.style.display = 'block';
-          if (createTitle) createTitle.innerHTML = '<span>✏️</span> Edit My Profile';
+          if (createTitle) createTitle.innerHTML = 'Edit My Profile';
           if (createDesc) createDesc.textContent = 'Modify your display name, 3D avatar, and relief style.';
-          if (submitBtn) submitBtn.innerHTML = '<span>💾</span> Save';
+          if (submitBtn) submitBtn.innerHTML = 'Save Profile';
           if (cancelBtn) cancelBtn.style.display = 'inline-block';
           if (deleteBtn) deleteBtn.style.display = 'inline-block';
 
@@ -2042,7 +2086,7 @@ if (!empty($_SESSION['auth_user'])) {
           const existingId = document.getElementById('my-profile-id')?.value.trim();
 
           if (!name) {
-            showProfileAlert('error', '⚠️ Please enter a profile name.');
+            showProfileAlert('error', 'Please enter a profile name.');
             document.getElementById('create-profile-name').focus();
             return;
           }
@@ -2065,7 +2109,7 @@ if (!empty($_SESSION['auth_user'])) {
 
           try {
             btn.disabled = true;
-            btn.innerHTML = '<span>⏳</span> Saving...';
+            btn.innerHTML = 'Saving...';
 
             const endpoint = isUpdate ? 'api/update_profile.php' : 'api/create_profile.php';
             const payload = isUpdate 
@@ -2084,19 +2128,19 @@ if (!empty($_SESSION['auth_user'])) {
             const json = await res.json();
             if (res.ok && json.success) {
               const msg = isUpdate
-                ? `✅ <strong>Profile Saved!</strong> Updated changes for "${json.data.name}".`
-                : `🎉 <strong>Profile Created Successfully!</strong> Welcome, ${json.data.name}!`;
+                ? `<strong>Profile Saved!</strong> Updated changes for "${json.data.name}".`
+                : `<strong>Profile Created Successfully!</strong> Welcome, ${json.data.name}!`;
               showProfileAlert('success', msg);
               isEditingProfile = false;
               await loadProfiles();
             } else {
-              showProfileAlert('error', `❌ <strong>Failed to save profile:</strong> ${json.error || 'Server error'}`);
+              showProfileAlert('error', `<strong>Failed to save profile:</strong> ${json.error || 'Server error'}`);
             }
           } catch (err) {
-            showProfileAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+            showProfileAlert('error', `<strong>Network error:</strong> ${err.message}`);
           } finally {
             btn.disabled = false;
-            btn.innerHTML = '<span>💾</span> Save';
+            btn.innerHTML = 'Save Profile';
           }
         });
       }
@@ -2114,7 +2158,7 @@ if (!empty($_SESSION['auth_user'])) {
 
           try {
             btnDeleteMyProfile.disabled = true;
-            btnDeleteMyProfile.innerHTML = '<span>⏳</span> Deleting...';
+            btnDeleteMyProfile.innerHTML = 'Deleting...';
 
             const res = await fetch('api/delete_profile.php', {
               method: 'POST',
@@ -2126,19 +2170,19 @@ if (!empty($_SESSION['auth_user'])) {
             });
             const json = await res.json();
             if (res.ok && json.success) {
-              showProfileAlert('success', `🗑️ <strong>Profile Deleted!</strong> Your profile has been removed.`);
+              showProfileAlert('success', `<strong>Profile Deleted!</strong> Your profile has been removed.`);
               document.getElementById('my-profile-id').value = '';
               document.getElementById('create-profile-name').value = '';
               isEditingProfile = false;
               await loadProfiles();
             } else {
-              showProfileAlert('error', `❌ <strong>Failed to delete profile:</strong> ${json.error || 'Server error'}`);
+              showProfileAlert('error', `<strong>Failed to delete profile:</strong> ${json.error || 'Server error'}`);
             }
           } catch (err) {
-            showProfileAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+            showProfileAlert('error', `<strong>Network error:</strong> ${err.message}`);
           } finally {
             btnDeleteMyProfile.disabled = false;
-            btnDeleteMyProfile.innerHTML = '🗑️ Delete';
+            btnDeleteMyProfile.innerHTML = 'Delete Profile';
           }
         });
       }
