@@ -2947,45 +2947,99 @@ if (!empty($_SESSION['auth_user'])) {
           const isClosed = lot.status === 'closed';
           const isFull = lot.status === 'full' || avail <= 0;
 
-          // Find reservations for this space from ownerReservations
-          const lotReservations = (ownerReservations || []).filter(r => r.parking_space_id === lot.id && (r.status === 'confirmed' || r.status === 'active'));
-
           const lat = lot.latitude ? parseFloat(lot.latitude).toFixed(5) : 'N/A';
           const lng = lot.longitude ? parseFloat(lot.longitude).toFixed(5) : 'N/A';
 
-          let spotRows = '';
-          for (let i = 0; i < cap; i++) {
-            const booking = lotReservations[i];
-            const spotNum = i + 1;
-            if (booking && booking.cars) {
-              spotRows += `
-                <div class="dash-assigned-car-item">
-                  <span><strong>Spot #${spotNum}:</strong> 🚘 ${booking.cars.license_plate} (${booking.cars.model || 'Standard'})</span>
-                  <span class="status-pill status-available" style="font-size: 0.65rem; padding: 1px 5px;">Occupied</span>
+          // Filter pending requests and accepted bookings for this specific lot
+          const pendingReqs = (ownerReservations || []).filter(r => r.parking_space_id === lot.id && r.status === 'pending');
+          const acceptedBookings = (ownerReservations || []).filter(r => r.parking_space_id === lot.id && (r.status === 'confirmed' || r.status === 'active'));
+
+          // 1. Render Pending Requests for this parking lot
+          let pendingHtml = '';
+          if (pendingReqs.length > 0) {
+            pendingHtml = pendingReqs.map(r => {
+              const driverName = r.driver_profile?.name || 'Community Driver';
+              const car = r.cars || {};
+              const plate = car.license_plate || 'Unlinked Vehicle';
+              const model = car.model ? ` (${car.model})` : '';
+              const createdStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+              return `
+                <div class="dash-lot-req-card" id="dash-owner-req-${r.id}">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <div>
+                      <div style="font-weight: 800; color: #0f172a; font-size: 0.88rem;">👤 ${driverName}</div>
+                      <div style="font-size: 0.8rem; color: #334155; margin-top: 2px;">
+                        🚘 <span class="dash-car-plate" style="font-size: 0.74rem;">${plate}</span>${model}
+                      </div>
+                    </div>
+                    <span class="status-pill" style="font-size: 0.65rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
+                      ⏳ PENDING
+                    </span>
+                  </div>
+                  <div class="dash-req-meta">
+                    <span><strong>Requested:</strong> 1 space</span>
+                    <span><strong>Requested At:</strong> ${createdStr}</span>
+                  </div>
+                  ${r.notes ? `<div style="font-size: 0.75rem; color: #64748b; font-style: italic; margin-top: 4px;">Note: "${r.notes}"</div>` : ''}
+                  <div style="display: flex; gap: 6px; margin-top: 8px;">
+                    <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${lot.name}" data-plate="${plate}" style="flex: 1; padding: 6px 8px; font-size: 0.78rem;">
+                      Accept
+                    </button>
+                    <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${lot.name}" data-plate="${plate}" style="flex: 1; padding: 6px 8px; font-size: 0.78rem;">
+                      Decline
+                    </button>
+                  </div>
                 </div>
               `;
-            } else if (booking) {
-              spotRows += `
-                <div class="dash-assigned-car-item">
-                  <span><strong>Spot #${spotNum}:</strong> 🚗 Parked Vehicle (Active Reservation)</span>
-                  <span class="status-pill status-available" style="font-size: 0.65rem; padding: 1px 5px;">Occupied</span>
+            }).join('');
+          } else {
+            pendingHtml = `<div style="color: #94a3b8; font-size: 0.78rem; font-style: italic; padding: 4px 0;">No pending requests awaiting approval.</div>`;
+          }
+
+          // 2. Render Accepted Bookings (Occupied Spaces) for this parking lot
+          let acceptedHtml = '';
+          if (acceptedBookings.length > 0) {
+            acceptedHtml = acceptedBookings.map((r, idx) => {
+              const driverName = r.driver_profile?.name || 'Community Driver';
+              const car = r.cars || {};
+              const plate = car.license_plate || 'Unlinked Vehicle';
+              const model = car.model ? ` (${car.model})` : '';
+              const updatedStr = r.updated_at ? new Date(r.updated_at).toLocaleString() : (r.created_at ? new Date(r.created_at).toLocaleString() : 'Confirmed');
+              return `
+                <div class="dash-lot-booking-card" id="dash-owner-booking-${r.id}">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <div>
+                      <div style="font-weight: 800; color: #0f172a; font-size: 0.88rem;">
+                        <span>Spot #${idx + 1}:</span> 👤 ${driverName}
+                      </div>
+                      <div style="font-size: 0.8rem; color: #334155; margin-top: 2px;">
+                        🚘 <span class="dash-car-plate" style="font-size: 0.74rem;">${plate}</span>${model}
+                      </div>
+                    </div>
+                    <span class="status-pill status-available" style="font-size: 0.65rem; padding: 2px 6px;">
+                      ACCEPTED
+                    </span>
+                  </div>
+                  <div class="dash-req-meta">
+                    <span><strong>Parking Lot:</strong> ${lot.name}</span>
+                    <span><strong>Spaces:</strong> 1 space</span>
+                    <span><strong>Confirmed:</strong> ${updatedStr}</span>
+                  </div>
+                  ${r.notes ? `<div style="font-size: 0.75rem; color: #64748b; font-style: italic; margin-top: 4px;">Note: "${r.notes}"</div>` : ''}
                 </div>
               `;
-            } else if (isClosed) {
-              spotRows += `
-                <div class="dash-assigned-car-item" style="color: #94a3b8;">
-                  <span><strong>Spot #${spotNum}:</strong> 🚫 Closed</span>
-                  <span class="status-pill status-closed" style="font-size: 0.65rem; padding: 1px 5px;">Unavailable</span>
-                </div>
-              `;
-            } else {
-              spotRows += `
-                <div class="dash-assigned-car-item" style="color: #16a34a;">
-                  <span><strong>Spot #${spotNum}:</strong> 🟢 Available Open Spot</span>
-                  <span class="status-pill status-available" style="font-size: 0.65rem; padding: 1px 5px;">Open</span>
-                </div>
-              `;
-            }
+            }).join('');
+          } else {
+            acceptedHtml = `<div style="color: #94a3b8; font-size: 0.78rem; font-style: italic; padding: 4px 0;">No vehicles parked yet (0 / ${cap} spots).</div>`;
+          }
+
+          let statusPill = '';
+          if (isClosed) {
+            statusPill = '<span class="status-pill status-closed">🔴 CLOSED</span>';
+          } else if (isFull) {
+            statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🟡 FULL</span>';
+          } else {
+            statusPill = '<span class="status-pill status-available">🟢 AVAILABLE</span>';
           }
 
           html += `
@@ -2997,14 +3051,12 @@ if (!empty($_SESSION['auth_user'])) {
                     <div class="dash-lot-coords">📍 GPS: ${lat}, ${lng}</div>
                   </div>
                   <div>
-                    ${isClosed 
-                      ? '<span class="status-pill status-closed">🔴 CLOSED</span>'
-                      : (isFull ? '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🟡 FULL</span>' : '<span class="status-pill status-available">🟢 AVAILABLE</span>')
-                    }
+                    ${statusPill}
                   </div>
                 </div>
 
-                <div class="dash-lot-spots-bar">
+                <!-- Capacity & Availability Metrics Bar -->
+                <div class="dash-lot-spots-bar" style="margin: 12px 0;">
                   <div>
                     <div class="dash-spot-stat-num" style="color: #16a34a;">${avail}</div>
                     <div class="dash-spot-stat-lbl">Available</div>
@@ -3014,8 +3066,8 @@ if (!empty($_SESSION['auth_user'])) {
                     <div class="dash-spot-stat-lbl">Occupied</div>
                   </div>
                   <div>
-                    <div class="dash-spot-stat-num" style="color: ${isClosed ? '#dc2626' : '#64748b'};">${isClosed ? 'Closed' : 'Active'}</div>
-                    <div class="dash-spot-stat-lbl">Status</div>
+                    <div class="dash-spot-stat-num" style="color: #b45309;">${pendingReqs.length}</div>
+                    <div class="dash-spot-stat-lbl">Pending</div>
                   </div>
                   <div>
                     <div class="dash-spot-stat-num" style="color: #0f172a;">${cap}</div>
@@ -3023,17 +3075,29 @@ if (!empty($_SESSION['auth_user'])) {
                   </div>
                 </div>
 
-                <div class="dash-lot-assigned-cars">
-                  <div style="font-weight: 700; color: #334155; margin-bottom: 6px; font-size: 0.8rem;">
-                    PARKING SPOTS & VEHICLE OCCUPANCY (${occupied}/${cap}):
+                <!-- Section: Pending Reservation Requests -->
+                <div class="dash-lot-section" style="margin-bottom: 12px;">
+                  <div class="dash-lot-section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Pending Requests (${pendingReqs.length})</span>
+                    ${pendingReqs.length > 0 ? '<span class="status-badge" style="background: #fef3c7; color: #b45309; font-size: 0.65rem;">Action Needed</span>' : ''}
                   </div>
-                  <div style="max-height: 120px; overflow-y: auto;">
-                    ${spotRows}
+                  <div class="dash-lot-requests-box">
+                    ${pendingHtml}
+                  </div>
+                </div>
+
+                <!-- Section: Accepted Reservations -->
+                <div class="dash-lot-section">
+                  <div class="dash-lot-section-title">
+                    Accepted Bookings (${acceptedBookings.length}/${cap})
+                  </div>
+                  <div class="dash-lot-requests-box">
+                    ${acceptedHtml}
                   </div>
                 </div>
               </div>
 
-              <div class="dash-card-actions">
+              <div class="dash-card-actions" style="margin-top: 12px;">
                 <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${lot.name}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
                   ${isClosed ? '🟢 Reopen Lot' : '⏸️ Close Lot'}
                 </button>

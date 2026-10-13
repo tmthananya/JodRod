@@ -90,7 +90,7 @@ if ($res['success']) {
                 $httpCode = 403;
             } elseif (stripos($errorMsg, 'not found') !== false) {
                 $httpCode = 404;
-            } elseif (stripos($errorMsg, 'full') !== false || stripos($errorMsg, 'closed') !== false) {
+            } elseif (stripos($errorMsg, 'full') !== false || stripos($errorMsg, 'closed') !== false || stripos($errorMsg, 'Only pending') !== false || stripos($errorMsg, 'already') !== false) {
                 $httpCode = 409;
             }
             http_response_code($httpCode);
@@ -115,6 +115,8 @@ $httpCode = $res['http_code'] ?: 500;
 $errMsg = $res['error'] ?? 'Failed to execute approval RPC in Supabase.';
 if ($httpCode === 404) {
     $errMsg = 'The reservation system RPC functions are not yet installed in Supabase. Please apply migration 20261011_phase2_create_reservations.sql.';
+} elseif (stripos($errMsg, 'updated_at') !== false && stripos($errMsg, 'parking_spaces') !== false) {
+    $errMsg = 'Database migration required: The live accept_reservation RPC references non-existent column parking_spaces.updated_at. Please execute migration supabase/migrations/20261013_fix_acceptance_and_owner_car_rls.sql in the Supabase SQL Editor.';
 }
 
 http_response_code($httpCode);

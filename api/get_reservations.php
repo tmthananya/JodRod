@@ -97,6 +97,22 @@ if ($asOwner) {
                 'name'   => 'Community Driver',
                 'avatar' => null
             ];
+
+            // If cars relation was filtered by Supabase RLS, extract from resilient metadata
+            if (empty($item['cars']) || empty($item['cars']['license_plate'])) {
+                if (!empty($item['notes']) && preg_match('/\[Vehicle:\s*([^\]|]+)(?:\s*\|\s*([^\]]+))?\]/i', $item['notes'], $m)) {
+                    $item['cars'] = [
+                        'id'            => $item['car_id'] ?? null,
+                        'license_plate' => trim($m[1]),
+                        'model'         => isset($m[2]) ? trim($m[2]) : 'Standard'
+                    ];
+                }
+            }
+
+            // Clean visible notes for display
+            if (!empty($item['notes'])) {
+                $item['notes'] = trim(preg_replace('/\[Vehicle:[^\]]+\]\s*/i', '', $item['notes']));
+            }
         }
         unset($item);
 
@@ -119,12 +135,29 @@ if ($asOwner) {
     $res = supabase_request($resUrl, 'GET');
 
     if ($res['success'] && is_array($res['data'])) {
+        $driverRes = $res['data'];
+        foreach ($driverRes as &$item) {
+            if (empty($item['cars']) || empty($item['cars']['license_plate'])) {
+                if (!empty($item['notes']) && preg_match('/\[Vehicle:\s*([^\]|]+)(?:\s*\|\s*([^\]]+))?\]/i', $item['notes'], $m)) {
+                    $item['cars'] = [
+                        'id'            => $item['car_id'] ?? null,
+                        'license_plate' => trim($m[1]),
+                        'model'         => isset($m[2]) ? trim($m[2]) : 'Standard'
+                    ];
+                }
+            }
+            if (!empty($item['notes'])) {
+                $item['notes'] = trim(preg_replace('/\[Vehicle:[^\]]+\]\s*/i', '', $item['notes']));
+            }
+        }
+        unset($item);
+
         echo json_encode([
             'success' => true,
             'source'  => 'supabase',
             'view'    => 'driver',
-            'count'   => count($res['data']),
-            'data'    => $res['data']
+            'count'   => count($driverRes),
+            'data'    => $driverRes
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }

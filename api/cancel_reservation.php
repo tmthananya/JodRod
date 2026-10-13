@@ -100,6 +100,8 @@ $httpCode = $rpcRes['http_code'] ?: 500;
 $errMsg = $rpcRes['error'] ?? 'Database error while cancelling reservation.';
 if ($httpCode === 404) {
     $errMsg = 'The reservation system is not yet installed in Supabase. Please execute migration 20261011_phase2_create_reservations.sql in the Supabase SQL Editor.';
+} elseif (stripos($errMsg, 'updated_at') !== false && stripos($errMsg, 'parking_spaces') !== false) {
+    $errMsg = 'Database migration required: The live cancel_reservation RPC references non-existent column parking_spaces.updated_at. Please execute migration supabase/migrations/20261013_fix_acceptance_and_owner_car_rls.sql in the Supabase SQL Editor.';
 }
 
 http_response_code($httpCode);

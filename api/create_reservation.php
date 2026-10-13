@@ -63,12 +63,32 @@ if (empty($spaceId)) {
     exit;
 }
 
-// 2. Execute atomic database RPC: request_reservation
+// 2. Query driver's car metadata to ensure owner dashboard can view vehicle details across RLS
+$carMetaPrefix = '';
+$carFetch = supabase_request("/rest/v1/cars?id=eq." . urlencode($carId) . "&select=license_plate,model", 'GET');
+if ($carFetch['success'] && !empty($carFetch['data'][0])) {
+    $cPlate = $carFetch['data'][0]['license_plate'] ?? '';
+    $cModel = $carFetch['data'][0]['model'] ?? 'Standard';
+    if (!empty($cPlate)) {
+        $carMetaPrefix = "[Vehicle: {$cPlate} | {$cModel}]";
+    }
+}
+
+$finalNotes = $carMetaPrefix;
+if (!empty($notes)) {
+    $escapedNotes = htmlspecialchars($notes, ENT_QUOTES, 'UTF-8');
+    $finalNotes = !empty($finalNotes) ? "{$finalNotes} {$escapedNotes}" : $escapedNotes;
+}
+if (empty($finalNotes)) {
+    $finalNotes = null;
+}
+
+// 3. Execute atomic database RPC: request_reservation
 $rpcRes = supabase_request('/rest/v1/rpc/request_reservation', 'POST', [
     'p_parking_space_id' => $spaceId,
     'p_user_id'          => $uid,
     'p_car_id'           => $carId,
-    'p_notes'            => !empty($notes) ? htmlspecialchars($notes, ENT_QUOTES, 'UTF-8') : null
+    'p_notes'            => $finalNotes
 ]);
 
 if ($rpcRes['success']) {
@@ -77,10 +97,11 @@ if ($rpcRes['success']) {
         if ($data['success']) {
             http_response_code(201);
             echo json_encode([
-                'success' => true,
-                'source'  => 'supabase',
-                'message' => $data['message'] ?? 'Reservation request submitted. Awaiting parking lot owner approval.',
-                'data'    => $data['reservation'] ?? $data
+                'success'     => true,
+                'source'      => 'supabase',
+                'message'     => $data['message'] ?? 'Reservation request submitted. Awaiting parking lot owner approval.',
+                'reservation' => $data['reservation'] ?? $data,
+                'data'        => $data['reservation'] ?? $data
             ], JSON_UNESCAPED_UNICODE);
             exit;
         } else {
