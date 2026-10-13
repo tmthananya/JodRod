@@ -12,3 +12,6 @@ data/*.json
 mobile/node_modules/
 mobile/.expo/
 
+# Temporary logs
+.php_server.log
+
