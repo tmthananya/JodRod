@@ -37,7 +37,7 @@ if (!empty($_SESSION['auth_user'])) {
        ======================================================== -->
   <header class="site-header">
     <nav class="navbar" aria-label="Main Navigation">
-      <a href="index.php" class="brand">
+      <a href="#map" class="brand">
         <div class="brand-icon">🚗</div>
         <div class="brand-text">
           <span class="brand-title">JODROD</span>
@@ -45,13 +45,8 @@ if (!empty($_SESSION['auth_user'])) {
         </div>
       </a>
 
-      <!-- Strictly: Dashboard, Find Parking, My Parking Lots, My Reservations, My Profile -->
+      <!-- Strictly: Find Parking (Main), My Parking Lots, My Reservations, My Profile -->
       <ul class="nav-links" id="site-nav-links" style="display: none;">
-        <li>
-          <a href="#dashboard" class="nav-link" id="nav-dashboard">
-            <span>📊</span> Dashboard
-          </a>
-        </li>
         <li>
           <a href="#map" class="nav-link" id="nav-map">
             <span>🗺️</span> Find Parking
@@ -274,219 +269,14 @@ if (!empty($_SESSION['auth_user'])) {
          NAVIGATION TARGET SECTIONS (MODULAR PLACEHOLDERS)
          ======================================================== -->
     
-    <!-- 0. Dashboard Section: My Cars & My Parking Lots -->
-    <section id="section-dashboard" class="nav-content-section">
-      <div class="dash-header-bar">
+    <!-- 1. Map Section: Find Safe Parking (Main Page) -->
+    <section id="section-map" class="nav-content-section active">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <div>
-          <h2 class="dash-title"><span>📊</span> My Cars & Parking Lots Dashboard</h2>
-          <p class="dash-subtitle">Real-time flood parking command center: track your vehicles, active spot assignments, and owned parking spaces.</p>
-        </div>
-        <div class="dash-header-actions">
-          <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-dash-add-car">
-            <span>➕</span> Add Vehicle
-          </button>
-          <a href="#my-spaces" class="pixel-btn pixel-btn-blue pixel-btn-sm" id="btn-dash-offer-space">
-            <span>🅿️</span> Offer Parking Lot
-          </a>
-          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-dash-refresh" title="Reload live data from Supabase">
-            <span>🔄</span> Refresh
-          </button>
+          <h2 class="section-title" style="margin-bottom: 2px;"><span>🗺️</span> Find Safe Parking</h2>
+          <p class="section-subtitle" style="margin: 0;">Explore real flood-safe parking locations, find elevated high ground, and request emergency parking.</p>
         </div>
       </div>
-
-      <!-- Action Feedback Alert Box -->
-      <div id="dash-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
-
-      <!-- Welcome Command Center Area -->
-      <div class="dash-welcome-card" id="dash-welcome-area">
-        <div class="dash-welcome-header">
-          <div>
-            <div class="dash-welcome-badge">🛡️ FLOOD RELIEF COMMAND CENTER</div>
-            <h3 class="dash-welcome-title">Welcome back, <span id="dash-welcome-user">Driver & Host</span>!</h3>
-            <p class="dash-welcome-text">
-              Real-time flood parking overview: track vehicles, secure high-ground spots, manage community parking lots, and confirm emergency reservations.
-            </p>
-          </div>
-          <div class="dash-welcome-status">
-            <span class="status-badge status-available">🟢 System Online</span>
-            <span class="status-badge" style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">🌊 Flood Alert Active</span>
-          </div>
-        </div>
-        <div class="dash-quick-nav">
-          <a href="#map" class="pixel-btn pixel-btn-blue pixel-btn-sm">
-            <span>🗺️</span> Find Parking
-          </a>
-          <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm btn-dash-add-car-trigger">
-            <span>➕</span> Add Vehicle
-          </button>
-          <a href="#my-spaces" class="pixel-btn pixel-btn-yellow pixel-btn-sm">
-            <span>🅿️</span> My Parking Lots
-          </a>
-          <a href="#my-reservations" class="pixel-btn pixel-btn-sm">
-            <span>📋</span> My Reservations
-          </a>
-          <a href="#profile" class="pixel-btn pixel-btn-sm">
-            <span>👤</span> My Profile
-          </a>
-        </div>
-      </div>
-
-      <!-- Action Required: What Needs Attention Section -->
-      <div class="dash-section-wrapper" id="dash-attention-section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-          <div>
-            <h3 class="dash-section-heading" style="margin-bottom: 2px;"><span>⚡</span> What Needs Attention</h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Urgent actions requiring your decision, host approval, or vehicle safety relocation.</p>
-          </div>
-          <div id="dash-attention-count-badge"></div>
-        </div>
-        <div id="dash-attention-container">
-          <div class="dash-attention-empty">
-            <span>⏳</span> Checking for pending requests and active spot updates...
-          </div>
-        </div>
-      </div>
-
-      <!-- Section A: Overview Metrics Cards -->
-      <div class="dash-section-wrapper">
-        <h3 class="dash-section-heading"><span>📈</span> A. Dashboard Overview</h3>
-        
-        <!-- Driver Role Summary -->
-        <div style="margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">🚘 Driver Summary</span>
-          <a href="#my-reservations" style="font-size: 0.75rem; color: #0284c7; font-weight: 700; text-decoration: underline;">View All Reservations &rarr;</a>
-        </div>
-        <div class="dash-overview-grid" style="margin-top: 4px; margin-bottom: 20px;">
-          <div class="dash-metric-card" id="metric-card-cars">
-            <div class="dash-metric-icon">🚘</div>
-            <div class="metric-info">
-              <div class="dash-metric-val" id="dash-stat-cars">-</div>
-              <div class="dash-metric-lbl">Total Registered Cars</div>
-            </div>
-          </div>
-
-          <div class="dash-metric-card" id="metric-card-assigned">
-            <div class="dash-metric-icon" style="background: #f0fdf4;">🛡️</div>
-            <div class="metric-info">
-              <div class="dash-metric-val" id="dash-stat-assigned">-</div>
-              <div class="dash-metric-lbl">Cars on Safe Ground</div>
-            </div>
-          </div>
-
-          <div class="dash-metric-card" id="metric-card-reservations">
-            <div class="dash-metric-icon" style="background: #eff6ff;">📋</div>
-            <div class="metric-info">
-              <div class="dash-metric-val" id="dash-stat-reservations">-</div>
-              <div class="dash-metric-lbl">Active Spot Reservations</div>
-              <div class="dash-metric-sub" id="dash-driver-pending-sub" style="margin-top: 4px;">
-                <span class="status-pill" style="font-size: 0.68rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
-                  ⏳ <span id="dash-stat-driver-pending">0</span> Awaiting Approval
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Host Role Summary -->
-        <div style="margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">🅿️ Parking Lot Host Summary</span>
-          <a href="#my-spaces" style="font-size: 0.75rem; color: #0284c7; font-weight: 700; text-decoration: underline;">Manage Parking Lots &rarr;</a>
-        </div>
-        <div class="dash-overview-grid" style="margin-top: 4px;">
-          <div class="dash-metric-card" id="metric-card-lots">
-            <div class="dash-metric-icon" style="background: #fef9c3;">🅿️</div>
-            <div class="metric-info">
-              <div class="dash-metric-val" id="dash-stat-lots">-</div>
-              <div class="dash-metric-lbl">My Owned Parking Lots</div>
-            </div>
-          </div>
-
-          <div class="dash-metric-card" id="metric-card-owner-available">
-            <div class="dash-metric-icon" style="background: #ecfdf5;">🟢</div>
-            <div class="metric-info">
-              <div class="dash-metric-val" id="dash-stat-owner-available">-</div>
-              <div class="dash-metric-lbl">Available Spaces</div>
-            </div>
-          </div>
-
-          <div class="dash-metric-card" id="metric-card-owner-pending">
-            <div class="dash-metric-icon" style="background: #fffbeb;">⏳</div>
-            <div class="metric-info">
-              <div class="dash-metric-val" id="dash-stat-owner-pending">-</div>
-              <div class="dash-metric-lbl">Requests Awaiting Decision</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section B: My Cars -->
-      <div class="dash-section-wrapper">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h3 class="dash-section-heading" style="margin-bottom: 2px;"><span>🚘</span> B. My Cars</h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Manage your vehicles, track their flood parking spot assignment, and reserve safe elevated spaces.</p>
-          </div>
-          <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-dash-add-car-sec">
-            <span>➕</span> Register New Car
-          </button>
-        </div>
-        <div id="dash-cars-container" class="dashboard-cars-grid">
-          <div class="empty-spaces-notice">Loading your vehicles from Supabase...</div>
-        </div>
-      </div>
-
-      <!-- Section C: My Parking Lots -->
-      <div class="dash-section-wrapper">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h3 class="dash-section-heading" style="margin-bottom: 2px;"><span>🅿️</span> C. My Parking Lots</h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Displays exclusively parking lots owned by you (<code>auth.uid() = owner_id</code>). Manage capacity, availability, and inspect parked cars.</p>
-          </div>
-          <a href="#my-spaces" class="pixel-btn pixel-btn-blue pixel-btn-sm">
-            <span>➕</span> Offer New Lot
-          </a>
-        </div>
-        <div id="dash-lots-container" class="dashboard-lots-grid">
-          <div class="empty-spaces-notice">Loading your parking lots from Supabase...</div>
-        </div>
-      </div>
-
-      <!-- Section D: My Parking Assignments -->
-      <div class="dash-section-wrapper">
-        <div style="margin-bottom: 12px;">
-          <h3 class="dash-section-heading" style="margin-bottom: 2px;"><span>📋</span> D. My Parking Assignments</h3>
-          <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Relational view connecting your registered vehicles to assigned parking lots, spots, and reservation records.</p>
-        </div>
-        <div class="table-responsive-container">
-          <table class="dashboard-table" id="dash-assignments-table">
-            <thead>
-              <tr>
-                <th>Vehicle</th>
-                <th>License Plate</th>
-                <th>Parking Lot</th>
-                <th>Location / Spot</th>
-                <th>Status</th>
-                <th>Reserved Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="dash-assignments-tbody">
-              <tr>
-                <td colspan="7" style="text-align: center; color: #64748b; padding: 20px;">Loading parking assignments...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- 1. Map Section -->
-    <section id="section-map" class="nav-content-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h2 class="section-title"><span>🗺️</span> Real-World Flood Map</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
-      </div>
-      <p class="section-subtitle">Explore real geographic flood areas, pan, zoom, or click anywhere to capture GPS coordinates.</p>
 
       <!-- Action Feedback Alert Box (for Delete/Update feedback) -->
       <div id="map-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 16px;"></div>
@@ -525,10 +315,32 @@ if (!empty($_SESSION['auth_user'])) {
 
       <!-- Active Parking Spaces Directory (Loaded from Supabase) -->
       <div style="margin-top: 24px;">
-        <h3 class="section-title">
-          <span>🅿️</span> Active Parking Spaces
-        </h3>
-        <p class="section-subtitle">Retrieved live from the database. Click "View on Map" to locate any space.</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+          <div>
+            <h3 class="section-title" style="margin-bottom: 2px;">
+              <span>🅿️</span> Active Parking Spaces
+            </h3>
+            <p class="section-subtitle" style="margin: 0;">Retrieved live from the database. Search parking spaces by name or owner.</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex: 1; max-width: 440px; min-width: 260px;">
+            <div style="position: relative; flex: 1;">
+              <input 
+                type="text" 
+                id="spaces-search-input" 
+                class="form-input" 
+                placeholder="🔍 Search by parking lot name or owner..." 
+                style="padding-right: 28px; width: 100%; margin: 0; min-height: 38px;"
+              />
+              <button 
+                type="button" 
+                id="btn-clear-spaces-search" 
+                style="display: none; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1rem; cursor: pointer; color: #94a3b8;" 
+                title="Clear search"
+              >&times;</button>
+            </div>
+          </div>
+        </div>
+        <div id="spaces-search-meta" style="font-size: 0.8rem; color: #64748b; margin-bottom: 12px; font-weight: 600;"></div>
         <div id="parking-spaces-list" class="spaces-list-container">
           <div class="empty-spaces-notice">Loading parking spaces...</div>
         </div>
@@ -1260,7 +1072,11 @@ if (!empty($_SESSION['auth_user'])) {
           navUserBadge.style.display = 'inline-flex';
           navUserEmail.textContent = currentUser.email;
           navUserEmail.title = `Logged in as: ${currentUser.email}`;
-          handleRoute();
+          if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#dashboard' || window.location.hash === '#home') {
+            window.location.hash = '#map';
+          } else {
+            handleRoute();
+          }
           if (typeof loadProfiles === 'function') {
             loadProfiles();
           }
@@ -1325,6 +1141,7 @@ if (!empty($_SESSION['auth_user'])) {
               currentUser = json.user;
               document.getElementById('auth-password').value = '';
               hideAuthAlert();
+              window.location.hash = '#map';
               updateAuthUI();
             } else if (json.requires_confirmation) {
               showAuthAlert('success', `🎉 <strong>Account Created!</strong> ${json.message}<br><small>If you have auto-confirm enabled or confirmed via email, click "Log In" above.</small>`);
@@ -1359,21 +1176,17 @@ if (!empty($_SESSION['auth_user'])) {
       });
 
       const navLinks = {
-        '#dashboard': document.getElementById('nav-dashboard'),
         '#map': document.getElementById('nav-map'),
         '#my-spaces': document.getElementById('nav-my-spaces'),
         '#my-reservations': document.getElementById('nav-my-reservations'),
-        '#my-car': document.getElementById('nav-dashboard'),
         '#profile': document.getElementById('nav-profile')
       };
 
       const sections = {
         '#home': document.getElementById('section-home'),
-        '#dashboard': document.getElementById('section-dashboard'),
         '#map': document.getElementById('section-map'),
         '#my-spaces': document.getElementById('section-my-spaces'),
         '#my-reservations': document.getElementById('section-my-reservations'),
-        '#my-car': document.getElementById('section-dashboard'),
         '#points': document.getElementById('section-points'),
         '#profile': document.getElementById('section-profile')
       };
@@ -1386,7 +1199,13 @@ if (!empty($_SESSION['auth_user'])) {
           return;
         }
 
-        const hash = window.location.hash || '#dashboard';
+        // Find Parking (#map) is the main page once logged in
+        let hash = window.location.hash;
+        if (!hash || hash === '#' || hash === '#dashboard' || hash === '#my-car' || hash === '#home') {
+          hash = '#map';
+          window.location.hash = '#map';
+          return;
+        }
 
         // Update nav active states
         Object.keys(navLinks).forEach(key => {
@@ -1400,32 +1219,20 @@ if (!empty($_SESSION['auth_user'])) {
         });
 
         // Show/hide sections
-        if (hash === '#home' || !sections[hash]) {
-          sections['#home'].style.display = 'block';
-          Object.keys(sections).forEach(key => {
-            if (key !== '#home' && sections[key]) {
-              sections[key].classList.remove('active');
-            }
-          });
-        } else {
-          sections['#home'].style.display = 'none';
-          Object.keys(sections).forEach(key => {
-            if (key !== '#home' && sections[key]) {
-              if (key === hash) {
-                sections[key].classList.add('active');
-              } else {
-                sections[key].classList.remove('active');
-              }
-            }
-          });
+        if (!sections[hash]) {
+          hash = '#map';
         }
 
-        // Refresh dashboard if dashboard section is shown
-        if (hash === '#dashboard' || hash === '#my-car') {
-          if (typeof loadDashboard === 'function') {
-            loadDashboard();
+        sections['#home'].style.display = 'none';
+        Object.keys(sections).forEach(key => {
+          if (key !== '#home' && sections[key]) {
+            if (key === hash) {
+              sections[key].classList.add('active');
+            } else {
+              sections[key].classList.remove('active');
+            }
           }
-        }
+        });
 
         // Refresh map dimensions if map section is shown
         if (hash === '#map' && window.parkingMap) {

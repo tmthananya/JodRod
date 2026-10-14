@@ -148,11 +148,65 @@ class ParkingMapController {
       const res = await fetch('api/get_parking_spaces.php');
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
-        this.renderParkingSpaces(json.data);
+        this.rawSpaces = json.data;
+        this.applyFilter();
       }
     } catch (e) {
       console.warn('Could not load parking spaces:', e);
     }
+  }
+
+  // Bind real-time search bar events
+  bindSearch() {
+    const searchInput = document.getElementById('spaces-search-input');
+    const clearBtn = document.getElementById('btn-clear-spaces-search');
+    if (!searchInput || this._searchBound) return;
+    this._searchBound = true;
+
+    searchInput.addEventListener('input', (e) => {
+      this.searchQuery = (e.target.value || '').trim().toLowerCase();
+      if (clearBtn) {
+        clearBtn.style.display = this.searchQuery ? 'block' : 'none';
+      }
+      this.applyFilter();
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        this.searchQuery = '';
+        clearBtn.style.display = 'none';
+        this.applyFilter();
+        searchInput.focus();
+      });
+    }
+  }
+
+  // Filter parking spaces by name or owner
+  applyFilter() {
+    this.bindSearch();
+    const query = this.searchQuery || '';
+    let filtered = this.rawSpaces || [];
+
+    if (query) {
+      filtered = filtered.filter(s => {
+        const name = (s.name || '').toLowerCase();
+        const owner = (s.owner_name || '').toLowerCase();
+        return name.includes(query) || owner.includes(query);
+      });
+    }
+
+    const metaEl = document.getElementById('spaces-search-meta');
+    if (metaEl) {
+      if (query) {
+        const safeQuery = query.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+        metaEl.innerHTML = `Found <strong>${filtered.length}</strong> of ${this.rawSpaces.length} parking spaces matching "<em>${safeQuery}</em>"`;
+      } else {
+        metaEl.innerHTML = `Showing all <strong>${this.rawSpaces.length}</strong> active parking spaces`;
+      }
+    }
+
+    this.renderParkingSpaces(filtered);
   }
 
   // Render parking pins on the map and populate directory
@@ -165,7 +219,12 @@ class ParkingMapController {
 
     if (!spaces || spaces.length === 0) {
       if (listContainer) {
-        listContainer.innerHTML = '<div class="empty-spaces-notice">No parking spaces registered yet. Use "Offer Parking Space" to add one.</div>';
+        if (this.searchQuery) {
+          const safeQuery = this.searchQuery.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+          listContainer.innerHTML = `<div class="empty-spaces-notice">🔍 No parking spaces found matching "<strong>${safeQuery}</strong>". Try searching for another name or owner.</div>`;
+        } else {
+          listContainer.innerHTML = '<div class="empty-spaces-notice">No parking spaces registered yet. Use "Offer Parking Space" to add one.</div>';
+        }
       }
       this.updateStatusBadge(0);
       return;
@@ -190,13 +249,11 @@ class ParkingMapController {
       const isOwner = Boolean(window.currentUser && s.owner_id && s.owner_id === window.currentUser.id);
       const isCommunity = !s.owner_id;
       const isAvailable = (s.status === 'available' && parseInt(s.available_spaces, 10) > 0);
+      const ownerDisplay = s.owner_name || (isCommunity ? 'Public Relief Area' : 'Community Host');
 
       const marker = L.marker([s.latitude, s.longitude], { icon: pinIcon });
 
       // Marker Popup Actions:
-      // - If owner: Edit & Delete
-      // - If not owner & available: Reserve Spot
-      // - If not owner & full/closed: No reserve button, show status pill
       let popupActionsHtml = '';
       if (isOwner) {
         popupActionsHtml = `
@@ -235,6 +292,7 @@ class ParkingMapController {
         <div style="font-family: inherit; min-width: 190px;">
           <h4 style="margin: 0 0 6px; font-size: 1rem; color: #0f172a; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">${s.name}</h4>
           <div style="font-size: 0.85rem; color: #334155; display: flex; flex-direction: column; gap: 4px;">
+            <div><strong>Owner / Host:</strong> 👤 ${ownerDisplay}</div>
             <div><strong>Location:</strong> <span style="font-family: monospace;">${latFixed}, ${lngFixed}</span></div>
             <div><strong>Capacity:</strong> ${s.capacity}</div>
             <div><strong>Available spaces:</strong> ${s.available_spaces}</div>
@@ -285,6 +343,7 @@ class ParkingMapController {
               <span class="status-pill ${statusClass}">${s.status.toUpperCase()}</span>
             </div>
             <div class="space-card-body" style="margin-top: 10px;">
+              <div><strong>Owner / Host:</strong> 👤 ${ownerDisplay}</div>
               <div><strong>Location:</strong> <span style="font-family: monospace;">${latFixed}, ${lngFixed}</span></div>
               <div><strong>Capacity:</strong> ${s.capacity} vehicles</div>
               <div><strong>Available spaces:</strong> ${s.available_spaces} spots</div>
