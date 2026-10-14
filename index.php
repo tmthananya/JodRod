@@ -297,6 +297,37 @@ if (!empty($_SESSION['auth_user'])) {
       <!-- Action Feedback Alert Box -->
       <div id="dash-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
 
+      <!-- Welcome Command Center Area -->
+      <div class="dash-welcome-card" id="dash-welcome-area">
+        <div class="dash-welcome-header">
+          <div>
+            <div class="dash-welcome-badge">🛡️ FLOOD RELIEF COMMAND CENTER</div>
+            <h3 class="dash-welcome-title">Welcome back, <span id="dash-welcome-user">Driver & Host</span>!</h3>
+            <p class="dash-welcome-text">
+              Real-time flood parking coordination: track vehicles, discover safe ground, manage community parking spaces, and confirm emergency reservations.
+            </p>
+          </div>
+          <div class="dash-welcome-status">
+            <span class="status-badge status-available">🟢 System Online</span>
+            <span class="status-badge" style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">🌊 Flood Alert Active</span>
+          </div>
+        </div>
+        <div class="dash-quick-nav">
+          <a href="#map" class="pixel-btn pixel-btn-blue pixel-btn-sm">
+            <span>🗺️</span> Find Parking
+          </a>
+          <a href="#my-spaces" class="pixel-btn pixel-btn-green pixel-btn-sm">
+            <span>🅿️</span> My Parking Lots
+          </a>
+          <a href="#my-reservations" class="pixel-btn pixel-btn-yellow pixel-btn-sm">
+            <span>📋</span> My Reservations
+          </a>
+          <a href="#profile" class="pixel-btn pixel-btn-sm">
+            <span>👤</span> My Profile
+          </a>
+        </div>
+      </div>
+
       <!-- Section A: Overview Metrics Cards -->
       <div class="dash-section-wrapper">
         <h3 class="dash-section-heading"><span>📈</span> A. Dashboard Overview</h3>
@@ -326,6 +357,11 @@ if (!empty($_SESSION['auth_user'])) {
             </div>
             <div class="dash-metric-val" id="dash-stat-lots">-</div>
             <div class="dash-metric-lbl">My Owned Parking Lots</div>
+            <div class="dash-metric-sub" id="dash-owner-pending-sub" style="margin-top: 6px;">
+              <span class="status-pill" style="font-size: 0.68rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
+                ⏳ <span id="dash-stat-owner-pending">0</span> Pending Requests
+              </span>
+            </div>
           </div>
 
           <div class="dash-metric-card" id="metric-card-reservations">
@@ -335,6 +371,11 @@ if (!empty($_SESSION['auth_user'])) {
             </div>
             <div class="dash-metric-val" id="dash-stat-reservations">-</div>
             <div class="dash-metric-lbl">Active Spot Reservations</div>
+            <div class="dash-metric-sub" id="dash-driver-pending-sub" style="margin-top: 6px;">
+              <span class="status-pill" style="font-size: 0.68rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
+                ⏳ <span id="dash-stat-driver-pending">0</span> Awaiting Approval
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -538,6 +579,22 @@ if (!empty($_SESSION['auth_user'])) {
             <span class="my-res-metric-num" id="res-metric-history" style="color: #64748b;">0</span>
             <span class="my-res-metric-label">Past / Historical</span>
           </div>
+        </div>
+
+        <!-- Status Filter Tabs (All, Pending, Confirmed, Past/Cancelled) -->
+        <div class="my-res-filter-bar" id="my-res-filter-controls">
+          <button type="button" class="pixel-btn pixel-btn-sm filter-btn active" data-filter="all" id="btn-filter-all">
+            📋 All (<span id="filter-count-all">0</span>)
+          </button>
+          <button type="button" class="pixel-btn pixel-btn-sm filter-btn" data-filter="pending" id="btn-filter-pending">
+            ⏳ Pending (<span id="filter-count-pending">0</span>)
+          </button>
+          <button type="button" class="pixel-btn pixel-btn-sm filter-btn" data-filter="confirmed" id="btn-filter-confirmed">
+            🟢 Confirmed (<span id="filter-count-confirmed">0</span>)
+          </button>
+          <button type="button" class="pixel-btn pixel-btn-sm filter-btn" data-filter="past" id="btn-filter-past">
+            📁 Past / Cancelled (<span id="filter-count-past">0</span>)
+          </button>
         </div>
 
         <!-- Reservations List / Grid Container -->
@@ -2327,8 +2384,18 @@ if (!empty($_SESSION['auth_user'])) {
 
       let myResState = {
         reservations: [],
-        selectedReservationId: null
+        selectedReservationId: null,
+        activeFilter: 'all'
       };
+
+      function setReservationFilter(filter) {
+        myResState.activeFilter = filter;
+        document.querySelectorAll('#my-res-filter-controls .filter-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.filter === filter);
+        });
+        renderMyReservationsList(myResState.reservations);
+      }
+      window.setReservationFilter = setReservationFilter;
 
       async function loadReservations() {
         const container = document.getElementById('reservations-list-container');
@@ -2361,14 +2428,17 @@ if (!empty($_SESSION['auth_user'])) {
 
           myResState.reservations = json.data || [];
 
-          // Compute compact summary metrics
+          // Compute compact summary metrics & filter counts
           const total = myResState.reservations.length;
           const pending = myResState.reservations.filter(r => (r.status || 'pending').toLowerCase() === 'pending').length;
           const confirmed = myResState.reservations.filter(r => {
             const s = (r.status || '').toLowerCase();
             return s === 'confirmed' || s === 'active';
           }).length;
-          const history = total - pending - confirmed;
+          const history = myResState.reservations.filter(r => {
+            const s = (r.status || '').toLowerCase();
+            return s === 'cancelled' || s === 'rejected' || s === 'completed';
+          }).length;
 
           const elTotal = document.getElementById('res-metric-total');
           const elPending = document.getElementById('res-metric-pending');
@@ -2381,6 +2451,16 @@ if (!empty($_SESSION['auth_user'])) {
           if (elConfirmed) elConfirmed.textContent = confirmed;
           if (elHistory) elHistory.textContent = history;
           if (metricsBox) metricsBox.style.display = total > 0 ? 'flex' : 'none';
+
+          // Update filter badge counts
+          const fAll = document.getElementById('filter-count-all');
+          const fPending = document.getElementById('filter-count-pending');
+          const fConfirmed = document.getElementById('filter-count-confirmed');
+          const fPast = document.getElementById('filter-count-past');
+          if (fAll) fAll.textContent = total;
+          if (fPending) fPending.textContent = pending;
+          if (fConfirmed) fConfirmed.textContent = confirmed;
+          if (fPast) fPast.textContent = history;
 
           // If currently in detail view and reservation still exists, re-render detail; else render list
           if (myResState.selectedReservationId) {
@@ -2429,8 +2509,50 @@ if (!empty($_SESSION['auth_user'])) {
           return;
         }
 
+        // Apply active filter (All, Pending, Confirmed, Past/Cancelled)
+        const filter = myResState.activeFilter || 'all';
+        let filtered = reservations;
+        if (filter === 'pending') {
+          filtered = reservations.filter(r => (r.status || 'pending').toLowerCase() === 'pending');
+        } else if (filter === 'confirmed') {
+          filtered = reservations.filter(r => {
+            const s = (r.status || '').toLowerCase();
+            return s === 'confirmed' || s === 'active';
+          });
+        } else if (filter === 'past') {
+          filtered = reservations.filter(r => {
+            const s = (r.status || '').toLowerCase();
+            return s === 'cancelled' || s === 'rejected' || s === 'completed';
+          });
+        }
+
+        // Update active class on filter tab buttons
+        document.querySelectorAll('#my-res-filter-controls .filter-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.filter === filter);
+        });
+
+        if (filtered.length === 0) {
+          const filterLabels = {
+            pending: 'pending approval',
+            confirmed: 'confirmed',
+            past: 'past or cancelled'
+          };
+          container.innerHTML = `
+            <div class="empty-spaces-notice">
+              <span style="font-size: 1.4rem; display: block; margin-bottom: 8px;">🔍</span>
+              <strong>No ${filterLabels[filter] || filter} reservations found.</strong>
+              <div style="margin-top: 10px;">
+                <button type="button" class="pixel-btn pixel-btn-sm" onclick="setReservationFilter('all')">
+                  Show All Reservations (${reservations.length})
+                </button>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
         let html = '<div class="my-res-grid">';
-        reservations.forEach(r => {
+        filtered.forEach(r => {
           const space = r.parking_spaces || {};
           const spaceName = space.name || 'Flood Safe Parking Lot';
           const status = (r.status || 'pending').toLowerCase();
@@ -2463,7 +2585,7 @@ if (!empty($_SESSION['auth_user'])) {
           const lng = space.longitude ? parseFloat(space.longitude).toFixed(4) : null;
 
           html += `
-            <article class="my-res-card" id="my-res-card-${r.id}" data-res-id="${r.id}">
+            <article class="my-res-card clickable-res-card" id="my-res-card-${r.id}" data-res-id="${r.id}" title="Click to view full reservation details">
               <div>
                 <div class="my-res-card-header">
                   <h4 class="my-res-card-title">🚗 ${escapeHtml(spaceName)}</h4>
@@ -3105,11 +3227,11 @@ if (!empty($_SESSION['auth_user'])) {
           }
 
           html += `
-            <article class="my-lot-card" id="my-lot-card-${lot.id}">
+            <article class="my-lot-card clickable-lot-card" id="my-lot-card-${lot.id}" data-lot-id="${lot.id}" title="Click to view full parking lot details and requests">
               <div>
                 <div class="my-lot-card-header">
                   <div>
-                    <h3 class="my-lot-card-title">🅿️ ${lot.name}</h3>
+                    <h3 class="my-lot-card-title">🅿️ ${escapeHtml(lot.name)}</h3>
                     <div class="my-lot-card-coords">📍 GPS: ${lat}, ${lng}</div>
                   </div>
                   <div>
@@ -3153,13 +3275,13 @@ if (!empty($_SESSION['auth_user'])) {
                   <span>📋</span> Manage Lot & Requests &rarr;
                 </button>
                 <div class="my-lot-card-subactions">
-                  <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${lot.name}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
+                  <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${escapeHtml(lot.name)}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
                     ${isClosed ? '🟢 Reopen' : '⏸️ Close'}
                   </button>
                   <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-edit-lot-dash" data-id="${lot.id}">
                     ✏️ Edit
                   </button>
-                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${lot.name}">
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${escapeHtml(lot.name)}">
                     🗑️ Delete
                   </button>
                 </div>
@@ -3240,9 +3362,9 @@ if (!empty($_SESSION['auth_user'])) {
                   <div class="dash-lot-req-card" id="owner-req-card-${r.id}">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                       <div>
-                        <div style="font-weight: 800; color: #0f172a; font-size: 0.95rem;">👤 ${driverName}</div>
+                        <div style="font-weight: 800; color: #0f172a; font-size: 0.95rem;">👤 ${escapeHtml(driverName)}</div>
                         <div style="font-size: 0.85rem; color: #334155; margin-top: 3px;">
-                          🚘 <span class="dash-car-plate" style="font-size: 0.78rem;">${plate}</span>${model}
+                          🚘 <span class="dash-car-plate" style="font-size: 0.78rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}
                         </div>
                       </div>
                       <span class="status-pill" style="font-size: 0.65rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
@@ -3253,12 +3375,12 @@ if (!empty($_SESSION['auth_user'])) {
                       <span><strong>Requested Spaces:</strong> 1 spot</span>
                       <span><strong>Submitted:</strong> ${createdStr}</span>
                     </div>
-                    ${r.notes ? `<div style="font-size: 0.78rem; color: #64748b; font-style: italic; margin-top: 6px; background: #ffffff; padding: 4px 8px; border-radius: 3px;">Note: "${r.notes}"</div>` : ''}
+                    ${r.notes ? `<div style="font-size: 0.78rem; color: #64748b; font-style: italic; margin-top: 6px; background: #ffffff; padding: 4px 8px; border-radius: 3px;">Note: "${escapeHtml(r.notes)}"</div>` : ''}
                     <div style="display: flex; gap: 8px; margin-top: 10px;">
-                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${lot.name}" data-plate="${plate}" style="flex: 1; padding: 8px;">
+                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${escapeHtml(lot.name)}" data-plate="${escapeHtml(plate)}" style="flex: 1; padding: 8px;">
                         ✅ Accept
                       </button>
-                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${lot.name}" data-plate="${plate}" style="flex: 1; padding: 8px;">
+                      <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${escapeHtml(lot.name)}" data-plate="${escapeHtml(plate)}" style="flex: 1; padding: 8px;">
                         ❌ Decline
                       </button>
                     </div>
@@ -3291,10 +3413,10 @@ if (!empty($_SESSION['auth_user'])) {
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                       <div>
                         <div style="font-weight: 800; color: #0f172a; font-size: 0.95rem;">
-                          <span>Spot #${idx + 1}:</span> 👤 ${driverName}
+                          <span>Spot #${idx + 1}:</span> 👤 ${escapeHtml(driverName)}
                         </div>
                         <div style="font-size: 0.85rem; color: #334155; margin-top: 3px;">
-                          🚘 <span class="dash-car-plate" style="font-size: 0.78rem;">${plate}</span>${model}
+                          🚘 <span class="dash-car-plate" style="font-size: 0.78rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}
                         </div>
                       </div>
                       <span class="status-pill status-available" style="font-size: 0.65rem; padding: 3px 6px;">
@@ -3302,11 +3424,11 @@ if (!empty($_SESSION['auth_user'])) {
                       </span>
                     </div>
                     <div class="dash-req-meta" style="margin-top: 8px;">
-                      <span><strong>Lot:</strong> ${lot.name}</span>
+                      <span><strong>Lot:</strong> ${escapeHtml(lot.name)}</span>
                       <span><strong>Spaces:</strong> 1 space</span>
                       <span><strong>Confirmed At:</strong> ${updatedStr}</span>
                     </div>
-                    ${r.notes ? `<div style="font-size: 0.78rem; color: #64748b; font-style: italic; margin-top: 6px; background: #ffffff; padding: 4px 8px; border-radius: 3px;">Note: "${r.notes}"</div>` : ''}
+                    ${r.notes ? `<div style="font-size: 0.78rem; color: #64748b; font-style: italic; margin-top: 6px; background: #ffffff; padding: 4px 8px; border-radius: 3px;">Note: "${escapeHtml(r.notes)}"</div>` : ''}
                   </div>
                 `;
               }).join('')}
@@ -3325,18 +3447,18 @@ if (!empty($_SESSION['auth_user'])) {
           <div class="my-lot-detail-header-card">
             <div class="my-lot-detail-title-row">
               <div>
-                <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0;">🅿️ ${lot.name}</h3>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0;">🅿️ ${escapeHtml(lot.name)}</h3>
                 <div style="font-size: 0.82rem; color: #64748b; font-family: monospace; margin-top: 4px;">📍 GPS: ${lat}, ${lng}</div>
               </div>
               <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 ${statusPill}
-                <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${lot.name}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
+                <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${escapeHtml(lot.name)}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
                   ${isClosed ? '🟢 Reopen Lot' : '⏸️ Close Lot'}
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-edit-lot-dash" data-id="${lot.id}">
                   ✏️ Edit
                 </button>
-                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${lot.name}">
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${escapeHtml(lot.name)}">
                   🗑️ Delete
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm btn-view-car-spot" data-lat="${lot.latitude}" data-lng="${lot.longitude}">
@@ -3373,7 +3495,7 @@ if (!empty($_SESSION['auth_user'])) {
               ${pendingReqs.length > 0 ? '<span class="status-badge" style="background:#fef3c7; color:#b45309; font-size:0.7rem;">Action Needed</span>' : ''}
             </div>
             <p class="my-lot-detail-section-desc">
-              Review and approve reservation requests specifically for "${lot.name}". Accepting a request decreases available capacity by 1.
+              Review and approve reservation requests specifically for "${escapeHtml(lot.name)}". Accepting a request decreases available capacity by 1.
             </p>
             ${pendingHtml}
           </div>
@@ -3385,9 +3507,54 @@ if (!empty($_SESSION['auth_user'])) {
               <span class="status-badge status-available" style="font-size:0.7rem;">${occupied} Spots Filled</span>
             </div>
             <p class="my-lot-detail-section-desc">
-              Vehicles currently holding an accepted spot in "${lot.name}".
+              Vehicles currently holding an accepted spot in "${escapeHtml(lot.name)}".
             </p>
             ${confirmedHtml}
+          </div>
+
+          <!-- Section 3: Lot Details & Operating Specs -->
+          <div class="my-lot-detail-section" id="my-lot-specs-section">
+            <div class="my-lot-detail-section-title">
+              <h3><span>ℹ️</span> Lot Details & Operating Specs</h3>
+              <span class="status-badge status-available" style="font-size:0.7rem;">Verified Host</span>
+            </div>
+            <p class="my-lot-detail-section-desc">
+              Facility specifications and verified location coordinates for this community flood parking space.
+            </p>
+            <div class="my-lot-specs-grid">
+              <div class="my-lot-spec-item">
+                <span class="my-lot-spec-label">Parking Space Name</span>
+                <span class="my-lot-spec-val">🅿️ ${escapeHtml(lot.name)}</span>
+              </div>
+              <div class="my-lot-spec-item">
+                <span class="my-lot-spec-label">GPS Coordinates</span>
+                <span class="my-lot-spec-val" style="font-family: monospace;">📍 ${lat}, ${lng}</span>
+              </div>
+              <div class="my-lot-spec-item">
+                <span class="my-lot-spec-label">Total Vehicle Capacity</span>
+                <span class="my-lot-spec-val">${cap} vehicle spaces</span>
+              </div>
+              <div class="my-lot-spec-item">
+                <span class="my-lot-spec-label">Currently Available Spaces</span>
+                <span class="my-lot-spec-val" style="color: #16a34a; font-weight: 800;">${avail} open spots</span>
+              </div>
+              <div class="my-lot-spec-item">
+                <span class="my-lot-spec-label">Occupancy Rate</span>
+                <span class="my-lot-spec-val">${cap > 0 ? Math.round((occupied / cap) * 100) : 0}% (${occupied} / ${cap} spots occupied)</span>
+              </div>
+              <div class="my-lot-spec-item">
+                <span class="my-lot-spec-label">Operating Status</span>
+                <span class="my-lot-spec-val">${statusPill}</span>
+              </div>
+              <div class="my-lot-spec-item">
+                <span class="my-lot-spec-label">Host Account ID</span>
+                <span class="my-lot-spec-val" style="font-family: monospace; font-size: 0.78rem;">${lot.owner_id || currentUser.id}</span>
+              </div>
+              <div class="my-lot-spec-item">
+                <span class="my-lot-spec-label">Created Date</span>
+                <span class="my-lot-spec-val">${lot.created_at ? new Date(lot.created_at).toLocaleDateString() : 'Active'}</span>
+              </div>
+            </div>
           </div>
         `;
       }
@@ -3536,21 +3703,35 @@ if (!empty($_SESSION['auth_user'])) {
             }
           });
 
+          // Welcome greeting update
+          const welcomeUserEl = document.getElementById('dash-welcome-user');
+          if (welcomeUserEl && currentUser) {
+            welcomeUserEl.textContent = currentUser.name || currentUser.email || 'Driver & Host';
+          }
+
           // Section A: Metric counts
           const totalCars = dashboardState.cars.length;
           const assignedCarsCount = dashboardState.cars.filter(c => !!carAssignmentMap[c.id]).length;
           const myLotsCount = myLots.length;
           const activeResCount = dashboardState.reservations.filter(r => r.status === 'confirmed' || r.status === 'active').length;
 
+          // Pending counts
+          const pendingOwnerCount = (dashboardState.ownerReservations || []).filter(r => r.status === 'pending').length;
+          const pendingDriverCount = dashboardState.reservations.filter(r => (r.status || 'pending').toLowerCase() === 'pending').length;
+
           const statCars = document.getElementById('dash-stat-cars');
           const statAssigned = document.getElementById('dash-stat-assigned');
           const statLots = document.getElementById('dash-stat-lots');
           const statRes = document.getElementById('dash-stat-reservations');
+          const statOwnerPending = document.getElementById('dash-stat-owner-pending');
+          const statDriverPending = document.getElementById('dash-stat-driver-pending');
 
           if (statCars) statCars.textContent = totalCars;
           if (statAssigned) statAssigned.textContent = assignedCarsCount;
           if (statLots) statLots.textContent = myLotsCount;
           if (statRes) statRes.textContent = activeResCount;
+          if (statOwnerPending) statOwnerPending.textContent = pendingOwnerCount;
+          if (statDriverPending) statDriverPending.textContent = pendingDriverCount;
 
           // Section B: Render My Cars
           renderDashboardCars(dashboardState.cars, carAssignmentMap);
@@ -4438,13 +4619,18 @@ if (!empty($_SESSION['auth_user'])) {
           );
         }
 
-        const manageLotBtn = e.target.closest('.btn-manage-lot, .btn-select-lot');
+        const manageLotBtn = e.target.closest('.btn-manage-lot, .btn-select-lot, .clickable-lot-card');
         if (manageLotBtn) {
-          const lotId = manageLotBtn.dataset.lotId || manageLotBtn.dataset.id;
-          if (lotId) {
-            window.location.hash = '#my-spaces';
-            if (typeof selectLotDetail === 'function') {
-              selectLotDetail(lotId);
+          // If clicked inside another button or link inside the card, let that specific handler run
+          if (e.target.closest('button, a') && !e.target.closest('.btn-manage-lot')) {
+            // let default or specific sub-button handler execute
+          } else {
+            const lotId = manageLotBtn.dataset.lotId || manageLotBtn.dataset.id;
+            if (lotId) {
+              window.location.hash = '#my-spaces';
+              if (typeof selectLotDetail === 'function') {
+                selectLotDetail(lotId);
+              }
             }
           }
         }
@@ -4519,7 +4705,7 @@ if (!empty($_SESSION['auth_user'])) {
           openCarModal(null);
         }
 
-        const selectResBtn = e.target.closest('.btn-select-res, .my-res-card');
+        const selectResBtn = e.target.closest('.btn-select-res, .clickable-res-card, .my-res-card');
         if (selectResBtn) {
           // If clicked inside another button or link inside the card, let that specific handler run
           if (e.target.closest('button, a') && !e.target.closest('.btn-select-res')) {
@@ -4530,6 +4716,25 @@ if (!empty($_SESSION['auth_user'])) {
               selectReservationDetail(resId);
             }
           }
+        }
+
+        // Reservation filter buttons
+        const resFilterBtn = e.target.closest('#my-res-filter-controls .filter-btn');
+        if (resFilterBtn) {
+          const f = resFilterBtn.dataset.filter;
+          if (f && typeof setReservationFilter === 'function') {
+            setReservationFilter(f);
+          }
+        }
+
+        // Reservation summary metric pills as quick filter triggers
+        const resMetricPill = e.target.closest('#my-res-summary-metrics .my-res-metric-item');
+        if (resMetricPill && typeof setReservationFilter === 'function') {
+          const numId = resMetricPill.querySelector('.my-res-metric-num')?.id;
+          if (numId === 'res-metric-total') setReservationFilter('all');
+          else if (numId === 'res-metric-pending') setReservationFilter('pending');
+          else if (numId === 'res-metric-confirmed') setReservationFilter('confirmed');
+          else if (numId === 'res-metric-history') setReservationFilter('past');
         }
 
         const backToResBtn = e.target.closest('#btn-back-to-my-reservations, .btn-back-to-reservations');
