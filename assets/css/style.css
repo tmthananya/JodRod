@@ -1126,7 +1126,8 @@ textarea.form-input:focus {
 .character-3d-viewport {
   position: relative;
   width: 100%;
-  height: clamp(250px, 42vh, 320px);
+  height: clamp(270px, 44vh, 330px);
+  min-height: 270px;
   background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
   border: 3px solid var(--border-pixel);
   border-radius: 6px;
@@ -1150,31 +1151,33 @@ textarea.form-input:focus {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.78);
   color: #94a3b8;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   pointer-events: none;
   backdrop-filter: blur(4px);
   user-select: none;
+  z-index: 2;
 }
 
 .viewport-badge {
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background: rgba(2, 132, 199, 0.9);
+  background: rgba(2, 132, 199, 0.88);
   color: #ffffff;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-family: 'Press Start 2P', monospace;
-  padding: 4px 8px;
+  padding: 3px 7px;
   border-radius: 4px;
   border: 1px solid #38bdf8;
   pointer-events: none;
   letter-spacing: 0.5px;
+  z-index: 2;
 }
 
 /* 16-Bit Customizer Studio Category Tabs */
@@ -2155,7 +2158,8 @@ textarea.form-input:focus {
   }
 
   .character-3d-viewport {
-    height: 220px;
+    height: clamp(270px, 44vh, 320px);
+    min-height: 270px;
   }
 
   .action-card {
@@ -2190,6 +2194,14 @@ textarea.form-input:focus {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.my-spaces-header-actions .pixel-btn,
+.my-res-header-actions .pixel-btn {
+  min-height: 40px;
+  padding: 8px 16px;
+  font-size: 0.88rem;
+  line-height: 1.2;
 }
 
 .my-spaces-offer-box {
@@ -2373,12 +2385,27 @@ textarea.form-input:focus {
   }
   .my-spaces-header-actions {
     width: 100%;
-    justify-content: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .my-spaces-header-actions button,
   .my-spaces-header-actions a {
-    flex: 1;
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    box-sizing: border-box;
     text-align: center;
+    white-space: nowrap;
+  }
+  .my-spaces-header-actions #btn-open-offer-lot {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .my-spaces-header-actions #btn-refresh-my-lots,
+  .my-spaces-header-actions .btn-back-home {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
   }
   .my-lots-grid,
   .my-lot-req-grid {
@@ -2752,12 +2779,27 @@ textarea.form-input:focus {
   }
   .my-res-header-actions {
     width: 100%;
-    justify-content: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .my-res-header-actions button,
   .my-res-header-actions a {
-    flex: 1;
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    box-sizing: border-box;
     text-align: center;
+    white-space: nowrap;
+  }
+  .my-res-header-actions #btn-header-find-parking {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  .my-res-header-actions #btn-refresh-my-reservations,
+  .my-res-header-actions .btn-back-home {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
   }
   .my-res-metrics-bar {
     display: grid;

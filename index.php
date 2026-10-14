@@ -49,22 +49,22 @@ if (!empty($_SESSION['auth_user'])) {
       <ul class="nav-links" id="site-nav-links" style="display: none;">
         <li>
           <a href="#map" class="nav-link" id="nav-map">
-            <span>🗺️</span> Find Parking
+            Find Parking
           </a>
         </li>
         <li>
           <a href="#my-spaces" class="nav-link" id="nav-my-spaces">
-            <span>🅿️</span> My Parking Lots
+            My Parking Lots
           </a>
         </li>
         <li>
           <a href="#my-reservations" class="nav-link" id="nav-my-reservations">
-            <span>📋</span> My Reservations
+            My Reservations
           </a>
         </li>
         <li>
           <a href="#profile" class="nav-link" id="nav-profile">
-            <span>👤</span> My Profile
+            My Profile
           </a>
         </li>
       </ul>
@@ -73,7 +73,7 @@ if (!empty($_SESSION['auth_user'])) {
       <div class="user-auth-badge" id="nav-user-badge" style="display: none;">
         <span class="user-status-dot"></span>
         <span class="user-email-text" id="nav-user-email"></span>
-        <button type="button" class="pixel-btn pixel-btn-sm btn-logout" id="btn-logout" title="Sign out of account">🚪 Logout</button>
+        <button type="button" class="pixel-btn pixel-btn-sm btn-logout" id="btn-logout" title="Sign out of account">Logout</button>
       </div>
     </nav>
   </header>
@@ -90,7 +90,7 @@ if (!empty($_SESSION['auth_user'])) {
     <section id="auth-gate" class="auth-gate-section" style="display: flex;">
       <div class="auth-card">
         <div class="auth-header">
-          <div class="auth-icon">🛡️</div>
+          
           <div class="auth-badge">COMMUNITY AUTHENTICATION</div>
           <h1 class="auth-title">Flood Relief Access</h1>
           <p class="auth-subtitle">Sign in or create an account to access safe flood parking spaces, coordinate relief, and manage your profile.</p>
@@ -98,8 +98,8 @@ if (!empty($_SESSION['auth_user'])) {
 
         <!-- Auth Tabs: Login vs Sign Up -->
         <div class="auth-tabs-row">
-          <button type="button" class="auth-tab-btn active" id="tab-auth-login">🔑 Log In</button>
-          <button type="button" class="auth-tab-btn" id="tab-auth-signup">📝 Sign Up</button>
+          <button type="button" class="auth-tab-btn active" id="tab-auth-login">Log In</button>
+          <button type="button" class="auth-tab-btn" id="tab-auth-signup">Sign Up</button>
         </div>
 
         <!-- Feedback Alert Box -->
@@ -109,7 +109,7 @@ if (!empty($_SESSION['auth_user'])) {
         <form id="auth-form" novalidate>
           <div class="form-group">
             <label for="auth-email" class="form-label">
-              <span>📧 Email Address</span>
+              Email Address
             </label>
             <input 
               type="email" 
@@ -124,7 +124,7 @@ if (!empty($_SESSION['auth_user'])) {
 
           <div class="form-group" style="margin-top: 14px;">
             <label for="auth-password" class="form-label">
-              <span>🔒 Password</span>
+              Password
             </label>
             <input 
               type="password" 
@@ -140,7 +140,7 @@ if (!empty($_SESSION['auth_user'])) {
 
           <div style="margin-top: 20px;">
             <button type="submit" class="pixel-btn pixel-btn-blue pixel-btn-lg" id="btn-auth-submit" style="width: 100%;">
-              <span>🔑</span> Log In
+              Log In
             </button>
           </div>
 
@@ -162,7 +162,7 @@ if (!empty($_SESSION['auth_user'])) {
 
       <!-- Hero Banner -->
       <section class="hero-card">
-        <div class="hero-badge">🌊 Real-World Flood Relief &bull; Safe Parking Network</div>
+        <div class="hero-badge">Real-World Flood Relief &bull; Safe Parking Network</div>
         <h1 class="brand-font hero-title">
           Safe Parking During Floods
         </h1>
@@ -179,7 +179,7 @@ if (!empty($_SESSION['auth_user'])) {
           <article class="action-card find-parking" id="card-find-parking">
             <div>
               <div class="action-card-header">
-                <div class="action-card-icon">🔍</div>
+                <div class="action-card-icon">FIND</div>
                 <div>
                   <span class="action-badge">FOR DRIVERS</span>
                   <h2 class="action-title">1. Find Parking</h2>
@@ -189,14 +189,14 @@ if (!empty($_SESSION['auth_user'])) {
                 Find safe, elevated parking spaces nearby to protect your vehicle from rising floodwaters.
               </p>
               <ul class="action-points-list">
-                <li>✅ View safe parking locations on the real map</li>
-                <li>✅ See live available space counts</li>
-                <li>✅ Request parking with mutual confirmation</li>
+                <li>• View safe parking locations on the real map</li>
+                <li>• See live available space counts</li>
+                <li>• Request parking with mutual confirmation</li>
               </ul>
             </div>
             <div>
               <a href="#map" class="pixel-btn pixel-btn-blue action-btn" style="width: 100%;" id="btn-action-find">
-                <span>🚗</span> Find Safe Parking
+                Find Safe Parking
               </a>
             </div>
           </article>
@@ -205,7 +205,7 @@ if (!empty($_SESSION['auth_user'])) {
           <article class="action-card offer-parking" id="card-offer-parking">
             <div>
               <div class="action-card-header">
-                <div class="action-card-icon">🅿️</div>
+                <div class="action-card-icon">OFFER</div>
                 <div>
                   <span class="action-badge">FOR PARKING OWNERS</span>
                   <h2 class="action-title">2. Offer Parking Space</h2>
@@ -215,14 +215,14 @@ if (!empty($_SESSION['auth_user'])) {
                 Share your elevated driveway, yard, or lot with neighbors whose vehicles are at risk.
               </p>
               <ul class="action-points-list">
-                <li>✅ Pin your parking location on the map</li>
-                <li>✅ Set your total vehicle capacity</li>
-                <li>✅ Review and confirm parking requests</li>
+                <li>• Pin your parking location on the map</li>
+                <li>• Set your total vehicle capacity</li>
+                <li>• Review and confirm parking requests</li>
               </ul>
             </div>
             <div>
               <a href="#my-spaces" class="pixel-btn pixel-btn-green action-btn" style="width: 100%;" id="btn-action-offer">
-                <span>🅿️</span> Offer Parking Space
+                Offer Parking Space
               </a>
             </div>
           </article>
@@ -233,7 +233,7 @@ if (!empty($_SESSION['auth_user'])) {
       <!-- Realistic Community Concept & Flow -->
       <section class="concept-section">
         <h3 class="section-title">
-          <span>🔄</span> How Flood Parking Works
+          How Flood Parking Works
         </h3>
         <p class="section-subtitle">
           A clear, community-driven workflow powered by mutual confirmation.
@@ -273,7 +273,7 @@ if (!empty($_SESSION['auth_user'])) {
     <section id="section-map" class="nav-content-section active">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <div>
-          <h2 class="section-title" style="margin-bottom: 2px;"><span>🗺️</span> Find Safe Parking</h2>
+          <h2 class="section-title" style="margin-bottom: 2px;">Find Safe Parking</h2>
           <p class="section-subtitle" style="margin: 0;">Explore real flood-safe parking locations, find elevated high ground, and request emergency parking.</p>
         </div>
       </div>
@@ -284,12 +284,12 @@ if (!empty($_SESSION['auth_user'])) {
       <!-- Map Toolbar: City Jump Shortcuts & Zero Data Status -->
       <div class="map-toolbar">
         <div class="city-jump-group">
-          <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">📍 Quick Jump:</span>
+          <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">Quick Jump:</span>
           <button type="button" class="city-btn btn-city-jump" data-city="chiangmai">Chiang Mai</button>
           <button type="button" class="city-btn btn-city-jump" data-city="bangkok">Bangkok</button>
         </div>
         <div class="map-status-pill" id="map-status-badge">
-          <span>🅿️</span> Active Parking Spaces: <strong style="color: #0284c7; margin-left: 4px;">0 (Zero Data)</strong>
+          Active Parking Spaces: <strong style="color: #0284c7; margin-left: 4px;">0 (Zero Data)</strong>
         </div>
       </div>
 
@@ -306,10 +306,10 @@ if (!empty($_SESSION['auth_user'])) {
           <span style="font-size: 0.82rem; color: #64748b;">(Lat: <span id="selected-lat">18.78830</span>, Lng: <span id="selected-lng">98.98530</span>)</span>
         </div>
         <div style="font-size: 0.82rem; color: #475569; font-weight: 600;">
-          💡 Click anywhere on the map to change the selected coordinates.
+          Click anywhere on the map to change the selected coordinates.
         </div>
         <a href="#my-spaces" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-offer-from-map">
-          🅿️ Offer Space at Selected Location &rarr;
+          Offer Space at Selected Location &rarr;
         </a>
       </div>
 
@@ -318,7 +318,7 @@ if (!empty($_SESSION['auth_user'])) {
         <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
           <div>
             <h3 class="section-title" style="margin-bottom: 2px;">
-              <span>🅿️</span> Active Parking Spaces
+              Active Parking Spaces
             </h3>
             <p class="section-subtitle" style="margin: 0;">Retrieved live from the database. Search parking spaces by name or owner.</p>
           </div>
@@ -328,7 +328,7 @@ if (!empty($_SESSION['auth_user'])) {
                 type="text" 
                 id="spaces-search-input" 
                 class="form-input" 
-                placeholder="🔍 Search by parking lot name or owner..." 
+                placeholder="Search by parking lot name or owner..." 
                 style="padding-right: 28px; width: 100%; margin: 0; min-height: 38px;"
               />
               <button 
@@ -352,17 +352,17 @@ if (!empty($_SESSION['auth_user'])) {
       <!-- Header Bar -->
       <div class="my-res-header-bar">
         <div>
-          <h2 class="section-title"><span>📋</span> My Reservations</h2>
+          <h2 class="section-title">My Reservations</h2>
           <p class="section-subtitle">View and manage your safe flood parking reservations, status updates, and vehicles.</p>
         </div>
         <div class="my-res-header-actions">
           <a href="#map" class="pixel-btn pixel-btn-blue" id="btn-header-find-parking">
-            <span>🗺️</span> Find Parking
+            Find Parking
           </a>
-          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-refresh-my-reservations" title="Reload live data from Supabase">
-            <span>🔄</span> Refresh
+          <button type="button" class="pixel-btn" id="btn-refresh-my-reservations" title="Reload live data from Supabase">
+            Refresh
           </button>
-          <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
+          <a href="#home" class="pixel-btn btn-back-home">&larr; Back to Home</a>
         </div>
       </div>
 
@@ -374,14 +374,14 @@ if (!empty($_SESSION['auth_user'])) {
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
           <div>
             <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 4px;">
-              <span>🚘</span> My Vehicles (Cars)
+              My Vehicles (Cars)
             </h3>
             <p style="font-size: 0.88rem; color: #64748b; margin: 0;">
               Register your cars to link them with parking reservations. One account can own multiple cars.
             </p>
           </div>
           <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-toggle-add-car">
-            <span>➕</span> Add Vehicle
+            Add Vehicle
           </button>
         </div>
 
@@ -399,7 +399,7 @@ if (!empty($_SESSION['auth_user'])) {
           </div>
           <div style="display: flex; gap: 8px; justify-content: flex-end;">
             <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-add-car">Cancel</button>
-            <button type="submit" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-submit-car">💾 Save Vehicle</button>
+            <button type="submit" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-submit-car">Save Vehicle</button>
           </div>
         </form>
 
@@ -435,16 +435,16 @@ if (!empty($_SESSION['auth_user'])) {
         <!-- Status Filter Tabs (All, Pending, Confirmed, Past/Cancelled) -->
         <div class="my-res-filter-bar" id="my-res-filter-controls">
           <button type="button" class="pixel-btn pixel-btn-sm filter-btn active" data-filter="all" id="btn-filter-all">
-            📋 All (<span id="filter-count-all">0</span>)
+            All (<span id="filter-count-all">0</span>)
           </button>
           <button type="button" class="pixel-btn pixel-btn-sm filter-btn" data-filter="pending" id="btn-filter-pending">
-            ⏳ Pending (<span id="filter-count-pending">0</span>)
+            Pending (<span id="filter-count-pending">0</span>)
           </button>
           <button type="button" class="pixel-btn pixel-btn-sm filter-btn" data-filter="confirmed" id="btn-filter-confirmed">
-            🟢 Confirmed (<span id="filter-count-confirmed">0</span>)
+            Confirmed (<span id="filter-count-confirmed">0</span>)
           </button>
           <button type="button" class="pixel-btn pixel-btn-sm filter-btn" data-filter="past" id="btn-filter-past">
-            📁 Past / Cancelled (<span id="filter-count-past">0</span>)
+            Past / Cancelled (<span id="filter-count-past">0</span>)
           </button>
         </div>
 
@@ -474,17 +474,17 @@ if (!empty($_SESSION['auth_user'])) {
       <!-- Header Bar -->
       <div class="my-spaces-header-bar">
         <div>
-          <h2 class="section-title"><span>🅿️</span> My Parking Lots</h2>
+          <h2 class="section-title">My Parking Lots</h2>
           <p class="section-subtitle">Manage your flood-safe elevated spaces, review driver requests, and offer new lots.</p>
         </div>
         <div class="my-spaces-header-actions">
           <button type="button" class="pixel-btn pixel-btn-green" id="btn-open-offer-lot">
-            <span>🅿️</span> Offer Parking Lot
+            Offer Parking Lot
           </button>
-          <button type="button" class="pixel-btn pixel-btn-sm" id="btn-refresh-my-lots" title="Reload live data from Supabase">
-            <span>🔄</span> Refresh
+          <button type="button" class="pixel-btn" id="btn-refresh-my-lots" title="Reload live data from Supabase">
+            Refresh
           </button>
-          <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
+          <a href="#home" class="pixel-btn btn-back-home">&larr; Back to Home</a>
         </div>
       </div>
 
@@ -495,10 +495,10 @@ if (!empty($_SESSION['auth_user'])) {
       <div id="offer-parking-form-container" class="form-card my-spaces-offer-box" style="display: none; margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
           <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 8px;">
-            <span>🅿️</span> Offer Parking Space
+            Offer Parking Space
           </h3>
           <button type="button" class="pixel-btn pixel-btn-sm" id="btn-close-offer-form" title="Close offer form">
-            ✕ Close Form
+            Close Form
           </button>
         </div>
         <p style="font-size: 0.88rem; color: #64748b; margin-bottom: 20px;">
@@ -532,7 +532,7 @@ if (!empty($_SESSION['auth_user'])) {
                 </div>
               </div>
               <button type="button" id="btn-pick-location" class="pixel-btn pixel-btn-blue coords-pick-btn">
-                🗺️ Select on Map
+                Select on Map
               </button>
             </div>
             <div class="form-help">Click anywhere on the real map to set new coordinates.</div>
@@ -564,14 +564,14 @@ if (!empty($_SESSION['auth_user'])) {
           </div>
 
           <button type="submit" id="btn-submit-space" class="pixel-btn pixel-btn-green" style="width: 100%; padding: 14px; font-size: 1.05rem;">
-            <span>🅿️</span> Save & Offer Parking Space
+            Save & Offer Parking Space
           </button>
 
         </form>
       </div>
 
       <!-- Hidden compatibility elements for existing legacy hooks -->
-      <div id="owner-incoming-requests-container" style="display: none;"></div>
+      <div id="owner-incoming-requests-container" style="display: none;"><!-- Incoming Parking Requests (Owner Approval) --></div>
       <div id="owner-requests-alert" style="display: none;"></div>
 
       <!-- ========================================================
@@ -579,7 +579,7 @@ if (!empty($_SESSION['auth_user'])) {
            ======================================================== -->
       <div id="my-lots-step1-view">
         <div id="my-lots-list-container">
-          <div class="empty-spaces-notice"><span>⏳</span> Loading your parking lots...</div>
+          <div class="empty-spaces-notice">Loading your parking lots...</div>
         </div>
       </div>
 
@@ -600,7 +600,7 @@ if (!empty($_SESSION['auth_user'])) {
     <section id="section-points" class="nav-content-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h2 class="section-title"><span>⭐</span> Community Points</h2>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
+        <a href="#home" class="pixel-btn btn-back-home">&larr; Back to Home</a>
       </div>
       <p class="section-subtitle">Your volunteer points and community helper score.</p>
       <div class="placeholder-notice">
@@ -616,7 +616,7 @@ if (!empty($_SESSION['auth_user'])) {
           <h2 class="section-title">My Profile</h2>
           <p class="section-subtitle">Manage your player identity and custom 3D avatar for flood parking.</p>
         </div>
-        <a href="#home" class="pixel-btn pixel-btn-sm btn-back-home">&larr; Back to Home</a>
+        <a href="#home" class="pixel-btn btn-back-home">&larr; Back to Home</a>
       </div>
 
       <!-- Profile Action Alert Box -->
@@ -844,7 +844,7 @@ if (!empty($_SESSION['auth_user'])) {
   <div id="edit-space-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 id="edit-modal-title" class="modal-title"><span>✏️</span> Edit Parking Space</h3>
+        <h3 id="edit-modal-title" class="modal-title">Edit Parking Space</h3>
         <button type="button" class="modal-close-btn" id="btn-close-edit-modal" title="Close">&times;</button>
       </div>
 
@@ -894,7 +894,7 @@ if (!empty($_SESSION['auth_user'])) {
         <div class="modal-actions">
           <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-edit">Cancel</button>
           <button type="submit" class="pixel-btn pixel-btn-green" id="btn-save-edit-space">
-            <span>💾</span> Save Changes
+            Save Changes
           </button>
         </div>
       </form>
@@ -905,7 +905,7 @@ if (!empty($_SESSION['auth_user'])) {
   <div id="modal-car" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-car-title">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 id="modal-car-title" class="modal-title"><span>🚘</span> <span id="modal-car-title-text">Register Vehicle</span></h3>
+        <h3 id="modal-car-title" class="modal-title"><span id="modal-car-title-text">Register Vehicle</span></h3>
         <button type="button" class="modal-close-btn" id="btn-close-car-modal" title="Close">&times;</button>
       </div>
       <div id="modal-car-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 14px;"></div>
@@ -924,7 +924,7 @@ if (!empty($_SESSION['auth_user'])) {
         <div class="modal-actions" style="margin-top: 20px;">
           <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-car-modal">Cancel</button>
           <button type="submit" class="pixel-btn pixel-btn-green" id="btn-submit-car-modal">
-            <span>💾</span> Save Vehicle
+            Save Vehicle
           </button>
         </div>
       </form>
@@ -935,7 +935,7 @@ if (!empty($_SESSION['auth_user'])) {
   <div id="modal-reserve-car" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-reserve-title">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 id="modal-reserve-title" class="modal-title"><span>🅿️</span> Request Parking Reservation</h3>
+        <h3 id="modal-reserve-title" class="modal-title">Request Parking Reservation</h3>
         <button type="button" class="modal-close-btn" id="btn-close-reserve-modal" title="Close">&times;</button>
       </div>
       <div id="modal-reserve-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 14px;"></div>
@@ -948,10 +948,10 @@ if (!empty($_SESSION['auth_user'])) {
           <div id="reserve-modal-car-help" class="form-help">Select one of your registered flood evacuation vehicles.</div>
           <!-- Helpful guidance when no cars are registered -->
           <div id="reserve-modal-no-cars-notice" class="alert-message warning" style="display: none; margin-top: 10px;">
-            <span>🚘</span> You haven't added a car yet.
+            You haven't added a car yet.
             <div style="margin-top: 8px;">
               <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue" id="btn-modal-go-add-car">
-                ➕ Add a Car in My Vehicles
+                Add a Car in My Vehicles
               </button>
             </div>
           </div>
@@ -970,7 +970,7 @@ if (!empty($_SESSION['auth_user'])) {
         <div class="modal-actions" style="margin-top: 20px;">
           <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-reserve-modal">Cancel</button>
           <button type="submit" class="pixel-btn pixel-btn-green" id="btn-submit-reserve-modal">
-            <span>📩</span> Request Reservation
+            Request Reservation
           </button>
         </div>
       </form>
@@ -982,7 +982,7 @@ if (!empty($_SESSION['auth_user'])) {
        ======================================================== -->
   <footer>
     <p>
-      🚗 <strong>JodRod &bull; Flood Parking Community</strong> &bull; Civic Disaster Relief Initiative<br>
+      <strong>JodRod &bull; Flood Parking Community</strong> &bull; Civic Disaster Relief Initiative<br>
       Connecting neighbors to keep vehicles safe during flood emergencies.
     </p>
   </footer>
@@ -1036,7 +1036,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (mode === 'signup') {
           tabSignup.classList.add('active');
           tabLogin.classList.remove('active');
-          btnAuthSubmit.innerHTML = '<span>✨</span> Create Account';
+          btnAuthSubmit.innerHTML = 'Create Account';
           btnAuthSubmit.className = 'pixel-btn pixel-btn-green pixel-btn-lg';
           authSwitchPrompt.innerHTML = `Already have an account? <a href="#" id="link-switch-to-login" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Log in</a>`;
           document.getElementById('link-switch-to-login')?.addEventListener('click', (e) => {
@@ -1046,7 +1046,7 @@ if (!empty($_SESSION['auth_user'])) {
         } else {
           tabLogin.classList.add('active');
           tabSignup.classList.remove('active');
-          btnAuthSubmit.innerHTML = '<span>🔑</span> Log In';
+          btnAuthSubmit.innerHTML = 'Log In';
           btnAuthSubmit.className = 'pixel-btn pixel-btn-blue pixel-btn-lg';
           authSwitchPrompt.innerHTML = `Don't have an account? <a href="#" id="link-switch-to-signup" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Sign up now</a>`;
           document.getElementById('link-switch-to-signup')?.addEventListener('click', (e) => {
@@ -1118,7 +1118,7 @@ if (!empty($_SESSION['auth_user'])) {
         const password = document.getElementById('auth-password').value;
 
         if (!email || !password) {
-          showAuthAlert('error', '⚠️ Please enter both email and password.');
+          showAuthAlert('error', 'Please enter both email and password.');
           return;
         }
 
@@ -1144,17 +1144,17 @@ if (!empty($_SESSION['auth_user'])) {
               window.location.hash = '#map';
               updateAuthUI();
             } else if (json.requires_confirmation) {
-              showAuthAlert('success', `🎉 <strong>Account Created!</strong> ${json.message}<br><small>If you have auto-confirm enabled or confirmed via email, click "Log In" above.</small>`);
+              showAuthAlert('success', `<strong>Account Created!</strong> ${json.message}<br><small>If you have auto-confirm enabled or confirmed via email, click "Log In" above.</small>`);
               setAuthMode('login');
             }
           } else {
-            showAuthAlert('error', `❌ <strong>${currentAuthMode === 'login' ? 'Login Failed' : 'Sign Up Failed'}:</strong> ${json.error || 'Server error'}`);
+            showAuthAlert('error', `<strong>${currentAuthMode === 'login' ? 'Login Failed' : 'Sign Up Failed'}:</strong> ${json.error || 'Server error'}`);
           }
         } catch (err) {
-          showAuthAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+          showAuthAlert('error', `<strong>Network error:</strong> ${err.message}`);
         } finally {
           btnAuthSubmit.disabled = false;
-          btnAuthSubmit.innerHTML = (currentAuthMode === 'login') ? '<span>🔑</span> Log In' : '<span>✨</span> Create Account';
+          btnAuthSubmit.innerHTML = (currentAuthMode === 'login') ? 'Log In' : 'Create Account';
         }
       });
 
@@ -1172,7 +1172,7 @@ if (!empty($_SESSION['auth_user'])) {
         } catch (e) {}
         currentUser = null;
         updateAuthUI();
-        showAuthAlert('success', '🚪 <strong>Logged out.</strong> You have successfully signed out.');
+        showAuthAlert('success', '<strong>Logged out.</strong> You have successfully signed out.');
       });
 
       const navLinks = {
@@ -1320,30 +1320,30 @@ if (!empty($_SESSION['auth_user'])) {
 
           // Client-side Validation
           if (!name) {
-            showAlert('error', '⚠️ Please enter a parking space name.');
+            showAlert('error', 'Please enter a parking space name.');
             document.getElementById('offer-name').focus();
             return;
           }
 
           if (isNaN(latitude) || isNaN(longitude)) {
-            showAlert('error', '⚠️ Please select a location on the map first.');
+            showAlert('error', 'Please select a location on the map first.');
             return;
           }
 
           if (isNaN(capacity) || capacity <= 0) {
-            showAlert('error', '⚠️ Total capacity must be greater than 0.');
+            showAlert('error', 'Total capacity must be greater than 0.');
             document.getElementById('offer-capacity').focus();
             return;
           }
 
           if (isNaN(available_spaces) || available_spaces < 0) {
-            showAlert('error', '⚠️ Available spaces cannot be negative.');
+            showAlert('error', 'Available spaces cannot be negative.');
             document.getElementById('offer-available-spaces').focus();
             return;
           }
 
           if (available_spaces > capacity) {
-            showAlert('error', '⚠️ Available spaces cannot exceed total capacity (' + capacity + ').');
+            showAlert('error', 'Available spaces cannot exceed total capacity (' + capacity + ').');
             document.getElementById('offer-available-spaces').focus();
             return;
           }
@@ -1375,7 +1375,7 @@ if (!empty($_SESSION['auth_user'])) {
 
             if (response.ok && result.success) {
               showAlert('success', `
-                🎉 <strong>Parking Space Offered Successfully!</strong><br>
+                <strong>Parking Space Offered Successfully!</strong><br>
                 <span>"${result.data.name}" (${result.data.available_spaces}/${result.data.capacity} spots, status: ${result.data.status}) is now active on the map.</span>
               `);
 
@@ -1405,13 +1405,13 @@ if (!empty($_SESSION['auth_user'])) {
                 }, 1500);
               }
             } else {
-              showAlert('error', `❌ <strong>Failed to create space:</strong> ${result.error || 'Server error'}`);
+              showAlert('error', `<strong>Failed to create space:</strong> ${result.error || 'Server error'}`);
             }
           } catch (err) {
-            showAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+            showAlert('error', `<strong>Network error:</strong> ${err.message}`);
           } finally {
             btnSubmit.disabled = false;
-            btnSubmit.innerHTML = '<span>🅿️</span> Save & Offer Parking Space';
+            btnSubmit.innerHTML = 'Save & Offer Parking Space';
           }
         });
       }
@@ -1439,30 +1439,30 @@ if (!empty($_SESSION['auth_user'])) {
           const status = document.getElementById('edit-space-status').value;
 
           if (!id) {
-            showEditAlert('error', '⚠️ Missing parking space ID.');
+            showEditAlert('error', 'Missing parking space ID.');
             return;
           }
 
           if (!name) {
-            showEditAlert('error', '⚠️ Please enter a parking space name.');
+            showEditAlert('error', 'Please enter a parking space name.');
             document.getElementById('edit-space-name').focus();
             return;
           }
 
           if (isNaN(capacity) || capacity <= 0) {
-            showEditAlert('error', '⚠️ Total capacity must be greater than 0.');
+            showEditAlert('error', 'Total capacity must be greater than 0.');
             document.getElementById('edit-space-capacity').focus();
             return;
           }
 
           if (isNaN(available_spaces) || available_spaces < 0) {
-            showEditAlert('error', '⚠️ Available spaces cannot be negative.');
+            showEditAlert('error', 'Available spaces cannot be negative.');
             document.getElementById('edit-space-available').focus();
             return;
           }
 
           if (available_spaces > capacity) {
-            showEditAlert('error', '⚠️ Available spaces cannot exceed total capacity (' + capacity + ').');
+            showEditAlert('error', 'Available spaces cannot exceed total capacity (' + capacity + ').');
             document.getElementById('edit-space-available').focus();
             return;
           }
@@ -1492,7 +1492,7 @@ if (!empty($_SESSION['auth_user'])) {
 
             if (response.ok && result.success) {
               showEditAlert('success', `
-                ✅ <strong>Parking Space Updated Successfully!</strong><br>
+                <strong>Parking Space Updated Successfully!</strong><br>
                 <span>Changes saved: "${result.data.name}" (${result.data.available_spaces}/${result.data.capacity} spots, status: ${result.data.status}).</span>
               `);
 
@@ -1511,13 +1511,13 @@ if (!empty($_SESSION['auth_user'])) {
                 }
               }, 1200);
             } else {
-              showEditAlert('error', `❌ <strong>Failed to update:</strong> ${result.error || 'Server error'}`);
+              showEditAlert('error', `<strong>Failed to update:</strong> ${result.error || 'Server error'}`);
             }
           } catch (err) {
-            showEditAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+            showEditAlert('error', `<strong>Network error:</strong> ${err.message}`);
           } finally {
             btnSaveEdit.disabled = false;
-            btnSaveEdit.innerHTML = '<span>💾</span> Save Changes';
+            btnSaveEdit.innerHTML = 'Save Changes';
           }
         });
       }
@@ -1794,7 +1794,7 @@ if (!empty($_SESSION['auth_user'])) {
           return `<div class="profile-avatar-portrait"><img src="${data.snapshot}" alt="3D Character"></div>`;
         }
         // Legacy fallback
-        return `<div class="profile-avatar-portrait"><span class="profile-avatar-fallback">👤</span></div>`;
+        return `<div class="profile-avatar-portrait"><span class="profile-avatar-fallback">PIC</span></div>`;
       }
 
       function getAvatarSpecsBadge(avatarRaw) {
@@ -2194,7 +2194,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (!profile) return;
 
         if (!currentUser || !profile.user_id || profile.user_id !== currentUser.id) {
-          showProfileAlert('error', '⚠️ Forbidden: You can edit only your own profile.');
+          showProfileAlert('error', 'Forbidden: You can edit only your own profile.');
           return;
         }
 
@@ -2250,7 +2250,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (!currentUser) {
           container.innerHTML = `
             <div class="empty-spaces-notice">
-              <span>🔒</span> Please log in to view and manage your reservations.
+              Please log in to view and manage your reservations.
             </div>
           `;
           const metricsBox = document.getElementById('my-res-summary-metrics');
@@ -2266,7 +2266,7 @@ if (!empty($_SESSION['auth_user'])) {
           if (!res.ok || !json.success) {
             container.innerHTML = `
               <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
-                ❌ Could not load reservations: ${json.error || 'Server error'}
+                Could not load reservations: ${json.error || 'Server error'}
               </div>
             `;
             return;
@@ -2324,7 +2324,7 @@ if (!empty($_SESSION['auth_user'])) {
         } catch (err) {
           container.innerHTML = `
             <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
-              ❌ Network error while loading reservations: ${err.message}
+              Network error while loading reservations: ${err.message}
             </div>
           `;
         }
@@ -2342,12 +2342,12 @@ if (!empty($_SESSION['auth_user'])) {
         if (!reservations || reservations.length === 0) {
           container.innerHTML = `
             <div class="empty-spaces-notice">
-              <span style="font-size: 1.5rem; display: block; margin-bottom: 8px;">📋</span>
+              
               <strong>No flood parking reservations found.</strong><br>
               Browse available high-ground parking lots on the interactive map to protect your vehicle.
               <div style="margin-top: 14px;">
                 <a href="#map" class="pixel-btn pixel-btn-blue">
-                  <span>🗺️</span> Find Parking on Map &rarr;
+                  Find Parking on Map &rarr;
                 </a>
               </div>
             </div>
@@ -2385,7 +2385,7 @@ if (!empty($_SESSION['auth_user'])) {
           };
           container.innerHTML = `
             <div class="empty-spaces-notice">
-              <span style="font-size: 1.4rem; display: block; margin-bottom: 8px;">🔍</span>
+              
               <strong>No ${filterLabels[filter] || filter} reservations found.</strong>
               <div style="margin-top: 10px;">
                 <button type="button" class="pixel-btn pixel-btn-sm" onclick="setReservationFilter('all')">
@@ -2410,15 +2410,15 @@ if (!empty($_SESSION['auth_user'])) {
 
           let statusPill = '';
           if (isConfirmed) {
-            statusPill = '<span class="status-pill status-available">🟢 CONFIRMED</span>';
+            statusPill = '<span class="status-pill status-available">CONFIRMED</span>';
           } else if (isPending) {
-            statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">⏳ PENDING APPROVAL</span>';
+            statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">PENDING APPROVAL</span>';
           } else if (isRejected) {
-            statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 REJECTED</span>';
+            statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">REJECTED</span>';
           } else if (isCancelled) {
-            statusPill = '<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">⚪ CANCELLED</span>';
+            statusPill = '<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">CANCELLED</span>';
           } else if (isCompleted) {
-            statusPill = '<span class="status-pill" style="background:#f0fdf4; color:#15803d; border-color:#86efac;">⭐ COMPLETED</span>';
+            statusPill = '<span class="status-pill" style="background:#f0fdf4; color:#15803d; border-color:#86efac;">COMPLETED</span>';
           } else {
             statusPill = `<span class="status-pill">${escapeHtml(status.toUpperCase())}</span>`;
           }
@@ -2434,18 +2434,18 @@ if (!empty($_SESSION['auth_user'])) {
             <article class="my-res-card clickable-res-card" id="my-res-card-${r.id}" data-res-id="${r.id}" title="Click to view full reservation details">
               <div>
                 <div class="my-res-card-header">
-                  <h4 class="my-res-card-title">🚗 ${escapeHtml(spaceName)}</h4>
+                  <h4 class="my-res-card-title">${escapeHtml(spaceName)}</h4>
                   ${statusPill}
                 </div>
                 <div class="my-res-card-body" style="margin-top: 10px;">
-                  <div><strong>Vehicle:</strong> 🚘 <span class="dash-car-plate" style="font-size: 0.74rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}</div>
-                  <div><strong>Requested:</strong> 📅 ${createdAtFormatted}</div>
-                  ${lat && lng ? `<div><strong>Location:</strong> 📍 <span style="font-family: monospace; font-size: 0.8rem;">${lat}, ${lng}</span></div>` : ''}
+                  <div><strong>Vehicle:</strong> <span class="dash-car-plate" style="font-size: 0.74rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}</div>
+                  <div><strong>Requested:</strong> ${createdAtFormatted}</div>
+                  ${lat && lng ? `<div><strong>Location:</strong> <span style="font-family: monospace; font-size: 0.8rem;">${lat}, ${lng}</span></div>` : ''}
                 </div>
               </div>
               <div class="my-res-card-actions">
                 <button type="button" class="pixel-btn pixel-btn-blue btn-select-res" data-res-id="${r.id}" style="width: 100%;">
-                  <span>📋</span> View Details & Manage &rarr;
+                  View Details & Manage &rarr;
                 </button>
               </div>
             </article>
@@ -2509,15 +2509,15 @@ if (!empty($_SESSION['auth_user'])) {
 
         let statusPill = '';
         if (isConfirmed) {
-          statusPill = '<span class="status-pill status-available">🟢 CONFIRMED</span>';
+          statusPill = '<span class="status-pill status-available">CONFIRMED</span>';
         } else if (isPending) {
-          statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">⏳ PENDING APPROVAL</span>';
+          statusPill = '<span class="status-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">PENDING APPROVAL</span>';
         } else if (isRejected) {
-          statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 REJECTED</span>';
+          statusPill = '<span class="status-pill status-closed" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">REJECTED</span>';
         } else if (isCancelled) {
-          statusPill = '<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">⚪ CANCELLED</span>';
+          statusPill = '<span class="status-pill" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1;">CANCELLED</span>';
         } else if (isCompleted) {
-          statusPill = '<span class="status-pill" style="background:#f0fdf4; color:#15803d; border-color:#86efac;">⭐ COMPLETED</span>';
+          statusPill = '<span class="status-pill" style="background:#f0fdf4; color:#15803d; border-color:#86efac;">COMPLETED</span>';
         } else {
           statusPill = `<span class="status-pill">${escapeHtml(status.toUpperCase())}</span>`;
         }
@@ -2546,7 +2546,7 @@ if (!empty($_SESSION['auth_user'])) {
           step2Title = 'Approved';
           step2Desc = 'Owner accepted request';
           step3Class += ' completed';
-          step3Dot = '🛡️';
+          step3Dot = '3';
           step3Title = 'Spot Secured';
           step3Desc = 'Protected high ground';
         } else if (isRejected) {
@@ -2564,7 +2564,7 @@ if (!empty($_SESSION['auth_user'])) {
           step2Title = 'Cancelled';
           step2Desc = 'Request cancelled';
           step3Class += ' cancelled';
-          step3Dot = '⚪';
+          step3Dot = '3';
           step3Title = 'Space Returned';
           step3Desc = 'Restored to community';
         } else if (isCompleted) {
@@ -2591,52 +2591,52 @@ if (!empty($_SESSION['auth_user'])) {
           `;
           actionButtonsHtml = `
             <button type="button" class="pixel-btn pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${escapeHtml(spaceName)}">
-              <span>❌</span> Cancel Request
+              Cancel Request
             </button>
             ${space.latitude && space.longitude ? `
               <button type="button" class="pixel-btn pixel-btn-blue btn-view-reservation-map" data-lat="${space.latitude}" data-lng="${space.longitude}">
-                <span>🗺️</span> View Lot on Map
+                View Lot on Map
               </button>
             ` : ''}
           `;
         } else if (isConfirmed) {
           actionBannerHtml = `
             <div class="my-res-action-banner banner-confirmed">
-              🟢 <strong>Reservation Confirmed:</strong> Your flood parking space is secured on high ground. 
+              <strong>Reservation Confirmed:</strong> Your flood parking space is secured on high ground. 
               If you no longer need this space, please cancel promptly so your spot is returned to neighbors in need.
             </div>
           `;
           actionButtonsHtml = `
             <button type="button" class="pixel-btn pixel-btn-red btn-cancel-reservation" data-id="${r.id}" data-name="${escapeHtml(spaceName)}">
-              <span>❌</span> Cancel Spot
+              Cancel Spot
             </button>
             ${space.latitude && space.longitude ? `
               <button type="button" class="pixel-btn pixel-btn-blue btn-view-reservation-map" data-lat="${space.latitude}" data-lng="${space.longitude}">
-                <span>🗺️</span> View Lot on Map
+                View Lot on Map
               </button>
             ` : ''}
           `;
         } else if (isRejected) {
           actionBannerHtml = `
             <div class="my-res-action-banner banner-rejected">
-              🔴 <strong>Request Declined:</strong> The parking lot owner declined this reservation request 
+              <strong>Request Declined:</strong> The parking lot owner declined this reservation request 
               (the lot may have filled or become inaccessible). Your vehicle has been released so you can find another high-ground parking space immediately.
             </div>
           `;
           actionButtonsHtml = `
             <a href="#map" class="pixel-btn pixel-btn-blue">
-              <span>🔍</span> Find Another Parking Lot on Map &rarr;
+              Find Another Parking Lot on Map &rarr;
             </a>
           `;
         } else if (isCancelled) {
           actionBannerHtml = `
             <div class="my-res-action-banner banner-cancelled">
-              ⚪ <strong>Reservation Cancelled:</strong> This reservation was cancelled and the parking spot was returned to open community capacity.
+              <strong>Reservation Cancelled:</strong> This reservation was cancelled and the parking spot was returned to open community capacity.
             </div>
           `;
           actionButtonsHtml = `
             <a href="#map" class="pixel-btn pixel-btn-blue">
-              <span>🔍</span> Browse Available Parking Lots on Map &rarr;
+              Browse Available Parking Lots on Map &rarr;
             </a>
           `;
         } else if (isCompleted) {
@@ -2647,7 +2647,7 @@ if (!empty($_SESSION['auth_user'])) {
           `;
           actionButtonsHtml = `
             <a href="#map" class="pixel-btn pixel-btn-blue">
-              <span>🗺️</span> Return to Map &rarr;
+              Return to Map &rarr;
             </a>
           `;
         }
@@ -2658,10 +2658,10 @@ if (!empty($_SESSION['auth_user'])) {
             <div class="my-res-detail-title-row">
               <div>
                 <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0 0 4px 0;">
-                  🚗 ${escapeHtml(spaceName)}
+                  ${escapeHtml(spaceName)}
                 </h3>
                 <div style="font-size: 0.8rem; color: #64748b; font-family: monospace;">
-                  📍 Coordinates: ${lat}, ${lng}
+                  Coordinates: ${lat}, ${lng}
                 </div>
               </div>
               <div>
@@ -2680,7 +2680,7 @@ if (!empty($_SESSION['auth_user'])) {
             <!-- Card 1: Reserved Vehicle Details -->
             <div class="my-res-detail-card">
               <h4 class="my-res-detail-card-title">
-                <span>🚘</span> Reserved Vehicle
+                Reserved Vehicle
               </h4>
               <div class="my-res-info-list">
                 <div class="my-res-info-row">
@@ -2705,12 +2705,12 @@ if (!empty($_SESSION['auth_user'])) {
             <!-- Card 2: Parking Space & Owner Details -->
             <div class="my-res-detail-card">
               <h4 class="my-res-detail-card-title">
-                <span>🅿️</span> Parking Space & Owner
+                Parking Space & Owner
               </h4>
               <div class="my-res-info-list">
                 <div class="my-res-info-row">
                   <span class="my-res-info-label">Offered By</span>
-                  <span class="my-res-info-value">👤 ${escapeHtml(ownerName)}</span>
+                  <span class="my-res-info-value">${escapeHtml(ownerName)}</span>
                 </div>
                 <div class="my-res-info-row">
                   <span class="my-res-info-label">Lot Capacity</span>
@@ -2778,7 +2778,7 @@ if (!empty($_SESSION['auth_user'])) {
           const json = await res.json();
 
           if (!res.ok || !json.success) {
-            container.innerHTML = `<div style="font-size: 0.88rem; color: #ef4444;">❌ Could not load vehicles: ${json.error || 'Database error'}</div>`;
+            container.innerHTML = `<div style="font-size: 0.88rem; color: #ef4444;">Could not load vehicles: ${json.error || 'Database error'}</div>`;
             return;
           }
 
@@ -2786,7 +2786,7 @@ if (!empty($_SESSION['auth_user'])) {
           if (cars.length === 0) {
             container.innerHTML = `
               <div style="font-size: 0.88rem; color: #64748b; background: #f8fafc; padding: 10px; border-radius: 4px; border: 1px solid #e2e8f0;">
-                🚘 No vehicles registered yet. Click "Add Vehicle" above to register your car in Supabase.
+                No vehicles registered yet. Click "Add Vehicle" above to register your car in Supabase.
               </div>
             `;
             return;
@@ -2797,15 +2797,15 @@ if (!empty($_SESSION['auth_user'])) {
             html += `
               <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 4px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                  <div style="font-weight: 800; font-size: 1rem; color: #0f172a;">🚘 ${c.license_plate}</div>
+                  <div style="font-weight: 800; font-size: 1rem; color: #0f172a;">${c.license_plate}</div>
                   <div style="font-size: 0.82rem; color: #64748b;">${c.model || 'Standard Vehicle'}</div>
                 </div>
                 <div style="display: flex; gap: 6px;">
                   <button type="button" class="pixel-btn pixel-btn-sm btn-edit-car" data-id="${c.id}" data-plate="${c.license_plate}" data-model="${c.model || ''}" title="Edit Vehicle Details">
-                    ✏️ Edit
+                    Edit
                   </button>
                   <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${c.id}" data-plate="${c.license_plate}" title="Delete Vehicle">
-                    🗑️
+                    Delete
                   </button>
                 </div>
               </div>
@@ -2814,7 +2814,7 @@ if (!empty($_SESSION['auth_user'])) {
           html += '</div>';
           container.innerHTML = html;
         } catch (err) {
-          container.innerHTML = `<div style="font-size: 0.88rem; color: #ef4444;">❌ Network error: ${err.message}</div>`;
+          container.innerHTML = `<div style="font-size: 0.88rem; color: #ef4444;">Network error: ${err.message}</div>`;
         }
       }
 
@@ -2853,9 +2853,9 @@ if (!empty($_SESSION['auth_user'])) {
 
           const json = await res.json();
           if (res.ok && json.success) {
-            showReservationAlert('success', `🚘 <strong>Vehicle Registered:</strong> "${plate}" has been saved in Supabase.`);
+            showReservationAlert('success', `<strong>Vehicle Registered:</strong> "${plate}" has been saved in Supabase.`);
             if (typeof showDashboardAlert === 'function') {
-              showDashboardAlert('success', `🚘 <strong>Vehicle Registered:</strong> "${plate}" has been saved in Supabase.`);
+              showDashboardAlert('success', `<strong>Vehicle Registered:</strong> "${plate}" has been saved in Supabase.`);
             }
             if (plateInput) plateInput.value = '';
             if (modelInput) modelInput.value = '';
@@ -2863,10 +2863,10 @@ if (!empty($_SESSION['auth_user'])) {
             await loadCars();
             if (typeof loadDashboard === 'function') await loadDashboard();
           } else {
-            showReservationAlert('error', `❌ <strong>Failed to register vehicle:</strong> ${json.error || 'Server error'}`);
+            showReservationAlert('error', `<strong>Failed to register vehicle:</strong> ${json.error || 'Server error'}`);
           }
         } catch (err) {
-          showReservationAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+          showReservationAlert('error', `<strong>Network error:</strong> ${err.message}`);
         }
       });
 
@@ -2886,20 +2886,20 @@ if (!empty($_SESSION['auth_user'])) {
           });
           const json = await res.json();
           if (res.ok && json.success) {
-            showReservationAlert('success', `🗑️ Vehicle "${plate}" deleted from Supabase.`);
+            showReservationAlert('success', `Vehicle "${plate}" deleted from Supabase.`);
             if (typeof showDashboardAlert === 'function') {
-              showDashboardAlert('success', `🗑️ Vehicle "${plate}" deleted from Supabase.`);
+              showDashboardAlert('success', `Vehicle "${plate}" deleted from Supabase.`);
             }
             await loadCars();
             if (typeof loadDashboard === 'function') await loadDashboard();
           } else {
-            showReservationAlert('error', `❌ <strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
+            showReservationAlert('error', `<strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
             if (typeof showDashboardAlert === 'function') {
-              showDashboardAlert('error', `❌ <strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
+              showDashboardAlert('error', `<strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
             }
           }
         } catch (err) {
-          showReservationAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+          showReservationAlert('error', `<strong>Network error:</strong> ${err.message}`);
         }
       }
 
@@ -2908,7 +2908,7 @@ if (!empty($_SESSION['auth_user'])) {
 
         const displayName = spaceName || 'this parking spot';
         const confirmed = window.confirm(
-          `❌ Cancel Parking Reservation\n\n` +
+          `Cancel Parking Reservation\n\n` +
           `Are you sure you want to cancel your reservation for "${displayName}"?\n\n` +
           `The parking space will immediately be returned to available capacity for neighbors in need.`
         );
@@ -2927,7 +2927,7 @@ if (!empty($_SESSION['auth_user'])) {
           const json = await res.json();
           if (res.ok && json.success) {
             showReservationAlert('success', `
-              ✅ <strong>Reservation Cancelled:</strong><br>
+              <strong>Reservation Cancelled:</strong><br>
               Your reservation for "${displayName}" has been cancelled. The parking spot is now available for other drivers.
             `);
             await loadReservations();
@@ -2937,10 +2937,10 @@ if (!empty($_SESSION['auth_user'])) {
               window.parkingMap.loadParkingSpaces();
             }
           } else {
-            showReservationAlert('error', `❌ <strong>Failed to cancel reservation:</strong> ${json.error || 'Server error'}`);
+            showReservationAlert('error', `<strong>Failed to cancel reservation:</strong> ${json.error || 'Server error'}`);
           }
         } catch (err) {
-          showReservationAlert('error', `❌ <strong>Network error:</strong> ${err.message}`);
+          showReservationAlert('error', `<strong>Network error:</strong> ${err.message}`);
         }
       }
 
@@ -2979,7 +2979,7 @@ if (!empty($_SESSION['auth_user'])) {
 
         const listContainer = document.getElementById('my-lots-list-container');
         if (listContainer && !myLotsState.selectedLotId) {
-          listContainer.innerHTML = '<div class="empty-spaces-notice"><span>⏳</span> Loading your parking lots...</div>';
+          listContainer.innerHTML = '<div class="empty-spaces-notice">Loading your parking lots...</div>';
         }
 
         try {
@@ -3010,7 +3010,7 @@ if (!empty($_SESSION['auth_user'])) {
           if (listContainer) {
             listContainer.innerHTML = `
               <div class="empty-spaces-notice" style="border-color: #ef4444; color: #b91c1c;">
-                ❌ Network error while loading parking lots: ${err.message}
+                Network error while loading parking lots: ${err.message}
               </div>
             `;
           }
@@ -3036,13 +3036,13 @@ if (!empty($_SESSION['auth_user'])) {
         if (lots.length === 0) {
           container.innerHTML = `
             <div class="empty-spaces-notice">
-              <div style="font-size: 2.2rem; margin-bottom: 8px;">🅿️</div>
+              
               <h4 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">No Parking Lots Registered</h4>
               <p style="color: #64748b; font-size: 0.88rem; max-width: 480px; margin: 0 auto 16px;">
                 You haven't listed any elevated parking spaces yet. Help your community during flood emergencies by offering safe ground for neighbors' vehicles.
               </p>
               <button type="button" class="pixel-btn pixel-btn-green" id="btn-empty-offer-lot">
-                <span>➕</span> Offer Parking Lot
+                Offer Parking Lot
               </button>
             </div>
           `;
@@ -3065,11 +3065,11 @@ if (!empty($_SESSION['auth_user'])) {
 
           let statusPill = '';
           if (isClosed) {
-            statusPill = '<span class="status-pill status-closed">🔴 CLOSED</span>';
+            statusPill = '<span class="status-pill status-closed">CLOSED</span>';
           } else if (isFull) {
-            statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🟡 FULL</span>';
+            statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">FULL</span>';
           } else {
-            statusPill = '<span class="status-pill status-available">🟢 AVAILABLE</span>';
+            statusPill = '<span class="status-pill status-available">AVAILABLE</span>';
           }
 
           html += `
@@ -3077,8 +3077,8 @@ if (!empty($_SESSION['auth_user'])) {
               <div>
                 <div class="my-lot-card-header">
                   <div>
-                    <h3 class="my-lot-card-title">🅿️ ${escapeHtml(lot.name)}</h3>
-                    <div class="my-lot-card-coords">📍 GPS: ${lat}, ${lng}</div>
+                    <h3 class="my-lot-card-title">${escapeHtml(lot.name)}</h3>
+                    <div class="my-lot-card-coords">GPS: ${lat}, ${lng}</div>
                   </div>
                   <div>
                     ${statusPill}
@@ -3108,27 +3108,27 @@ if (!empty($_SESSION['auth_user'])) {
                 <!-- Badges Summary -->
                 <div class="my-lot-badges-row">
                   ${pendingCount > 0 
-                    ? `<span class="status-pill" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">⏳ ${pendingCount} Pending Request${pendingCount > 1 ? 's' : ''}</span>`
+                    ? `<span class="status-pill" style="font-size: 0.75rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">${pendingCount} Pending Request${pendingCount > 1 ? 's' : ''}</span>`
                     : '<span style="font-size: 0.74rem; color: #94a3b8;">No pending requests</span>'
                   }
-                  <span class="status-pill status-available" style="font-size: 0.75rem;">🟢 ${confirmedCount} Confirmed Booking${confirmedCount > 1 ? 's' : ''}</span>
+                  <span class="status-pill status-available" style="font-size: 0.75rem;">${confirmedCount} Confirmed Booking${confirmedCount > 1 ? 's' : ''}</span>
                 </div>
               </div>
 
               <!-- Action Bar -->
               <div class="my-lot-card-actions">
                 <button type="button" class="pixel-btn pixel-btn-blue btn-manage-lot" data-lot-id="${lot.id}" style="width: 100%; padding: 10px; font-weight: 800;">
-                  <span>📋</span> Manage Lot & Requests &rarr;
+                  Manage Lot & Requests &rarr;
                 </button>
                 <div class="my-lot-card-subactions">
                   <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${escapeHtml(lot.name)}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
-                    ${isClosed ? '🟢 Reopen' : '⏸️ Close'}
+                    ${isClosed ? 'Reopen' : 'Close'}
                   </button>
                   <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-edit-lot-dash" data-id="${lot.id}">
-                    ✏️ Edit
+                    Edit
                   </button>
                   <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${escapeHtml(lot.name)}">
-                    🗑️ Delete
+                    Delete
                   </button>
                 </div>
               </div>
@@ -3186,11 +3186,11 @@ if (!empty($_SESSION['auth_user'])) {
 
         let statusPill = '';
         if (isClosed) {
-          statusPill = '<span class="status-pill status-closed">🔴 CLOSED</span>';
+          statusPill = '<span class="status-pill status-closed">CLOSED</span>';
         } else if (isFull) {
-          statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🟡 FULL</span>';
+          statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">FULL</span>';
         } else {
-          statusPill = '<span class="status-pill status-available">🟢 AVAILABLE</span>';
+          statusPill = '<span class="status-pill status-available">AVAILABLE</span>';
         }
 
         // Render Pending Requests HTML
@@ -3208,9 +3208,9 @@ if (!empty($_SESSION['auth_user'])) {
                   <div class="dash-lot-req-card" id="owner-req-card-${r.id}">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                       <div>
-                        <div style="font-weight: 800; color: #0f172a; font-size: 0.95rem;">👤 ${escapeHtml(driverName)}</div>
+                        <div style="font-weight: 800; color: #0f172a; font-size: 0.95rem;">${escapeHtml(driverName)}</div>
                         <div style="font-size: 0.85rem; color: #334155; margin-top: 3px;">
-                          🚘 <span class="dash-car-plate" style="font-size: 0.78rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}
+                          <span class="dash-car-plate" style="font-size: 0.78rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}
                         </div>
                       </div>
                       <span class="status-pill" style="font-size: 0.65rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
@@ -3224,10 +3224,10 @@ if (!empty($_SESSION['auth_user'])) {
                     ${r.notes ? `<div style="font-size: 0.78rem; color: #64748b; font-style: italic; margin-top: 6px; background: #ffffff; padding: 4px 8px; border-radius: 3px;">Note: "${escapeHtml(r.notes)}"</div>` : ''}
                     <div style="display: flex; gap: 8px; margin-top: 10px;">
                       <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${escapeHtml(lot.name)}" data-plate="${escapeHtml(plate)}" style="flex: 1; padding: 8px;">
-                        ✅ Accept
+                        Accept
                       </button>
                       <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${escapeHtml(lot.name)}" data-plate="${escapeHtml(plate)}" style="flex: 1; padding: 8px;">
-                        ❌ Decline
+                        Decline
                       </button>
                     </div>
                   </div>
@@ -3238,7 +3238,7 @@ if (!empty($_SESSION['auth_user'])) {
         } else {
           pendingHtml = `
             <div class="dash-empty-notice">
-              <span>📬</span> No pending reservation requests for this parking lot.
+              No pending reservation requests for this parking lot.
             </div>
           `;
         }
@@ -3259,14 +3259,14 @@ if (!empty($_SESSION['auth_user'])) {
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                       <div>
                         <div style="font-weight: 800; color: #0f172a; font-size: 0.95rem;">
-                          <span>Spot #${idx + 1}:</span> 👤 ${escapeHtml(driverName)}
+                          <span>Spot #${idx + 1}:</span> ${escapeHtml(driverName)}
                         </div>
                         <div style="font-size: 0.85rem; color: #334155; margin-top: 3px;">
-                          🚘 <span class="dash-car-plate" style="font-size: 0.78rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}
+                          <span class="dash-car-plate" style="font-size: 0.78rem;">${escapeHtml(plate)}</span>${escapeHtml(model)}
                         </div>
                       </div>
                       <span class="status-pill status-available" style="font-size: 0.65rem; padding: 3px 6px;">
-                        🟢 ACCEPTED
+                        ACCEPTED
                       </span>
                     </div>
                     <div class="dash-req-meta" style="margin-top: 8px;">
@@ -3283,7 +3283,7 @@ if (!empty($_SESSION['auth_user'])) {
         } else {
           confirmedHtml = `
             <div class="dash-empty-notice">
-              <span>🚘</span> No vehicles currently parked in this lot (0 / ${cap} spots occupied).
+              No vehicles currently parked in this lot (0 / ${cap} spots occupied).
             </div>
           `;
         }
@@ -3293,22 +3293,22 @@ if (!empty($_SESSION['auth_user'])) {
           <div class="my-lot-detail-header-card">
             <div class="my-lot-detail-title-row">
               <div>
-                <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0;">🅿️ ${escapeHtml(lot.name)}</h3>
-                <div style="font-size: 0.82rem; color: #64748b; font-family: monospace; margin-top: 4px;">📍 GPS: ${lat}, ${lng}</div>
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0;">${escapeHtml(lot.name)}</h3>
+                <div style="font-size: 0.82rem; color: #64748b; font-family: monospace; margin-top: 4px;">GPS: ${lat}, ${lng}</div>
               </div>
               <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 ${statusPill}
                 <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${escapeHtml(lot.name)}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
-                  ${isClosed ? '🟢 Reopen Lot' : '⏸️ Close Lot'}
+                  ${isClosed ? 'Reopen Lot' : 'Close Lot'}
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-edit-lot-dash" data-id="${lot.id}">
-                  ✏️ Edit
+                  Edit
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${escapeHtml(lot.name)}">
-                  🗑️ Delete
+                  Delete
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm btn-view-car-spot" data-lat="${lot.latitude}" data-lng="${lot.longitude}">
-                  🗺️ Map
+                  Map
                 </button>
               </div>
             </div>
@@ -3337,7 +3337,7 @@ if (!empty($_SESSION['auth_user'])) {
           <!-- Section 1: Pending Reservation Requests -->
           <div class="my-lot-detail-section">
             <div class="my-lot-detail-section-title">
-              <h3><span>📬</span> Pending Requests (${pendingReqs.length})</h3>
+              <h3>Pending Requests (${pendingReqs.length})</h3>
               ${pendingReqs.length > 0 ? '<span class="status-badge" style="background:#fef3c7; color:#b45309; font-size:0.7rem;">Action Needed</span>' : ''}
             </div>
             <p class="my-lot-detail-section-desc">
@@ -3349,7 +3349,7 @@ if (!empty($_SESSION['auth_user'])) {
           <!-- Section 2: Confirmed Bookings -->
           <div class="my-lot-detail-section">
             <div class="my-lot-detail-section-title">
-              <h3><span>🛡️</span> Confirmed Bookings (${confirmedBookings.length} / ${cap})</h3>
+              <h3>Confirmed Bookings (${confirmedBookings.length} / ${cap})</h3>
               <span class="status-badge status-available" style="font-size:0.7rem;">${occupied} Spots Filled</span>
             </div>
             <p class="my-lot-detail-section-desc">
@@ -3370,11 +3370,11 @@ if (!empty($_SESSION['auth_user'])) {
             <div class="my-lot-specs-grid">
               <div class="my-lot-spec-item">
                 <span class="my-lot-spec-label">Parking Space Name</span>
-                <span class="my-lot-spec-val">🅿️ ${escapeHtml(lot.name)}</span>
+                <span class="my-lot-spec-val">${escapeHtml(lot.name)}</span>
               </div>
               <div class="my-lot-spec-item">
                 <span class="my-lot-spec-label">GPS Coordinates</span>
-                <span class="my-lot-spec-val" style="font-family: monospace;">📍 ${lat}, ${lng}</span>
+                <span class="my-lot-spec-val" style="font-family: monospace;">${lat}, ${lng}</span>
               </div>
               <div class="my-lot-spec-item">
                 <span class="my-lot-spec-label">Total Vehicle Capacity</span>
@@ -3442,7 +3442,7 @@ if (!empty($_SESSION['auth_user'])) {
             if (alertBox) {
               alertBox.className = 'alert-message success';
               alertBox.innerHTML = (action === 'accept') 
-                ? `🎉 <strong>Reservation Accepted!</strong><br>Spot assigned for vehicle "${plateName}" at "${spaceName}". Available capacity has been updated.`
+                ? `<strong>Reservation Accepted!</strong><br>Spot assigned for vehicle "${plateName}" at "${spaceName}". Available capacity has been updated.`
                 : `ℹ️ <strong>Reservation Request Declined:</strong><br>Request for vehicle "${plateName}" was rejected and the vehicle released.`;
               alertBox.style.display = 'block';
               alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -3453,7 +3453,7 @@ if (!empty($_SESSION['auth_user'])) {
           } else {
             if (alertBox) {
               alertBox.className = 'alert-message error';
-              alertBox.innerHTML = `❌ <strong>Failed to ${actionText.toLowerCase()} reservation:</strong> ${json.error || 'Server error'}`;
+              alertBox.innerHTML = `<strong>Failed to ${actionText.toLowerCase()} reservation:</strong> ${json.error || 'Server error'}`;
               alertBox.style.display = 'block';
               alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
@@ -3461,13 +3461,13 @@ if (!empty($_SESSION['auth_user'])) {
               b.disabled = false;
             });
             if (buttonElement) {
-              buttonElement.innerHTML = (action === 'accept') ? '✅ Accept' : '❌ Decline';
+              buttonElement.innerHTML = (action === 'accept') ? 'Accept' : 'Decline';
             }
           }
         } catch (err) {
           if (alertBox) {
             alertBox.className = 'alert-message error';
-            alertBox.innerHTML = `❌ <strong>Network error:</strong> ${err.message}`;
+            alertBox.innerHTML = `<strong>Network error:</strong> ${err.message}`;
             alertBox.style.display = 'block';
             alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
@@ -3475,7 +3475,7 @@ if (!empty($_SESSION['auth_user'])) {
             b.disabled = false;
           });
           if (buttonElement) {
-            buttonElement.innerHTML = (action === 'accept') ? '✅ Accept' : '❌ Decline';
+            buttonElement.innerHTML = (action === 'accept') ? 'Accept' : 'Decline';
           }
         }
       }
@@ -3532,7 +3532,7 @@ if (!empty($_SESSION['auth_user'])) {
           if ((!carsRes.success && carsRes.error && (carsRes.error.includes('relation "public.cars" does not exist') || carsRes.error.includes('PGRST205'))) ||
               (!reservationsRes.success && reservationsRes.error && (reservationsRes.error.includes('relation "public.reservations" does not exist') || reservationsRes.error.includes('PGRST205')))) {
             showDashboardAlert('error', `
-              ⚠️ <strong>Database Tables Required:</strong> The <code>cars</code> and <code>reservations</code> tables need to be created in your Supabase project. 
+              <strong>Database Tables Required:</strong> The <code>cars</code> and <code>reservations</code> tables need to be created in your Supabase project. 
               Please execute the migration script in <code>supabase/migrations/20261011_supabase_only_reservations_and_cars.sql</code> in your Supabase SQL Editor.
             `);
           }
@@ -3602,7 +3602,7 @@ if (!empty($_SESSION['auth_user'])) {
           }
 
         } catch (err) {
-          showDashboardAlert('error', `❌ Network error while loading dashboard: ${err.message}`);
+          showDashboardAlert('error', `Network error while loading dashboard: ${err.message}`);
         }
       }
       window.loadDashboard = loadDashboard;
@@ -3620,16 +3620,16 @@ if (!empty($_SESSION['auth_user'])) {
 
         if (countBadge) {
           if (totalUrgent > 0) {
-            countBadge.innerHTML = `<span class="status-pill" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5; font-size:0.72rem; font-weight:800;">⚠️ ${totalUrgent} Action${totalUrgent > 1 ? 's' : ''} Pending</span>`;
+            countBadge.innerHTML = `<span class="status-pill" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5; font-size:0.72rem; font-weight:800;">${totalUrgent} Action${totalUrgent > 1 ? 's' : ''} Pending</span>`;
           } else {
-            countBadge.innerHTML = `<span class="status-pill status-available" style="font-size:0.72rem; font-weight:700;">🟢 All Clear</span>`;
+            countBadge.innerHTML = `<span class="status-pill status-available" style="font-size:0.72rem; font-weight:700;">All Clear</span>`;
           }
         }
 
         if (pendingOwnerReqs.length === 0 && pendingDriverReqs.length === 0 && confirmedDriverSpots.length === 0) {
           container.innerHTML = `
             <div class="dash-attention-empty">
-              <div style="font-size: 1.5rem; margin-bottom: 4px;">✨</div>
+              
               <div style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">All Clear — No Urgent Actions Required</div>
               <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">
                 You have no pending requests awaiting your decision, and no active flood reservations requiring attention.
@@ -3654,27 +3654,27 @@ if (!empty($_SESSION['auth_user'])) {
           html += `
             <div class="dash-attention-card owner-urgent" id="dash-attn-owner-${r.id}">
               <div class="dash-attn-header">
-                <div class="dash-attn-badge owner-badge">🅿️ HOST DECISION NEEDED</div>
+                <div class="dash-attn-badge owner-badge">HOST DECISION NEEDED</div>
                 <span class="status-pill" style="font-size: 0.65rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
                   ⏳ Awaiting Approval
                 </span>
               </div>
               <div class="dash-attn-body">
                 <div style="font-weight: 800; color: #0f172a; font-size: 0.92rem;">
-                  👤 ${driverName} <span style="font-weight: normal; color: #64748b; font-size: 0.82rem;">requested a spot at</span> <strong>${lotName}</strong>
+                  ${driverName} <span style="font-weight: normal; color: #64748b; font-size: 0.82rem;">requested a spot at</span> <strong>${lotName}</strong>
                 </div>
                 <div style="font-size: 0.82rem; color: #334155; margin-top: 4px;">
-                  🚘 <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>${model}
+                  <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>${model}
                 </div>
                 ${r.notes ? `<div style="font-size: 0.76rem; color: #64748b; font-style: italic; margin-top: 4px;">Note: "${r.notes}"</div>` : ''}
                 <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">Requested: ${createdStr}</div>
               </div>
               <div class="dash-attn-actions">
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${lotName}" data-plate="${plate}">
-                  <span>✅</span> Accept Request
+                  Accept Request
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${lotName}" data-plate="${plate}">
-                  <span>❌</span> Decline
+                  Decline
                 </button>
               </div>
             </div>
@@ -3700,19 +3700,19 @@ if (!empty($_SESSION['auth_user'])) {
               </div>
               <div class="dash-attn-body">
                 <div style="font-weight: 800; color: #0f172a; font-size: 0.92rem;">
-                  🅿️ ${lotName}
+                  ${lotName}
                 </div>
                 <div style="font-size: 0.82rem; color: #334155; margin-top: 4px;">
-                  🚘 <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>${model}
+                  <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>${model}
                 </div>
                 <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">Submitted: ${createdStr}</div>
               </div>
               <div class="dash-attn-actions">
                 <a href="#my-reservations" class="pixel-btn pixel-btn-sm pixel-btn-blue">
-                  <span>📋</span> View Reservation
+                  View Reservation
                 </a>
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-car-res" data-id="${r.id}" data-plate="${plate}" data-lot="${lotName}">
-                  <span>❌</span> Cancel Request
+                  Cancel Request
                 </button>
               </div>
             </div>
@@ -3731,28 +3731,28 @@ if (!empty($_SESSION['auth_user'])) {
           html += `
             <div class="dash-attention-card driver-confirmed" id="dash-attn-confirmed-${r.id}">
               <div class="dash-attn-header">
-                <div class="dash-attn-badge confirmed-badge">🟢 CONFIRMED FLOOD SPOT</div>
+                <div class="dash-attn-badge confirmed-badge">CONFIRMED FLOOD SPOT</div>
                 <span class="status-pill status-available" style="font-size: 0.65rem;">
                   Ready
                 </span>
               </div>
               <div class="dash-attn-body">
                 <div style="font-weight: 800; color: #0f172a; font-size: 0.92rem;">
-                  🅿️ ${lotName}
+                  ${lotName}
                 </div>
                 <div style="font-size: 0.82rem; color: #334155; margin-top: 4px;">
-                  🚘 Assigned: <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>
+                  Assigned: <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>
                 </div>
-                ${(lat && lng) ? `<div style="font-size: 0.75rem; color: #64748b; font-family: monospace; margin-top: 4px;">📍 GPS: ${lat}, ${lng}</div>` : ''}
+                ${(lat && lng) ? `<div style="font-size: 0.75rem; color: #64748b; font-family: monospace; margin-top: 4px;">GPS: ${lat}, ${lng}</div>` : ''}
               </div>
               <div class="dash-attn-actions">
                 ${(lat && lng) ? `
                   <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-car-spot" data-lat="${space.latitude}" data-lng="${space.longitude}">
-                    <span>🗺️</span> Navigate / Map
+                    Navigate / Map
                   </button>
                 ` : ''}
                 <a href="#my-reservations" class="pixel-btn pixel-btn-sm">
-                  <span>📋</span> Details
+                  Details
                 </a>
               </div>
             </div>
@@ -3770,7 +3770,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (cars.length === 0) {
           container.innerHTML = `
             <div class="dash-empty-role-card">
-              <div class="dash-empty-role-icon">🚘</div>
+              
               <div style="flex: 1; min-width: 0;">
                 <h4 style="margin: 0 0 4px 0; font-size: 1rem; color: #0f172a;">No Vehicles Registered Yet</h4>
                 <p style="margin: 0; font-size: 0.84rem; color: #64748b; line-height: 1.4;">
@@ -3778,7 +3778,7 @@ if (!empty($_SESSION['auth_user'])) {
                 </p>
               </div>
               <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm btn-dash-add-car-trigger" style="flex-shrink: 0;">
-                <span>➕</span> Register New Car
+                Register New Car
               </button>
             </div>
           `;
@@ -3799,13 +3799,13 @@ if (!empty($_SESSION['auth_user'])) {
             const isPending = (res.status === 'pending');
             const statusBadge = isPending 
               ? '<span class="status-pill" style="font-size: 0.7rem; padding: 2px 6px; background: #fef3c7; color: #b45309; border-color: #fde68a;">⏳ PENDING OWNER APPROVAL</span>'
-              : '<span class="status-pill status-available" style="font-size: 0.7rem; padding: 2px 6px;">🟢 RESERVATION CONFIRMED</span>';
+              : '<span class="status-pill status-available" style="font-size: 0.7rem; padding: 2px 6px;">RESERVATION CONFIRMED</span>';
 
             assignmentBoxHtml = `
               <div class="dash-car-assignment-box ${isPending ? 'pending' : 'assigned'}" style="${isPending ? 'border: 1px dashed #f59e0b; background: #fffbeb;' : ''}">
                 <div class="dash-car-assignment-label">${isPending ? 'Requested Parking Spot' : 'Assigned Parking Spot'}</div>
-                <div class="dash-car-assignment-value">🅿️ ${lotName}</div>
-                ${(lat && lng) ? `<div style="font-size: 0.75rem; color: #64748b; font-family: monospace; margin-top: 2px;">📍 GPS: ${lat}, ${lng}</div>` : ''}
+                <div class="dash-car-assignment-value">${lotName}</div>
+                ${(lat && lng) ? `<div style="font-size: 0.75rem; color: #64748b; font-family: monospace; margin-top: 2px;">GPS: ${lat}, ${lng}</div>` : ''}
                 <div style="margin-top: 6px;">
                   ${statusBadge}
                 </div>
@@ -3815,7 +3815,7 @@ if (!empty($_SESSION['auth_user'])) {
             assignmentBoxHtml = `
               <div class="dash-car-assignment-box unassigned">
                 <div class="dash-car-assignment-label">Assignment Status</div>
-                <div class="dash-car-assignment-value" style="color: #64748b; font-weight: normal;">⚪ No parking spot assigned</div>
+                <div class="dash-car-assignment-value" style="color: #64748b; font-weight: normal;">No parking spot assigned</div>
                 <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 3px;">Ready for safe elevated parking assignment.</div>
               </div>
             `;
@@ -3827,29 +3827,29 @@ if (!empty($_SESSION['auth_user'])) {
             if (lat && lng) {
               actionButtons += `
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-car-spot" data-lat="${space.latitude}" data-lng="${space.longitude}" title="Locate parking lot on map">
-                  🗺️ View Spot
+                  View Spot
                 </button>
               `;
             }
             actionButtons += `
               <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-car-res" data-id="${res.id}" data-plate="${car.license_plate}" data-lot="${lotName}" title="${isPending ? 'Cancel request' : 'Cancel reservation'}">
-                ${isPending ? '❌ Cancel Request' : '❌ Cancel Spot'}
+                ${isPending ? 'Cancel Request' : 'Cancel Spot'}
               </button>
             `;
           } else {
             actionButtons += `
               <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-open-reserve-car" data-car-id="${car.id}" data-plate="${car.license_plate}" title="Reserve available spot for this vehicle">
-                🅿️ Reserve Spot
+                Reserve Spot
               </button>
             `;
           }
 
           actionButtons += `
             <button type="button" class="pixel-btn pixel-btn-sm btn-edit-car" data-id="${car.id}" data-plate="${car.license_plate}" data-model="${car.model || ''}" title="Edit vehicle details">
-              ✏️ Edit
+              Edit
             </button>
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${car.id}" data-plate="${car.license_plate}" title="Delete vehicle">
-              🗑️
+              Delete
             </button>
           `;
 
@@ -3857,7 +3857,7 @@ if (!empty($_SESSION['auth_user'])) {
             <article class="dash-car-card" id="dash-car-${car.id}">
               <div>
                 <div class="dash-car-header">
-                  <div class="dash-car-icon">🚘</div>
+                  <div class="dash-car-icon">CAR</div>
                   <div style="flex: 1; min-width: 0;">
                     <h4 class="dash-car-title">${car.model || 'Standard Vehicle'}</h4>
                     <span class="dash-car-plate">${car.license_plate}</span>
@@ -3886,7 +3886,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (myLots.length === 0) {
           container.innerHTML = `
             <div class="dash-empty-role-card">
-              <div class="dash-empty-role-icon">🅿️</div>
+              
               <div style="flex: 1; min-width: 0;">
                 <h4 style="margin: 0 0 4px 0; font-size: 1rem; color: #0f172a;">Do you have flood-safe space to share?</h4>
                 <p style="margin: 0; font-size: 0.84rem; color: #64748b; line-height: 1.4;">
@@ -3894,7 +3894,7 @@ if (!empty($_SESSION['auth_user'])) {
                 </p>
               </div>
               <a href="#my-spaces" class="pixel-btn pixel-btn-blue pixel-btn-sm" style="flex-shrink: 0;">
-                <span>➕</span> Offer Parking Lot
+                Offer Parking Lot
               </a>
             </div>
           `;
@@ -3929,13 +3929,13 @@ if (!empty($_SESSION['auth_user'])) {
                 <div class="dash-lot-req-card" id="dash-owner-req-${r.id}">
                   <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                     <div>
-                      <div style="font-weight: 800; color: #0f172a; font-size: 0.88rem;">👤 ${driverName}</div>
+                      <div style="font-weight: 800; color: #0f172a; font-size: 0.88rem;">${driverName}</div>
                       <div style="font-size: 0.8rem; color: #334155; margin-top: 2px;">
-                        🚘 <span class="dash-car-plate" style="font-size: 0.74rem;">${plate}</span>${model}
+                        <span class="dash-car-plate" style="font-size: 0.74rem;">${plate}</span>${model}
                       </div>
                     </div>
                     <span class="status-pill" style="font-size: 0.65rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
-                      ⏳ PENDING
+                      PENDING
                     </span>
                   </div>
                   <div class="dash-req-meta">
@@ -3972,10 +3972,10 @@ if (!empty($_SESSION['auth_user'])) {
                   <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                     <div>
                       <div style="font-weight: 800; color: #0f172a; font-size: 0.88rem;">
-                        <span>Spot #${idx + 1}:</span> 👤 ${driverName}
+                        <span>Spot #${idx + 1}:</span> ${driverName}
                       </div>
                       <div style="font-size: 0.8rem; color: #334155; margin-top: 2px;">
-                        🚘 <span class="dash-car-plate" style="font-size: 0.74rem;">${plate}</span>${model}
+                        <span class="dash-car-plate" style="font-size: 0.74rem;">${plate}</span>${model}
                       </div>
                     </div>
                     <span class="status-pill status-available" style="font-size: 0.65rem; padding: 2px 6px;">
@@ -3997,11 +3997,11 @@ if (!empty($_SESSION['auth_user'])) {
 
           let statusPill = '';
           if (isClosed) {
-            statusPill = '<span class="status-pill status-closed">🔴 CLOSED</span>';
+            statusPill = '<span class="status-pill status-closed">CLOSED</span>';
           } else if (isFull) {
-            statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🟡 FULL</span>';
+            statusPill = '<span class="status-pill status-closed" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">FULL</span>';
           } else {
-            statusPill = '<span class="status-pill status-available">🟢 AVAILABLE</span>';
+            statusPill = '<span class="status-pill status-available">AVAILABLE</span>';
           }
 
           html += `
@@ -4009,8 +4009,8 @@ if (!empty($_SESSION['auth_user'])) {
               <div>
                 <div class="dash-lot-header">
                   <div>
-                    <h4 class="dash-lot-title">🅿️ ${lot.name}</h4>
-                    <div class="dash-lot-coords">📍 GPS: ${lat}, ${lng}</div>
+                    <h4 class="dash-lot-title">${lot.name}</h4>
+                    <div class="dash-lot-coords">GPS: ${lat}, ${lng}</div>
                   </div>
                   <div>
                     ${statusPill}
@@ -4061,16 +4061,16 @@ if (!empty($_SESSION['auth_user'])) {
 
               <div class="dash-card-actions" style="margin-top: 12px;">
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-manage-lot" data-lot-id="${lot.id}">
-                  📋 Manage Lot & Requests
+                  Manage Lot & Requests
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm ${isClosed ? 'pixel-btn-green' : 'pixel-btn-yellow'} btn-toggle-lot-status" data-id="${lot.id}" data-name="${lot.name}" data-capacity="${lot.capacity}" data-available="${lot.available_spaces}" data-status="${lot.status}">
-                  ${isClosed ? '🟢 Reopen Lot' : '⏸️ Close Lot'}
+                  ${isClosed ? 'Reopen Lot' : 'Close Lot'}
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-edit-lot-dash" data-id="${lot.id}">
-                  ✏️ Edit Lot
+                  Edit Lot
                 </button>
                 <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-lot" data-id="${lot.id}" data-name="${lot.name}">
-                  🗑️ Delete
+                  Delete
                 </button>
               </div>
             </article>
@@ -4088,7 +4088,7 @@ if (!empty($_SESSION['auth_user'])) {
           tbody.innerHTML = `
             <tr>
               <td colspan="7" style="text-align: center; color: #64748b; padding: 24px;">
-                No registered vehicles found. <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-dash-table-add-car" style="margin-left: 8px;">➕ Add Car</button>
+                No registered vehicles found. <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-dash-table-add-car" style="margin-left: 8px;">Add Car</button>
               </td>
             </tr>
           `;
@@ -4109,24 +4109,24 @@ if (!empty($_SESSION['auth_user'])) {
 
             rowsHtml += `
               <tr>
-                <td><strong>🚘 ${car.model || 'Standard'}</strong></td>
+                <td><strong>${car.model || 'Standard'}</strong></td>
                 <td><span class="dash-car-plate" style="font-size: 0.75rem;">${car.license_plate}</span></td>
-                <td><strong>🅿️ ${lotName}</strong></td>
+                <td><strong>${lotName}</strong></td>
                 <td><span style="font-family: monospace; font-size: 0.8rem;">${spotCoords}</span></td>
-                <td><span class="status-pill status-available">🟢 ACTIVE RESERVATION</span></td>
+                <td><span class="status-pill status-available">ACTIVE RESERVATION</span></td>
                 <td style="font-size: 0.82rem; color: #64748b;">${dateStr}</td>
                 <td>
                   <div style="display: flex; gap: 6px;">
                     <button type="button" class="pixel-btn pixel-btn-sm btn-view-res-dash" data-res-id="${activeRes.id}" title="View Details in My Reservations">
-                      📋 Details
+                      Details
                     </button>
                     ${(space.latitude && space.longitude) ? `
                       <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-car-spot" data-lat="${space.latitude}" data-lng="${space.longitude}" title="View Spot on Map">
-                        🗺️ Map
+                        Map
                       </button>
                     ` : ''}
                     <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-car-res" data-id="${activeRes.id}" data-plate="${car.license_plate}" data-lot="${lotName}" title="Cancel reservation">
-                      ❌ Cancel
+                      Cancel
                     </button>
                   </div>
                 </td>
@@ -4136,15 +4136,15 @@ if (!empty($_SESSION['auth_user'])) {
             // Unassigned vehicle row
             rowsHtml += `
               <tr style="background: #fafafa;">
-                <td><strong>🚘 ${car.model || 'Standard'}</strong></td>
+                <td><strong>${car.model || 'Standard'}</strong></td>
                 <td><span class="dash-car-plate" style="font-size: 0.75rem;">${car.license_plate}</span></td>
                 <td style="color: #94a3b8; font-style: italic;">None</td>
                 <td style="color: #94a3b8; font-style: italic;">-</td>
-                <td><span class="status-pill status-closed" style="background: #f1f5f9; color: #64748b; border-color: #cbd5e1;">⚪ NO ASSIGNMENT</span></td>
+                <td><span class="status-pill status-closed" style="background: #f1f5f9; color: #64748b; border-color: #cbd5e1;">NO ASSIGNMENT</span></td>
                 <td style="font-size: 0.82rem; color: #94a3b8;">-</td>
                 <td>
                   <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-open-reserve-car" data-car-id="${car.id}" data-plate="${car.license_plate}">
-                    🅿️ Reserve Spot
+                    Reserve Spot
                   </button>
                 </td>
               </tr>
@@ -4164,11 +4164,11 @@ if (!empty($_SESSION['auth_user'])) {
 
           rowsHtml += `
             <tr style="opacity: 0.65; background: #fff5f5;">
-              <td>🚘 ${model}</td>
+              <td>${model}</td>
               <td><span class="dash-car-plate" style="font-size: 0.75rem;">${plate}</span></td>
-              <td>🅿️ ${lotName}</td>
+              <td>${lotName}</td>
               <td>-</td>
-              <td><span class="status-pill status-closed">🚫 CANCELLED</span></td>
+              <td><span class="status-pill status-closed">CANCELLED</span></td>
               <td style="font-size: 0.82rem; color: #64748b;">${dateStr}</td>
               <td style="font-size: 0.8rem; color: #94a3b8;">Cancelled</td>
             </tr>
@@ -4234,7 +4234,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (!license_plate) {
           if (modalCarAlert) {
             modalCarAlert.className = 'alert-message error';
-            modalCarAlert.innerHTML = '⚠️ Please enter a license plate.';
+            modalCarAlert.innerHTML = 'Please enter a license plate.';
             modalCarAlert.style.display = 'block';
           }
           return;
@@ -4263,26 +4263,26 @@ if (!empty($_SESSION['auth_user'])) {
           const json = await res.json();
           if (res.ok && json.success) {
             closeCarModal();
-            showDashboardAlert('success', `🚘 <strong>Vehicle Saved:</strong> "${license_plate}" has been saved in Supabase.`);
+            showDashboardAlert('success', `<strong>Vehicle Saved:</strong> "${license_plate}" has been saved in Supabase.`);
             await loadDashboard();
             if (typeof loadCars === 'function') await loadCars();
           } else {
             if (modalCarAlert) {
               modalCarAlert.className = 'alert-message error';
-              modalCarAlert.innerHTML = `❌ ${json.error || 'Failed to save vehicle.'}`;
+              modalCarAlert.innerHTML = `${json.error || 'Failed to save vehicle.'}`;
               modalCarAlert.style.display = 'block';
             }
           }
         } catch (err) {
           if (modalCarAlert) {
             modalCarAlert.className = 'alert-message error';
-            modalCarAlert.innerHTML = `❌ Network error: ${err.message}`;
+            modalCarAlert.innerHTML = `Network error: ${err.message}`;
             modalCarAlert.style.display = 'block';
           }
         } finally {
           if (btnSubmitCarModal) {
             btnSubmitCarModal.disabled = false;
-            btnSubmitCarModal.innerHTML = '<span>💾</span> Save Vehicle';
+            btnSubmitCarModal.innerHTML = 'Save Vehicle';
           }
         }
       });
@@ -4323,14 +4323,14 @@ if (!empty($_SESSION['auth_user'])) {
           if (availableSpaces.length === 0) {
             const opt = document.createElement('option');
             opt.value = '';
-            opt.textContent = '⚠️ No eligible host parking spaces currently open';
+            opt.textContent = 'No eligible host parking spaces currently open';
             opt.disabled = true;
             reserveLotSelect.appendChild(opt);
           } else {
             availableSpaces.forEach(s => {
               const opt = document.createElement('option');
               opt.value = s.id;
-              opt.textContent = `🅿️ ${s.name} (${s.available_spaces}/${s.capacity} spots open)`;
+              opt.textContent = `${s.name} (${s.available_spaces}/${s.capacity} spots open)`;
               if (s.id === preselectedLotId) {
                 opt.selected = true;
               }
@@ -4349,11 +4349,11 @@ if (!empty($_SESSION['auth_user'])) {
           if (!carsRes.ok || !carsJson.success || !Array.isArray(carsJson.data)) {
             if (reserveCarSelect) {
               reserveCarSelect.disabled = true;
-              reserveCarSelect.innerHTML = '<option value="">❌ Could not load cars</option>';
+              reserveCarSelect.innerHTML = '<option value="">Could not load cars</option>';
             }
             if (modalReserveAlert) {
               modalReserveAlert.className = 'alert-message error';
-              modalReserveAlert.innerHTML = `❌ Failed to load your vehicles: ${carsJson.error || 'Server error'}`;
+              modalReserveAlert.innerHTML = `Failed to load your vehicles: ${carsJson.error || 'Server error'}`;
               modalReserveAlert.style.display = 'block';
             }
             return;
@@ -4419,11 +4419,11 @@ if (!empty($_SESSION['auth_user'])) {
         } catch (err) {
           if (reserveCarSelect) {
             reserveCarSelect.disabled = true;
-            reserveCarSelect.innerHTML = '<option value="">❌ Network error</option>';
+            reserveCarSelect.innerHTML = '<option value="">Network error</option>';
           }
           if (modalReserveAlert) {
             modalReserveAlert.className = 'alert-message error';
-            modalReserveAlert.innerHTML = `❌ Network error while loading cars: ${err.message}`;
+            modalReserveAlert.innerHTML = `Network error while loading cars: ${err.message}`;
             modalReserveAlert.style.display = 'block';
           }
         }
@@ -4466,7 +4466,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (!car_id) {
           if (modalReserveAlert) {
             modalReserveAlert.className = 'alert-message error';
-            modalReserveAlert.innerHTML = '⚠️ Please select your registered car.';
+            modalReserveAlert.innerHTML = 'Please select your registered car.';
             modalReserveAlert.style.display = 'block';
           }
           return;
@@ -4475,7 +4475,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (!parking_space_id) {
           if (modalReserveAlert) {
             modalReserveAlert.className = 'alert-message error';
-            modalReserveAlert.innerHTML = '⚠️ Please select an eligible host parking lot.';
+            modalReserveAlert.innerHTML = 'Please select an eligible host parking lot.';
             modalReserveAlert.style.display = 'block';
           }
           return;
@@ -4500,12 +4500,12 @@ if (!empty($_SESSION['auth_user'])) {
           if (res.ok && json.success) {
             closeReserveModal();
             showDashboardAlert('success', `
-              🎉 <strong>Reservation Request Submitted!</strong><br>
+              <strong>Reservation Request Submitted!</strong><br>
               Your request is pending parking space owner approval. Available spots remain open until the owner accepts.
             `);
             if (typeof showReservationAlert === 'function') {
               showReservationAlert('success', `
-                🎉 <strong>Reservation Request Submitted!</strong><br>
+                <strong>Reservation Request Submitted!</strong><br>
                 Your request is pending parking space owner approval.
               `);
             }
@@ -4515,20 +4515,20 @@ if (!empty($_SESSION['auth_user'])) {
           } else {
             if (modalReserveAlert) {
               modalReserveAlert.className = 'alert-message error';
-              modalReserveAlert.innerHTML = `❌ ${json.error || 'Failed to submit reservation request.'}`;
+              modalReserveAlert.innerHTML = `${json.error || 'Failed to submit reservation request.'}`;
               modalReserveAlert.style.display = 'block';
             }
           }
         } catch (err) {
           if (modalReserveAlert) {
             modalReserveAlert.className = 'alert-message error';
-            modalReserveAlert.innerHTML = `❌ Network error: ${err.message}`;
+            modalReserveAlert.innerHTML = `Network error: ${err.message}`;
             modalReserveAlert.style.display = 'block';
           }
         } finally {
           if (btnSubmitReserveModal) {
             btnSubmitReserveModal.disabled = !reserveCarSelect?.value;
-            btnSubmitReserveModal.innerHTML = '<span>📩</span> Request Reservation';
+            btnSubmitReserveModal.innerHTML = 'Request Reservation';
           }
         }
       });
@@ -4560,14 +4560,14 @@ if (!empty($_SESSION['auth_user'])) {
 
           const json = await res.json();
           if (res.ok && json.success) {
-            showDashboardAlert('success', `🅿️ <strong>Lot Updated:</strong> "${name}" is now marked as <strong>${newStatus.toUpperCase()}</strong>.`);
+            showDashboardAlert('success', `<strong>Lot Updated:</strong> "${name}" is now marked as <strong>${newStatus.toUpperCase()}</strong>.`);
             await loadDashboard();
             if (window.parkingMap) window.parkingMap.loadParkingSpaces();
           } else {
-            showDashboardAlert('error', `❌ Failed to update status: ${json.error || 'Server error'}`);
+            showDashboardAlert('error', `Failed to update status: ${json.error || 'Server error'}`);
           }
         } catch (err) {
-          showDashboardAlert('error', `❌ Network error: ${err.message}`);
+          showDashboardAlert('error', `Network error: ${err.message}`);
         }
       }
 
@@ -4575,7 +4575,7 @@ if (!empty($_SESSION['auth_user'])) {
       async function deleteParkingLot(spaceId, spaceName) {
         if (!spaceId) return;
         const confirmed = window.confirm(
-          `🗑️ Delete Parking Lot\n\n` +
+          `Delete Parking Lot\n\n` +
           `Are you sure you want to delete "${spaceName}"?\n` +
           `This will permanently remove the lot from the map.`
         );
@@ -4593,14 +4593,14 @@ if (!empty($_SESSION['auth_user'])) {
 
           const json = await res.json();
           if (res.ok && json.success) {
-            showDashboardAlert('success', `🗑️ <strong>Parking Lot Deleted:</strong> "${spaceName}" has been removed.`);
+            showDashboardAlert('success', `<strong>Parking Lot Deleted:</strong> "${spaceName}" has been removed.`);
             await loadDashboard();
             if (window.parkingMap) window.parkingMap.loadParkingSpaces();
           } else {
-            showDashboardAlert('error', `❌ <strong>Cannot Delete Lot:</strong> ${json.error || 'Database error'}`);
+            showDashboardAlert('error', `<strong>Cannot Delete Lot:</strong> ${json.error || 'Database error'}`);
           }
         } catch (err) {
-          showDashboardAlert('error', `❌ Network error: ${err.message}`);
+          showDashboardAlert('error', `Network error: ${err.message}`);
         }
       }
 

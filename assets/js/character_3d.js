@@ -55,8 +55,8 @@
 
       this.scene = new THREE.Scene();
 
-      this.camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
-      this.camera.position.set(0, 1.25, 4.3);
+      this.camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 100);
+      this.camera.position.set(0, 1.12, 4.65);
       this.camera.lookAt(0, 1.05, 0);
 
       // Lighting
@@ -178,6 +178,12 @@
       this.parts.head.position.y = 1.62;
       bg.add(this.parts.head);
 
+      // Neck
+      const neckGeo = new THREE.BoxGeometry(0.28, 0.16, 0.26);
+      const neck = new THREE.Mesh(neckGeo, this.materials.skin);
+      neck.position.set(0, 1.28, 0);
+      bg.add(neck);
+
       // Eyes
       const eyeGeo = new THREE.BoxGeometry(0.09, 0.12, 0.05);
       const eyeL = new THREE.Mesh(eyeGeo, this.materials.dark);
@@ -259,20 +265,41 @@
       // Legs / Pants
       const legW = isFem ? 0.22 : 0.25;
       const legSpacing = isFem ? 0.16 : 0.18;
-      const legGeo = new THREE.BoxGeometry(legW, 0.65, 0.26);
+      const legGeo = new THREE.BoxGeometry(legW, 0.60, 0.26);
       const legL = new THREE.Mesh(legGeo, this.materials.dark);
-      legL.position.set(-legSpacing, 0.32, 0);
+      legL.position.set(-legSpacing, 0.36, 0);
       const legR = new THREE.Mesh(legGeo, this.materials.dark);
-      legR.position.set(legSpacing, 0.32, 0);
+      legR.position.set(legSpacing, 0.36, 0);
       bg.add(legL, legR);
 
-      // Flood Boots
-      const bootGeo = new THREE.BoxGeometry(legW + 0.04, 0.18, 0.36);
-      const bootL = new THREE.Mesh(bootGeo, this.materials.boots);
-      bootL.position.set(-legSpacing, 0.08, 0.05);
-      const bootR = new THREE.Mesh(bootGeo, this.materials.boots);
-      bootR.position.set(legSpacing, 0.08, 0.05);
-      bg.add(bootL, bootR);
+      // Flood Boots (Iconic safety rubber boots with sculpted heel, sole, and calf shaft)
+      const bootFootW = legW + 0.04;
+      const bootFootGeo = new THREE.BoxGeometry(bootFootW, 0.14, 0.40);
+      const bootHeelGeo = new THREE.BoxGeometry(bootFootW + 0.01, 0.05, 0.15);
+      const bootSoleGeo = new THREE.BoxGeometry(bootFootW + 0.01, 0.03, 0.24);
+      const bootShaftGeo = new THREE.BoxGeometry(legW + 0.03, 0.22, 0.29);
+
+      // Left Boot (Foot, rear heel, front sole tread, upper shaft)
+      const bootL = new THREE.Mesh(bootFootGeo, this.materials.boots);
+      bootL.position.set(-legSpacing, 0.09, 0.04);
+      const heelL = new THREE.Mesh(bootHeelGeo, this.materials.dark);
+      heelL.position.set(-legSpacing, 0.025, -0.08);
+      const soleL = new THREE.Mesh(bootSoleGeo, this.materials.dark);
+      soleL.position.set(-legSpacing, 0.015, 0.11);
+      const shaftL = new THREE.Mesh(bootShaftGeo, this.materials.boots);
+      shaftL.position.set(-legSpacing, 0.19, 0.01);
+      bg.add(bootL, heelL, soleL, shaftL);
+
+      // Right Boot (Foot, rear heel, front sole tread, upper shaft)
+      const bootR = new THREE.Mesh(bootFootGeo, this.materials.boots);
+      bootR.position.set(legSpacing, 0.09, 0.04);
+      const heelR = new THREE.Mesh(bootHeelGeo, this.materials.dark);
+      heelR.position.set(legSpacing, 0.025, -0.08);
+      const soleR = new THREE.Mesh(bootSoleGeo, this.materials.dark);
+      soleR.position.set(legSpacing, 0.015, 0.11);
+      const shaftR = new THREE.Mesh(bootShaftGeo, this.materials.boots);
+      shaftR.position.set(legSpacing, 0.19, 0.01);
+      bg.add(bootR, heelR, soleR, shaftR);
     }
 
     buildHair(style) {
@@ -298,6 +325,14 @@
           spike.rotation.z = -i * 0.16;
           hg.add(spike);
         }
+
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.45, 0.14), mat);
+        back.position.set(0, 1.68, -0.34);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.35, 0.68), mat);
+        sideL.position.set(-0.38, 1.72, 0);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.35, 0.68), mat);
+        sideR.position.set(0.38, 1.72, 0);
+        hg.add(back, sideL, sideR);
       } else if (style === 'short') {
         // Neat side-part
         const top = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.32, 0.74), mat);
@@ -312,7 +347,9 @@
         sideL.position.set(-0.38, 1.72, 0);
         const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.35, 0.65), mat);
         sideR.position.set(0.38, 1.72, 0);
-        hg.add(sideL, sideR);
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.45, 0.14), mat);
+        back.position.set(0, 1.68, -0.34);
+        hg.add(sideL, sideR, back);
       } else if (style === 'bob') {
         // Rounded bob cut with longer sides
         const top = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.34, 0.76), mat);
@@ -337,6 +374,14 @@
         const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.14), mat);
         fringe.position.set(0, 1.86, 0.34);
         hg.add(fringe);
+
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.40, 0.68), mat);
+        sideL.position.set(-0.38, 1.70, 0);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.40, 0.68), mat);
+        sideR.position.set(0.38, 1.70, 0);
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.50, 0.14), mat);
+        back.position.set(0, 1.65, -0.34);
+        hg.add(sideL, sideR, back);
 
         const tieGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.08, 12);
         const tie = new THREE.Mesh(tieGeo, this.materials.clothes);
@@ -367,6 +412,15 @@
         const lamp = new THREE.Mesh(lampGeo, this.materials.white);
         lamp.position.set(0, 1.94, 0.46);
         hg.add(lamp);
+
+        // Underside hair rim
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.30, 0.12), mat);
+        hairBack.position.set(0, 1.64, -0.33);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.50), mat);
+        sideL.position.set(-0.37, 1.68, 0.05);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.50), mat);
+        sideR.position.set(0.37, 1.68, 0.05);
+        hg.add(hairBack, sideL, sideR);
       } else if (style === 'cap') {
         // Baseball cap
         const capMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(this.options.clothesColor), roughness: 0.4 });
@@ -377,6 +431,14 @@
         const visor = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.05, 0.32), capMat);
         visor.position.set(0, 1.80, 0.46);
         hg.add(visor);
+
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.35, 0.12), mat);
+        hairBack.position.set(0, 1.68, -0.33);
+        const sideburnL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.28, 0.35), mat);
+        sideburnL.position.set(-0.38, 1.72, 0.10);
+        const sideburnR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.28, 0.35), mat);
+        sideburnR.position.set(0.38, 1.72, 0.10);
+        hg.add(hairBack, sideburnL, sideburnR);
       } else if (style === 'beanie') {
         // Cozy folded beanie
         const beanieMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
@@ -387,6 +449,10 @@
         const fold = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.12, 0.80), beanieMat);
         fold.position.set(0, 1.75, 0);
         hg.add(fold);
+
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.25, 0.10), mat);
+        hairBack.position.set(0, 1.64, -0.33);
+        hg.add(hairBack);
       } else if (style === 'twintails') {
         // Twin Tails (Female pigtails)
         const top = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.32, 0.74), mat);
@@ -396,6 +462,14 @@
         const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.14), mat);
         fringe.position.set(0, 1.86, 0.34);
         hg.add(fringe);
+
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.42, 0.68), mat);
+        sideL.position.set(-0.38, 1.70, 0);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.42, 0.68), mat);
+        sideR.position.set(0.38, 1.70, 0);
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.52, 0.14), mat);
+        back.position.set(0, 1.65, -0.34);
+        hg.add(sideL, sideR, back);
 
         const tailL = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.55, 6), mat);
         tailL.position.set(-0.45, 1.55, 0.05);
@@ -444,12 +518,22 @@
         sideL.position.set(-0.38, 1.72, 0);
         const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.30, 0.65), mat);
         sideR.position.set(0.38, 1.72, 0);
-        hg.add(sideL, sideR);
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.45, 0.14), mat);
+        back.position.set(0, 1.68, -0.34);
+        hg.add(sideL, sideR, back);
       } else if (style === 'buzz') {
         // Clean Buzz Cut (Male)
         const top = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.18, 0.72), mat);
         top.position.set(0, 1.84, 0);
         hg.add(top);
+
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.35, 0.10), mat);
+        back.position.set(0, 1.72, -0.33);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.28, 0.68), mat);
+        sideL.position.set(-0.37, 1.76, 0);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.28, 0.68), mat);
+        sideR.position.set(0.37, 1.76, 0);
+        hg.add(back, sideL, sideR);
       }
     }
 
@@ -749,7 +833,23 @@
       const width = (parent && parent.clientWidth > 0 ? parent.clientWidth : this.canvas.clientWidth) || 340;
       const height = (parent && parent.clientHeight > 0 ? parent.clientHeight : this.canvas.clientHeight) || 320;
       if (width > 0 && height > 0) {
-        this.camera.aspect = width / height;
+        const aspect = width / height;
+        this.camera.aspect = aspect;
+
+        // Dynamic responsive reframing to guarantee complete visibility (pedestal to top of helmet/hair)
+        // on every screen width (320px, 375px, 390px, 430px, 768px, desktop):
+        if (aspect < 0.85) {
+          // Narrow mobile screen: expand FOV proportionally so horizontal bounds (hands) don't clip
+          this.camera.fov = Math.min(42, (34 / aspect) * 0.86);
+        } else if (aspect < 1.15) {
+          this.camera.fov = 35;
+        } else if (aspect > 1.6) {
+          // Wide / landscape container: keep vertical FOV calibrated for head and pedestal
+          this.camera.fov = 36;
+        } else {
+          this.camera.fov = 34;
+        }
+
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height, false);
         this.render();
@@ -800,9 +900,9 @@
 
       const time = this.clock.getElapsedTime();
 
-      // Gentle breathing idle animation
+      // Gentle natural breathing that stays grounded on the pedestal surface (y >= 0)
       if (this.charGroup) {
-        this.charGroup.position.y = Math.sin(time * 2.2) * 0.025;
+        this.charGroup.position.y = (Math.sin(time * 2.2) * 0.5 + 0.5) * 0.02;
 
         if (this.isDragging) {
           // Handled in mousemove
