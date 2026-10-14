@@ -20,7 +20,7 @@ const APP_PORT = '8088';
 const APP_ROUTE = '/#map';
 
 // Known hosts
-const CURRENT_MAC_IP = '192.168.1.44';
+const CURRENT_MAC_IP = '172.20.10.2';
 const LOCALHOST_IP = '127.0.0.1';
 const HOTSPOT_IP = '172.20.10.2';
 const HOME_WIFI_IP = '192.168.70.187';
