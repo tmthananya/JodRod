@@ -2964,3 +2964,122 @@ textarea.form-input:focus {
   }
 }
 
+/* ==========================================================
+   DASHBOARD REFINEMENTS: WHAT NEEDS ATTENTION & ROLE CARDS
+   ========================================================== */
+.dash-attention-empty {
+  background: var(--bg-card);
+  border: 2px dashed #94a3b8;
+  border-radius: 6px;
+  padding: 20px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.dash-attention-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px;
+}
+
+.dash-attention-card {
+  background: #ffffff;
+  border: 3px solid var(--border-pixel);
+  box-shadow: var(--shadow-pixel-sm);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dash-attention-card.owner-urgent {
+  border-color: #b45309;
+  background: #fffbeb;
+}
+
+.dash-attention-card.driver-pending {
+  border-color: #0284c7;
+  background: #f0f9ff;
+}
+
+.dash-attention-card.driver-confirmed {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.dash-attn-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash-attn-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  letter-spacing: 0.5px;
+}
+
+.dash-attn-badge.owner-badge {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.dash-attn-badge.driver-badge {
+  color: #1e40af;
+  background: #dbeafe;
+}
+
+.dash-attn-badge.confirmed-badge {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.dash-attn-body {
+  font-size: 0.85rem;
+}
+
+.dash-attn-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dash-attn-actions .pixel-btn,
+.dash-attn-actions a {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+}
+
+.dash-empty-role-card {
+  grid-column: 1 / -1;
+  background: var(--bg-card);
+  border: 2px dashed #94a3b8;
+  border-radius: 6px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dash-empty-role-icon {
+  font-size: 2rem;
+  background: #f1f5f9;
+  border: 2px solid var(--border-pixel);
+  border-radius: 6px;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+

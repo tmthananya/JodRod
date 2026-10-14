@@ -304,7 +304,7 @@ if (!empty($_SESSION['auth_user'])) {
             <div class="dash-welcome-badge">🛡️ FLOOD RELIEF COMMAND CENTER</div>
             <h3 class="dash-welcome-title">Welcome back, <span id="dash-welcome-user">Driver & Host</span>!</h3>
             <p class="dash-welcome-text">
-              Real-time flood parking coordination: track vehicles, discover safe ground, manage community parking spaces, and confirm emergency reservations.
+              Real-time flood parking overview: track vehicles, secure high-ground spots, manage community parking lots, and confirm emergency reservations.
             </p>
           </div>
           <div class="dash-welcome-status">
@@ -316,10 +316,13 @@ if (!empty($_SESSION['auth_user'])) {
           <a href="#map" class="pixel-btn pixel-btn-blue pixel-btn-sm">
             <span>🗺️</span> Find Parking
           </a>
-          <a href="#my-spaces" class="pixel-btn pixel-btn-green pixel-btn-sm">
+          <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm btn-dash-add-car-trigger">
+            <span>➕</span> Add Vehicle
+          </button>
+          <a href="#my-spaces" class="pixel-btn pixel-btn-yellow pixel-btn-sm">
             <span>🅿️</span> My Parking Lots
           </a>
-          <a href="#my-reservations" class="pixel-btn pixel-btn-yellow pixel-btn-sm">
+          <a href="#my-reservations" class="pixel-btn pixel-btn-sm">
             <span>📋</span> My Reservations
           </a>
           <a href="#profile" class="pixel-btn pixel-btn-sm">
@@ -328,53 +331,89 @@ if (!empty($_SESSION['auth_user'])) {
         </div>
       </div>
 
+      <!-- Action Required: What Needs Attention Section -->
+      <div class="dash-section-wrapper" id="dash-attention-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 class="dash-section-heading" style="margin-bottom: 2px;"><span>⚡</span> What Needs Attention</h3>
+            <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Urgent actions requiring your decision, host approval, or vehicle safety relocation.</p>
+          </div>
+          <div id="dash-attention-count-badge"></div>
+        </div>
+        <div id="dash-attention-container">
+          <div class="dash-attention-empty">
+            <span>⏳</span> Checking for pending requests and active spot updates...
+          </div>
+        </div>
+      </div>
+
       <!-- Section A: Overview Metrics Cards -->
       <div class="dash-section-wrapper">
         <h3 class="dash-section-heading"><span>📈</span> A. Dashboard Overview</h3>
-        <div class="dash-overview-grid">
+        
+        <!-- Driver Role Summary -->
+        <div style="margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">🚘 Driver Summary</span>
+          <a href="#my-reservations" style="font-size: 0.75rem; color: #0284c7; font-weight: 700; text-decoration: underline;">View All Reservations &rarr;</a>
+        </div>
+        <div class="dash-overview-grid" style="margin-top: 4px; margin-bottom: 20px;">
           <div class="dash-metric-card" id="metric-card-cars">
-            <div class="dash-metric-header">
-              <span class="dash-metric-icon">🚘</span>
-              <span class="status-badge status-available" style="font-size: 0.68rem;">Owned</span>
+            <div class="dash-metric-icon">🚘</div>
+            <div class="metric-info">
+              <div class="dash-metric-val" id="dash-stat-cars">-</div>
+              <div class="dash-metric-lbl">Total Registered Cars</div>
             </div>
-            <div class="dash-metric-val" id="dash-stat-cars">-</div>
-            <div class="dash-metric-lbl">Total Registered Cars</div>
           </div>
 
           <div class="dash-metric-card" id="metric-card-assigned">
-            <div class="dash-metric-header">
-              <span class="dash-metric-icon">🛡️</span>
-              <span class="status-badge status-available" style="font-size: 0.68rem;">Safe</span>
-            </div>
-            <div class="dash-metric-val" id="dash-stat-assigned">-</div>
-            <div class="dash-metric-lbl">Cars with Active Parking Spots</div>
-          </div>
-
-          <div class="dash-metric-card" id="metric-card-lots">
-            <div class="dash-metric-header">
-              <span class="dash-metric-icon">🅿️</span>
-              <span class="status-badge status-available" style="font-size: 0.68rem;">Host</span>
-            </div>
-            <div class="dash-metric-val" id="dash-stat-lots">-</div>
-            <div class="dash-metric-lbl">My Owned Parking Lots</div>
-            <div class="dash-metric-sub" id="dash-owner-pending-sub" style="margin-top: 6px;">
-              <span class="status-pill" style="font-size: 0.68rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
-                ⏳ <span id="dash-stat-owner-pending">0</span> Pending Requests
-              </span>
+            <div class="dash-metric-icon" style="background: #f0fdf4;">🛡️</div>
+            <div class="metric-info">
+              <div class="dash-metric-val" id="dash-stat-assigned">-</div>
+              <div class="dash-metric-lbl">Cars on Safe Ground</div>
             </div>
           </div>
 
           <div class="dash-metric-card" id="metric-card-reservations">
-            <div class="dash-metric-header">
-              <span class="dash-metric-icon">📋</span>
-              <span class="status-badge status-available" style="font-size: 0.68rem;">Active</span>
+            <div class="dash-metric-icon" style="background: #eff6ff;">📋</div>
+            <div class="metric-info">
+              <div class="dash-metric-val" id="dash-stat-reservations">-</div>
+              <div class="dash-metric-lbl">Active Spot Reservations</div>
+              <div class="dash-metric-sub" id="dash-driver-pending-sub" style="margin-top: 4px;">
+                <span class="status-pill" style="font-size: 0.68rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
+                  ⏳ <span id="dash-stat-driver-pending">0</span> Awaiting Approval
+                </span>
+              </div>
             </div>
-            <div class="dash-metric-val" id="dash-stat-reservations">-</div>
-            <div class="dash-metric-lbl">Active Spot Reservations</div>
-            <div class="dash-metric-sub" id="dash-driver-pending-sub" style="margin-top: 6px;">
-              <span class="status-pill" style="font-size: 0.68rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
-                ⏳ <span id="dash-stat-driver-pending">0</span> Awaiting Approval
-              </span>
+          </div>
+        </div>
+
+        <!-- Host Role Summary -->
+        <div style="margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">🅿️ Parking Lot Host Summary</span>
+          <a href="#my-spaces" style="font-size: 0.75rem; color: #0284c7; font-weight: 700; text-decoration: underline;">Manage Parking Lots &rarr;</a>
+        </div>
+        <div class="dash-overview-grid" style="margin-top: 4px;">
+          <div class="dash-metric-card" id="metric-card-lots">
+            <div class="dash-metric-icon" style="background: #fef9c3;">🅿️</div>
+            <div class="metric-info">
+              <div class="dash-metric-val" id="dash-stat-lots">-</div>
+              <div class="dash-metric-lbl">My Owned Parking Lots</div>
+            </div>
+          </div>
+
+          <div class="dash-metric-card" id="metric-card-owner-available">
+            <div class="dash-metric-icon" style="background: #ecfdf5;">🟢</div>
+            <div class="metric-info">
+              <div class="dash-metric-val" id="dash-stat-owner-available">-</div>
+              <div class="dash-metric-lbl">Available Spaces</div>
+            </div>
+          </div>
+
+          <div class="dash-metric-card" id="metric-card-owner-pending">
+            <div class="dash-metric-icon" style="background: #fffbeb;">⏳</div>
+            <div class="metric-info">
+              <div class="dash-metric-val" id="dash-stat-owner-pending">-</div>
+              <div class="dash-metric-lbl">Requests Awaiting Decision</div>
             </div>
           </div>
         </div>
@@ -3703,26 +3742,30 @@ if (!empty($_SESSION['auth_user'])) {
             }
           });
 
-          // Welcome greeting update
-          const welcomeUserEl = document.getElementById('dash-welcome-user');
-          if (welcomeUserEl && currentUser) {
-            welcomeUserEl.textContent = currentUser.name || currentUser.email || 'Driver & Host';
-          }
-
           // Section A: Metric counts
           const totalCars = dashboardState.cars.length;
           const assignedCarsCount = dashboardState.cars.filter(c => !!carAssignmentMap[c.id]).length;
           const myLotsCount = myLots.length;
+          const totalAvailableSpaces = myLots.reduce((acc, lot) => acc + (parseInt(lot.available_spaces, 10) || 0), 0);
           const activeResCount = dashboardState.reservations.filter(r => r.status === 'confirmed' || r.status === 'active').length;
 
           // Pending counts
-          const pendingOwnerCount = (dashboardState.ownerReservations || []).filter(r => r.status === 'pending').length;
+          const pendingOwnerCount = (dashboardState.ownerReservations || []).filter(r => (r.status || 'pending').toLowerCase() === 'pending').length;
           const pendingDriverCount = dashboardState.reservations.filter(r => (r.status || 'pending').toLowerCase() === 'pending').length;
+
+          // Welcome greeting update with dynamic role badge
+          const welcomeUserEl = document.getElementById('dash-welcome-user');
+          if (welcomeUserEl && currentUser) {
+            const roleName = myLotsCount > 0 ? (totalCars > 0 ? 'Driver & Parking Host' : 'Parking Host') : 'Community Driver';
+            const displayName = currentUser.name || (currentUser.email ? currentUser.email.split('@')[0] : 'Community Member');
+            welcomeUserEl.innerHTML = `${displayName} <span style="font-size:0.75rem; font-weight:700; color:#64748b; margin-left:4px;">(${roleName})</span>`;
+          }
 
           const statCars = document.getElementById('dash-stat-cars');
           const statAssigned = document.getElementById('dash-stat-assigned');
           const statLots = document.getElementById('dash-stat-lots');
           const statRes = document.getElementById('dash-stat-reservations');
+          const statOwnerAvailable = document.getElementById('dash-stat-owner-available');
           const statOwnerPending = document.getElementById('dash-stat-owner-pending');
           const statDriverPending = document.getElementById('dash-stat-driver-pending');
 
@@ -3730,8 +3773,12 @@ if (!empty($_SESSION['auth_user'])) {
           if (statAssigned) statAssigned.textContent = assignedCarsCount;
           if (statLots) statLots.textContent = myLotsCount;
           if (statRes) statRes.textContent = activeResCount;
+          if (statOwnerAvailable) statOwnerAvailable.textContent = totalAvailableSpaces;
           if (statOwnerPending) statOwnerPending.textContent = pendingOwnerCount;
           if (statDriverPending) statDriverPending.textContent = pendingDriverCount;
+
+          // What Needs Attention Section
+          renderDashboardAttention(dashboardState.cars, myLots, dashboardState.reservations, dashboardState.ownerReservations);
 
           // Section B: Render My Cars
           renderDashboardCars(dashboardState.cars, carAssignmentMap);
@@ -3753,14 +3800,179 @@ if (!empty($_SESSION['auth_user'])) {
       }
       window.loadDashboard = loadDashboard;
 
+      function renderDashboardAttention(cars, myLots, driverReservations, ownerReservations) {
+        const container = document.getElementById('dash-attention-container');
+        const countBadge = document.getElementById('dash-attention-count-badge');
+        if (!container) return;
+
+        const pendingOwnerReqs = (ownerReservations || []).filter(r => (r.status || 'pending').toLowerCase() === 'pending');
+        const pendingDriverReqs = (driverReservations || []).filter(r => (r.status || 'pending').toLowerCase() === 'pending');
+        const confirmedDriverSpots = (driverReservations || []).filter(r => r.status === 'confirmed' || r.status === 'active');
+
+        const totalUrgent = pendingOwnerReqs.length + pendingDriverReqs.length;
+
+        if (countBadge) {
+          if (totalUrgent > 0) {
+            countBadge.innerHTML = `<span class="status-pill" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5; font-size:0.72rem; font-weight:800;">⚠️ ${totalUrgent} Action${totalUrgent > 1 ? 's' : ''} Pending</span>`;
+          } else {
+            countBadge.innerHTML = `<span class="status-pill status-available" style="font-size:0.72rem; font-weight:700;">🟢 All Clear</span>`;
+          }
+        }
+
+        if (pendingOwnerReqs.length === 0 && pendingDriverReqs.length === 0 && confirmedDriverSpots.length === 0) {
+          container.innerHTML = `
+            <div class="dash-attention-empty">
+              <div style="font-size: 1.5rem; margin-bottom: 4px;">✨</div>
+              <div style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">All Clear — No Urgent Actions Required</div>
+              <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">
+                You have no pending requests awaiting your decision, and no active flood reservations requiring attention.
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '<div class="dash-attention-grid">';
+
+        // 1. Owner pending requests (highest priority - someone is requesting a spot in your lot)
+        pendingOwnerReqs.forEach(r => {
+          const space = r.parking_spaces || {};
+          const lotName = space.name || 'Your Parking Lot';
+          const driverName = r.driver_profile?.name || 'Community Driver';
+          const car = r.cars || {};
+          const plate = car.license_plate || 'Unlinked Vehicle';
+          const model = car.model ? ` (${car.model})` : '';
+          const createdStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+
+          html += `
+            <div class="dash-attention-card owner-urgent" id="dash-attn-owner-${r.id}">
+              <div class="dash-attn-header">
+                <div class="dash-attn-badge owner-badge">🅿️ HOST DECISION NEEDED</div>
+                <span class="status-pill" style="font-size: 0.65rem; background: #fef3c7; color: #b45309; border-color: #fde68a;">
+                  ⏳ Awaiting Approval
+                </span>
+              </div>
+              <div class="dash-attn-body">
+                <div style="font-weight: 800; color: #0f172a; font-size: 0.92rem;">
+                  👤 ${driverName} <span style="font-weight: normal; color: #64748b; font-size: 0.82rem;">requested a spot at</span> <strong>${lotName}</strong>
+                </div>
+                <div style="font-size: 0.82rem; color: #334155; margin-top: 4px;">
+                  🚘 <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>${model}
+                </div>
+                ${r.notes ? `<div style="font-size: 0.76rem; color: #64748b; font-style: italic; margin-top: 4px;">Note: "${r.notes}"</div>` : ''}
+                <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">Requested: ${createdStr}</div>
+              </div>
+              <div class="dash-attn-actions">
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-green btn-owner-approve-res" data-id="${r.id}" data-action="accept" data-space="${lotName}" data-plate="${plate}">
+                  <span>✅</span> Accept Request
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-owner-approve-res" data-id="${r.id}" data-action="reject" data-space="${lotName}" data-plate="${plate}">
+                  <span>❌</span> Decline
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        // 2. Driver pending requests (driver waiting for owner approval)
+        pendingDriverReqs.forEach(r => {
+          const space = r.parking_spaces || {};
+          const lotName = space.name || 'Emergency Flood Lot';
+          const car = r.cars || {};
+          const plate = car.license_plate || 'Your Vehicle';
+          const model = car.model ? ` (${car.model})` : '';
+          const createdStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
+
+          html += `
+            <div class="dash-attention-card driver-pending" id="dash-attn-driver-${r.id}">
+              <div class="dash-attn-header">
+                <div class="dash-attn-badge driver-badge">⏳ OUTGOING REQUEST</div>
+                <span class="status-pill" style="font-size: 0.65rem; background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">
+                  Waiting on Host
+                </span>
+              </div>
+              <div class="dash-attn-body">
+                <div style="font-weight: 800; color: #0f172a; font-size: 0.92rem;">
+                  🅿️ ${lotName}
+                </div>
+                <div style="font-size: 0.82rem; color: #334155; margin-top: 4px;">
+                  🚘 <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>${model}
+                </div>
+                <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">Submitted: ${createdStr}</div>
+              </div>
+              <div class="dash-attn-actions">
+                <a href="#my-reservations" class="pixel-btn pixel-btn-sm pixel-btn-blue">
+                  <span>📋</span> View Reservation
+                </a>
+                <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-cancel-car-res" data-id="${r.id}" data-plate="${plate}" data-lot="${lotName}">
+                  <span>❌</span> Cancel Request
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        // 3. Driver confirmed emergency spot (ready for vehicle safety)
+        confirmedDriverSpots.forEach(r => {
+          const space = r.parking_spaces || {};
+          const lotName = space.name || 'Emergency Safe Lot';
+          const car = r.cars || {};
+          const plate = car.license_plate || 'Vehicle';
+          const lat = space.latitude ? parseFloat(space.latitude).toFixed(4) : null;
+          const lng = space.longitude ? parseFloat(space.longitude).toFixed(4) : null;
+
+          html += `
+            <div class="dash-attention-card driver-confirmed" id="dash-attn-confirmed-${r.id}">
+              <div class="dash-attn-header">
+                <div class="dash-attn-badge confirmed-badge">🟢 CONFIRMED FLOOD SPOT</div>
+                <span class="status-pill status-available" style="font-size: 0.65rem;">
+                  Ready
+                </span>
+              </div>
+              <div class="dash-attn-body">
+                <div style="font-weight: 800; color: #0f172a; font-size: 0.92rem;">
+                  🅿️ ${lotName}
+                </div>
+                <div style="font-size: 0.82rem; color: #334155; margin-top: 4px;">
+                  🚘 Assigned: <span class="dash-car-plate" style="font-size: 0.76rem;">${plate}</span>
+                </div>
+                ${(lat && lng) ? `<div style="font-size: 0.75rem; color: #64748b; font-family: monospace; margin-top: 4px;">📍 GPS: ${lat}, ${lng}</div>` : ''}
+              </div>
+              <div class="dash-attn-actions">
+                ${(lat && lng) ? `
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue btn-view-car-spot" data-lat="${space.latitude}" data-lng="${space.longitude}">
+                    <span>🗺️</span> Navigate / Map
+                  </button>
+                ` : ''}
+                <a href="#my-reservations" class="pixel-btn pixel-btn-sm">
+                  <span>📋</span> Details
+                </a>
+              </div>
+            </div>
+          `;
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+      }
+
       function renderDashboardCars(cars, carAssignmentMap) {
         const container = document.getElementById('dash-cars-container');
         if (!container) return;
 
         if (cars.length === 0) {
           container.innerHTML = `
-            <div class="empty-spaces-notice" style="grid-column: 1 / -1;">
-              <span>🚘</span> No vehicles registered yet. Click "Register New Car" above to register your vehicle in Supabase.
+            <div class="dash-empty-role-card">
+              <div class="dash-empty-role-icon">🚘</div>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 4px 0; font-size: 1rem; color: #0f172a;">No Vehicles Registered Yet</h4>
+                <p style="margin: 0; font-size: 0.84rem; color: #64748b; line-height: 1.4;">
+                  Register your car license plate and model to secure emergency high ground parking and track flood relocation status.
+                </p>
+              </div>
+              <button type="button" class="pixel-btn pixel-btn-green pixel-btn-sm btn-dash-add-car-trigger" style="flex-shrink: 0;">
+                <span>➕</span> Register New Car
+              </button>
             </div>
           `;
           return;
@@ -3866,9 +4078,17 @@ if (!empty($_SESSION['auth_user'])) {
 
         if (myLots.length === 0) {
           container.innerHTML = `
-            <div class="empty-spaces-notice" style="grid-column: 1 / -1;">
-              <span>🅿️</span> You have not registered any parking lots yet. 
-              <a href="#my-spaces" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Offer a parking space</a> to help neighbors keep their cars safe from floodwaters.
+            <div class="dash-empty-role-card">
+              <div class="dash-empty-role-icon">🅿️</div>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="margin: 0 0 4px 0; font-size: 1rem; color: #0f172a;">Do you have flood-safe space to share?</h4>
+                <p style="margin: 0; font-size: 0.84rem; color: #64748b; line-height: 1.4;">
+                  You haven't listed any parking lots yet. If you own an elevated driveway, warehouse, or open ground above flood level, offering parking helps neighbors protect their vehicles.
+                </p>
+              </div>
+              <a href="#my-spaces" class="pixel-btn pixel-btn-blue pixel-btn-sm" style="flex-shrink: 0;">
+                <span>➕</span> Offer Parking Lot
+              </a>
             </div>
           `;
           return;
@@ -4191,6 +4411,11 @@ if (!empty($_SESSION['auth_user'])) {
       document.getElementById('btn-cancel-car-modal')?.addEventListener('click', closeCarModal);
       document.getElementById('btn-dash-add-car')?.addEventListener('click', () => openCarModal(null));
       document.getElementById('btn-dash-add-car-sec')?.addEventListener('click', () => openCarModal(null));
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-dash-add-car-trigger')) {
+          openCarModal(null);
+        }
+      });
       document.getElementById('btn-dash-refresh')?.addEventListener('click', loadDashboard);
 
       formCarModal?.addEventListener('submit', async (e) => {
