@@ -94,13 +94,16 @@ if ($available_spaces > $capacity) {
     exit;
 }
 
-// 5. Validate: Status (required, must be one of: available, full, closed)
-$allowed_statuses = ['available', 'full', 'closed'];
-$status = trim($input['status'] ?? 'available');
-if (!in_array($status, $allowed_statuses, true)) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Status must be one of: available, full, closed.']);
-    exit;
+// 5. Automatic Lot Status Calculation
+// Capacity values are the source of truth:
+// - If owner explicitly marks it 'closed', status is 'closed'.
+// - If available_spaces reaches 0, status is automatically 'full'.
+// - If available_spaces > 0, status is 'available'.
+$statusInput = trim($input['status'] ?? 'available');
+if ($statusInput === 'closed') {
+    $status = 'closed';
+} else {
+    $status = ($available_spaces === 0) ? 'full' : 'available';
 }
 
 // Build exact record payload stamped with authenticated owner_id

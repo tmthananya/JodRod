@@ -308,7 +308,7 @@ if (!empty($_SESSION['auth_user'])) {
         <div style="font-size: 0.82rem; color: #475569; font-weight: 600;">
           Click anywhere on the map to change the selected coordinates.
         </div>
-        <a href="#my-spaces" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-offer-from-map">
+        <a href="#my-spaces?action=offer" class="pixel-btn pixel-btn-green pixel-btn-sm" id="btn-offer-from-map">
           Offer Space at Selected Location &rarr;
         </a>
       </div>
@@ -558,9 +558,9 @@ if (!empty($_SESSION['auth_user'])) {
             <label for="offer-status" class="form-label">Status *</label>
             <select id="offer-status" name="status" class="form-select" required>
               <option value="available" selected>Available (Ready for parking)</option>
-              <option value="full">Full (At capacity)</option>
               <option value="closed">Closed (Temporarily unavailable)</option>
             </select>
+            <div class="form-help">Status is automatic based on capacity (reaches 0 spots &rarr; Full).</div>
           </div>
 
           <button type="submit" id="btn-submit-space" class="pixel-btn pixel-btn-green" style="width: 100%; padding: 14px; font-size: 1.05rem;">
@@ -886,9 +886,9 @@ if (!empty($_SESSION['auth_user'])) {
           <label for="edit-space-status" class="form-label">Status *</label>
           <select id="edit-space-status" name="status" class="form-select" required>
             <option value="available">Available (Ready for parking)</option>
-            <option value="full">Full (At capacity)</option>
             <option value="closed">Closed (Temporarily unavailable)</option>
           </select>
+          <div class="form-help">Status is automatic based on capacity (reaches 0 spots &rarr; Full).</div>
         </div>
 
         <div class="modal-actions">
@@ -1200,11 +1200,18 @@ if (!empty($_SESSION['auth_user'])) {
         }
 
         // Find Parking (#map) is the main page once logged in
-        let hash = window.location.hash;
+        let rawHash = window.location.hash || '';
+        let [hashPath, hashQuery] = rawHash.split('?');
+        let hash = hashPath;
         if (!hash || hash === '#' || hash === '#dashboard' || hash === '#my-car' || hash === '#home') {
           hash = '#map';
           window.location.hash = '#map';
           return;
+        }
+
+        const isOfferAction = (hash === '#offer-parking' || hash === '#offer-lot' || hash === '#offer-space' || (hash === '#my-spaces' && hashQuery && hashQuery.includes('action=offer')));
+        if (isOfferAction) {
+          hash = '#my-spaces';
         }
 
         // Update nav active states
@@ -1251,6 +1258,33 @@ if (!empty($_SESSION['auth_user'])) {
           if (typeof loadOwnerRequests === 'function') {
             loadOwnerRequests();
           }
+          if (isOfferAction) {
+            const offerContainer = document.getElementById('offer-parking-form-container');
+            if (offerContainer) {
+              offerContainer.style.display = 'block';
+              if (typeof backToLotsList === 'function') {
+                backToLotsList();
+              }
+              // Sync coordinates from map if available
+              if (window.parkingMap && window.parkingMap.selectedCoords) {
+                const offerLat = document.getElementById('offer-latitude');
+                const offerLng = document.getElementById('offer-longitude');
+                const latStr = window.parkingMap.selectedCoords.lat.toFixed(5);
+                const lngStr = window.parkingMap.selectedCoords.lng.toFixed(5);
+                if (offerLat && (!offerLat.value || offerLat.value === '18.7883' || offerLat.value === '18.78830')) {
+                  offerLat.value = latStr;
+                }
+                if (offerLng && (!offerLng.value || offerLng.value === '98.9853' || offerLng.value === '98.98530')) {
+                  offerLng.value = lngStr;
+                }
+              }
+              setTimeout(() => {
+                offerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                const nameInput = document.getElementById('offer-name');
+                if (nameInput) nameInput.focus();
+              }, 60);
+            }
+          }
         }
 
         // Load profiles if profile section is shown
@@ -1295,6 +1329,26 @@ if (!empty($_SESSION['auth_user'])) {
         });
       }
 
+      // Jump from map directly to offer form
+      const btnOfferFromMap = document.getElementById('btn-offer-from-map');
+      if (btnOfferFromMap) {
+        btnOfferFromMap.addEventListener('click', () => {
+          window.offerOrigin = 'map';
+          if (window.parkingMap && window.parkingMap.selectedCoords) {
+            const offerLat = document.getElementById('offer-latitude');
+            const offerLng = document.getElementById('offer-longitude');
+            const latStr = window.parkingMap.selectedCoords.lat.toFixed(5);
+            const lngStr = window.parkingMap.selectedCoords.lng.toFixed(5);
+            if (offerLat) offerLat.value = latStr;
+            if (offerLng) offerLng.value = lngStr;
+          }
+          const offerContainer = document.getElementById('offer-parking-form-container');
+          if (offerContainer) {
+            offerContainer.style.display = 'block';
+          }
+        });
+      }
+
       // Handle Offer Parking Space Form Submit
       const offerForm = document.getElementById('offer-parking-form');
       const offerAlert = document.getElementById('offer-alert');
@@ -1316,7 +1370,8 @@ if (!empty($_SESSION['auth_user'])) {
           const longitude = parseFloat(document.getElementById('offer-longitude').value);
           const capacity = parseInt(document.getElementById('offer-capacity').value, 10);
           const available_spaces = parseInt(document.getElementById('offer-available-spaces').value, 10);
-          const status = document.getElementById('offer-status').value;
+          const statusInput = document.getElementById('offer-status').value;
+          const status = (statusInput === 'closed') ? 'closed' : ((available_spaces === 0) ? 'full' : 'available');
 
           // Client-side Validation
           if (!name) {
@@ -1404,6 +1459,12 @@ if (!empty($_SESSION['auth_user'])) {
                   offerContainer.style.display = 'none';
                 }, 1500);
               }
+              if (window.offerOrigin === 'map') {
+                window.offerOrigin = null;
+                setTimeout(() => {
+                  window.location.hash = '#map';
+                }, 1600);
+              }
             } else {
               showAlert('error', `<strong>Failed to create space:</strong> ${result.error || 'Server error'}`);
             }
@@ -1436,7 +1497,8 @@ if (!empty($_SESSION['auth_user'])) {
           const name = document.getElementById('edit-space-name').value.trim();
           const capacity = parseInt(document.getElementById('edit-space-capacity').value, 10);
           const available_spaces = parseInt(document.getElementById('edit-space-available').value, 10);
-          const status = document.getElementById('edit-space-status').value;
+          const statusInput = document.getElementById('edit-space-status').value;
+          const status = (statusInput === 'closed') ? 'closed' : ((available_spaces === 0) ? 'full' : 'available');
 
           if (!id) {
             showEditAlert('error', 'Missing parking space ID.');
@@ -4561,7 +4623,8 @@ if (!empty($_SESSION['auth_user'])) {
           const json = await res.json();
           if (res.ok && json.success) {
             showDashboardAlert('success', `<strong>Lot Updated:</strong> "${name}" is now marked as <strong>${newStatus.toUpperCase()}</strong>.`);
-            await loadDashboard();
+            if (typeof loadMyParkingLots === 'function') await loadMyParkingLots();
+            if (typeof loadDashboard === 'function') await loadDashboard();
             if (window.parkingMap) window.parkingMap.loadParkingSpaces();
           } else {
             showDashboardAlert('error', `Failed to update status: ${json.error || 'Server error'}`);

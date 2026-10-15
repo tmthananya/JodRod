@@ -423,7 +423,7 @@ class ParkingMapController {
     if (nameField) nameField.value = space.name || '';
     if (capField) capField.value = space.capacity;
     if (availField) availField.value = space.available_spaces;
-    if (statusField) statusField.value = space.status || 'available';
+    if (statusField) statusField.value = (space.status === 'closed') ? 'closed' : 'available';
 
     if (modal) {
       modal.classList.add('active');

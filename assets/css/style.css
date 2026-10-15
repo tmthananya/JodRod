@@ -1242,13 +1242,32 @@ textarea.form-input:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  width: 100%;
+}
+
+#create-clothes-styles,
+#edit-clothes-styles,
+#create-hair-styles,
+#edit-hair-styles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+#create-feature-options,
+#edit-feature-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  width: 100%;
 }
 
 .customizer-chip-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 7px 11px;
+  padding: 7px 8px;
   font-size: 0.8rem;
   font-weight: 700;
   background: #f8fafc;
@@ -1256,25 +1275,27 @@ textarea.form-input:focus {
   border-radius: 4px;
   cursor: pointer;
   box-shadow: 1px 1px 0px var(--border-pixel);
-  transition: all 0.08s ease;
+  transition: background 0.1s ease, border-color 0.1s ease;
   color: #1e293b;
   min-height: 38px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .customizer-chip-btn:hover {
   background: #e0f2fe;
-  transform: translateY(-1px);
 }
 
 .customizer-chip-btn.active {
   background: #fef08a;
-  border-color: #0284c7;
+  border: 2px solid #0284c7;
   color: #0c4a6e;
-  box-shadow: 2px 2px 0px #0284c7;
-  transform: translateY(-1px);
-  font-weight: 800;
-  outline: 2px solid #38bdf8;
-  outline-offset: 1px;
+  box-shadow: 1px 1px 0px #0284c7;
+  font-weight: 700;
+  outline: none;
+  transform: none;
 }
 
 .color-swatch-row {
@@ -2134,10 +2155,19 @@ textarea.form-input:focus {
     gap: 4px;
   }
 
+  #create-clothes-styles,
+  #edit-clothes-styles,
+  #create-hair-styles,
+  #edit-hair-styles {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+
   .customizer-chip-btn {
-    padding: 5px 8px;
+    padding: 5px 6px;
     font-size: 0.74rem;
     min-height: 34px;
+    box-sizing: border-box;
   }
 
   .color-swatch-row {

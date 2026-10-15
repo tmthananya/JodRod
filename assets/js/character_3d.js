@@ -314,8 +314,9 @@
       const mat = this.materials.hair;
 
       if (style === 'spiky') {
-        const top = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.30, 0.72), mat);
-        top.position.set(0, 1.86, -0.02);
+        // Spiky Hair (Male)
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.32, 0.74), mat);
+        top.position.set(0, 1.86, -0.01);
         hg.add(top);
 
         const spikeGeo = new THREE.ConeGeometry(0.14, 0.32, 4);
@@ -328,41 +329,45 @@
 
         const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.45, 0.14), mat);
         back.position.set(0, 1.68, -0.34);
-        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.35, 0.68), mat);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.35, 0.68), mat);
         sideL.position.set(-0.38, 1.72, 0);
-        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.35, 0.68), mat);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.35, 0.68), mat);
         sideR.position.set(0.38, 1.72, 0);
         hg.add(back, sideL, sideR);
       } else if (style === 'short') {
-        // Neat side-part
+        // Neat side-part (Male)
         const top = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.32, 0.74), mat);
-        top.position.set(0, 1.86, -0.02);
+        top.position.set(0, 1.86, -0.01);
         hg.add(top);
 
-        const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.15), mat);
+        const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.14), mat);
         fringe.position.set(0, 1.86, 0.34);
         hg.add(fringe);
 
-        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.35, 0.65), mat);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.35, 0.68), mat);
         sideL.position.set(-0.38, 1.72, 0);
-        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.35, 0.65), mat);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.35, 0.68), mat);
         sideR.position.set(0.38, 1.72, 0);
         const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.45, 0.14), mat);
         back.position.set(0, 1.68, -0.34);
         hg.add(sideL, sideR, back);
       } else if (style === 'bob') {
-        // Rounded bob cut with longer sides
+        // Rounded bob cut with longer sides & front fringe
         const top = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.34, 0.76), mat);
         top.position.set(0, 1.87, -0.01);
         hg.add(top);
 
-        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.60, 0.68), mat);
-        sideL.position.set(-0.39, 1.58, 0.02);
-        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.60, 0.68), mat);
-        sideR.position.set(0.39, 1.58, 0.02);
+        const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.14), mat);
+        fringe.position.set(0, 1.86, 0.34);
+        hg.add(fringe);
+
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.62, 0.68), mat);
+        sideL.position.set(-0.38, 1.58, 0.01);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.62, 0.68), mat);
+        sideR.position.set(0.38, 1.58, 0.01);
         hg.add(sideL, sideR);
 
-        const back = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.60, 0.16), mat);
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.62, 0.16), mat);
         back.position.set(0, 1.58, -0.34);
         hg.add(back);
       } else if (style === 'ponytail') {
@@ -389,55 +394,61 @@
         tie.position.set(0, 1.95, -0.42);
         hg.add(tie);
 
-        const tailGeo = new THREE.ConeGeometry(0.14, 0.48, 5);
+        const tailGeo = new THREE.ConeGeometry(0.14, 0.48, 6);
         const tail = new THREE.Mesh(tailGeo, mat);
         tail.rotation.x = -Math.PI / 3;
         tail.position.set(0, 1.80, -0.62);
         hg.add(tail);
       } else if (style === 'helmet') {
-        // Flood Rescue Hard Hat
+        // Flood Rescue Hard Hat (Engineered dome properly encasing box head without clipping)
         const helmetMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.25 }); // Safety yellow
-        const domeGeo = new THREE.SphereGeometry(0.48, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+        const domeGeo = new THREE.SphereGeometry(0.56, 20, 14, 0, Math.PI * 2, 0, Math.PI / 2);
         const dome = new THREE.Mesh(domeGeo, helmetMat);
-        dome.position.set(0, 1.78, 0);
+        dome.position.set(0, 1.76, 0.01);
+        dome.scale.set(1.02, 0.95, 1.05);
         hg.add(dome);
 
-        const rimGeo = new THREE.CylinderGeometry(0.56, 0.56, 0.06, 24);
+        const rimGeo = new THREE.CylinderGeometry(0.62, 0.62, 0.06, 28);
         const rim = new THREE.Mesh(rimGeo, helmetMat);
-        rim.position.set(0, 1.78, 0.04);
+        rim.position.set(0, 1.76, 0.04);
         hg.add(rim);
+
+        // Center hard hat reinforcement crest
+        const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.10, 0.72), helmetMat);
+        ridge.position.set(0, 2.22, 0.02);
+        hg.add(ridge);
 
         // Front Headlamp badge
         const lampGeo = new THREE.BoxGeometry(0.14, 0.10, 0.08);
         const lamp = new THREE.Mesh(lampGeo, this.materials.white);
-        lamp.position.set(0, 1.94, 0.46);
+        lamp.position.set(0, 1.92, 0.54);
         hg.add(lamp);
 
-        // Underside hair rim
-        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.30, 0.12), mat);
-        hairBack.position.set(0, 1.64, -0.33);
-        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.50), mat);
-        sideL.position.set(-0.37, 1.68, 0.05);
-        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.50), mat);
-        sideR.position.set(0.37, 1.68, 0.05);
+        // Underside hair rim (seamlessly framing face, sides, and neck)
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.32, 0.14), mat);
+        hairBack.position.set(0, 1.64, -0.34);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.28, 0.65), mat);
+        sideL.position.set(-0.38, 1.66, 0);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.28, 0.65), mat);
+        sideR.position.set(0.38, 1.66, 0);
         hg.add(hairBack, sideL, sideR);
       } else if (style === 'cap') {
-        // Baseball cap
-        const capMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(this.options.clothesColor), roughness: 0.4 });
-        const dome = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.26, 0.74), capMat);
+        // Baseball cap (Matching outfit color dynamically)
+        const capMat = this.materials.clothes;
+        const dome = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.26, 0.76), capMat);
         dome.position.set(0, 1.88, 0);
         hg.add(dome);
 
-        const visor = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.05, 0.32), capMat);
-        visor.position.set(0, 1.80, 0.46);
+        const visor = new THREE.Mesh(new THREE.BoxGeometry(0.70, 0.05, 0.34), capMat);
+        visor.position.set(0, 1.80, 0.48);
         hg.add(visor);
 
-        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.35, 0.12), mat);
-        hairBack.position.set(0, 1.68, -0.33);
-        const sideburnL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.28, 0.35), mat);
-        sideburnL.position.set(-0.38, 1.72, 0.10);
-        const sideburnR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.28, 0.35), mat);
-        sideburnR.position.set(0.38, 1.72, 0.10);
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.35, 0.14), mat);
+        hairBack.position.set(0, 1.68, -0.34);
+        const sideburnL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.30, 0.58), mat);
+        sideburnL.position.set(-0.38, 1.70, 0.02);
+        const sideburnR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.30, 0.58), mat);
+        sideburnR.position.set(0.38, 1.70, 0.02);
         hg.add(hairBack, sideburnL, sideburnR);
       } else if (style === 'beanie') {
         // Cozy folded beanie
@@ -450,9 +461,13 @@
         fold.position.set(0, 1.75, 0);
         hg.add(fold);
 
-        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.25, 0.10), mat);
-        hairBack.position.set(0, 1.64, -0.33);
-        hg.add(hairBack);
+        const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.28, 0.12), mat);
+        hairBack.position.set(0, 1.64, -0.34);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.55), mat);
+        sideL.position.set(-0.38, 1.65, 0.02);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.55), mat);
+        sideR.position.set(0.38, 1.65, 0.02);
+        hg.add(hairBack, sideL, sideR);
       } else if (style === 'twintails') {
         // Twin Tails (Female pigtails)
         const top = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.32, 0.74), mat);
@@ -471,33 +486,37 @@
         back.position.set(0, 1.65, -0.34);
         hg.add(sideL, sideR, back);
 
-        const tailL = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.55, 6), mat);
-        tailL.position.set(-0.45, 1.55, 0.05);
-        tailL.rotation.z = 0.25;
-        const tailR = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.55, 6), mat);
-        tailR.position.set(0.45, 1.55, 0.05);
-        tailR.rotation.z = -0.25;
-        hg.add(tailL, tailR);
-
-        const tieL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), this.materials.clothes);
-        tieL.position.set(-0.40, 1.80, 0.05);
-        const tieR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), this.materials.clothes);
-        tieR.position.set(0.40, 1.80, 0.05);
+        const tieL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.08, 12), this.materials.clothes);
+        tieL.position.set(-0.44, 1.76, 0.05);
+        tieL.rotation.z = Math.PI / 2;
+        const tieR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.08, 12), this.materials.clothes);
+        tieR.position.set(0.44, 1.76, 0.05);
+        tieR.rotation.z = Math.PI / 2;
         hg.add(tieL, tieR);
+
+        const tailGeoL = new THREE.ConeGeometry(0.12, 0.52, 6);
+        const tailL = new THREE.Mesh(tailGeoL, mat);
+        tailL.position.set(-0.48, 1.50, 0.05);
+        tailL.rotation.z = 0.20;
+        const tailGeoR = new THREE.ConeGeometry(0.12, 0.52, 6);
+        const tailR = new THREE.Mesh(tailGeoR, mat);
+        tailR.position.set(0.48, 1.50, 0.05);
+        tailR.rotation.z = -0.20;
+        hg.add(tailL, tailR);
       } else if (style === 'wavy') {
         // Long Wavy Hair (Female)
-        const top = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.34, 0.76), mat);
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.34, 0.78), mat);
         top.position.set(0, 1.87, -0.01);
         hg.add(top);
 
-        const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.15), mat);
+        const fringe = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.15, 0.14), mat);
         fringe.position.set(0, 1.86, 0.34);
         hg.add(fringe);
 
-        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.85, 0.50), mat);
-        sideL.position.set(-0.39, 1.45, 0.08);
-        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.85, 0.50), mat);
-        sideR.position.set(0.39, 1.45, 0.08);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.85, 0.68), mat);
+        sideL.position.set(-0.38, 1.45, 0.01);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.85, 0.68), mat);
+        sideR.position.set(0.38, 1.45, 0.01);
         hg.add(sideL, sideR);
 
         const back = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.85, 0.18), mat);
@@ -505,34 +524,37 @@
         hg.add(back);
       } else if (style === 'quiff') {
         // Quiff / Pompadour (Male)
-        const top = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.38, 0.72), mat);
-        top.position.set(0, 1.90, -0.02);
-        top.rotation.x = -0.12;
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.34, 0.74), mat);
+        top.position.set(0, 1.88, -0.01);
         hg.add(top);
 
-        const sweep = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.22, 0.25), mat);
-        sweep.position.set(0, 1.95, 0.30);
+        const sweep = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.22, 0.26), mat);
+        sweep.position.set(0, 1.96, 0.30);
         hg.add(sweep);
 
-        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.30, 0.65), mat);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.35, 0.68), mat);
         sideL.position.set(-0.38, 1.72, 0);
-        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.30, 0.65), mat);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.35, 0.68), mat);
         sideR.position.set(0.38, 1.72, 0);
         const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.45, 0.14), mat);
         back.position.set(0, 1.68, -0.34);
         hg.add(sideL, sideR, back);
       } else if (style === 'buzz') {
-        // Clean Buzz Cut (Male)
-        const top = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.18, 0.72), mat);
-        top.position.set(0, 1.84, 0);
+        // Clean Buzz Cut (Male) - Properly envelopes top of scalp
+        const top = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.26, 0.74), mat);
+        top.position.set(0, 1.86, 0);
         hg.add(top);
 
-        const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.35, 0.10), mat);
-        back.position.set(0, 1.72, -0.33);
-        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.28, 0.68), mat);
-        sideL.position.set(-0.37, 1.76, 0);
-        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.28, 0.68), mat);
-        sideR.position.set(0.37, 1.76, 0);
+        const hairline = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.08, 0.06), mat);
+        hairline.position.set(0, 1.86, 0.34);
+        hg.add(hairline);
+
+        const back = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.38, 0.12), mat);
+        back.position.set(0, 1.70, -0.34);
+        const sideL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.32, 0.68), mat);
+        sideL.position.set(-0.38, 1.74, 0);
+        const sideR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.32, 0.68), mat);
+        sideR.position.set(0.38, 1.74, 0);
         hg.add(back, sideL, sideR);
       }
     }
