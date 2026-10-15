@@ -8,12 +8,13 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tmthananya.jodrod"
+      "bundleIdentifier": "com.tmthananya.jodrod",
+      "icon": "./assets/icon.png"
     },
     "android": {
       "package": "com.tmthananya.jodrod",
       "adaptiveIcon": {
-        "backgroundColor": "#0f172a",
+        "backgroundColor": "#0e3150",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
