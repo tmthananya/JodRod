@@ -3243,12 +3243,46 @@ textarea.form-input:focus {
   cursor: pointer;
 }
 
+.studio-controls-row,
 .vehicle-studio-controls-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin-top: 8px;
-  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.btn-studio-control {
+  font-size: 0.72rem;
+  padding: 8px 6px;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.btn-studio-control.spin-active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0369a1;
+}
+
+@media (max-width: 480px) {
+  .studio-controls-row,
+  .vehicle-studio-controls-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+  .btn-studio-control {
+    font-size: 0.64rem;
+    padding: 7px 3px;
+  }
+}
+
+@media (max-width: 360px) {
+  .studio-controls-row,
+  .vehicle-studio-controls-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
 }
 

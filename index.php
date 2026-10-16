@@ -701,6 +701,19 @@ if (!empty($_SESSION['auth_user'])) {
                   <div class="viewport-badge">3D AVATAR</div>
                 </div>
 
+                <!-- Shared 3D Viewport Controls -->
+                <div class="studio-controls-row">
+                  <button type="button" class="pixel-btn pixel-btn-sm btn-studio-control" id="btn-avatar-reset-angle" title="Restore default camera angle">
+                    Reset Angle
+                  </button>
+                  <button type="button" class="pixel-btn pixel-btn-sm btn-studio-control" id="btn-avatar-toggle-spin" title="Toggle continuous rotation">
+                    Auto Spin: ON
+                  </button>
+                  <button type="button" class="pixel-btn pixel-btn-sm btn-studio-control" id="btn-avatar-reset-default" title="Restore default avatar appearance">
+                    Reset to Default
+                  </button>
+                </div>
+
                 <!-- Logical Customizer Category Tabs -->
                 <div class="customizer-tabs-nav" id="create-customizer-tabs" role="tablist">
                   <button type="button" class="customizer-tab-btn active" data-tab="body" role="tab" aria-selected="true">Face & Body</button>
@@ -893,16 +906,16 @@ if (!empty($_SESSION['auth_user'])) {
                 <div class="viewport-badge">3D GARAGE</div>
               </div>
 
-              <!-- Viewport Studio Controls & Reset Angle -->
-              <div class="vehicle-studio-controls-row">
-                <button type="button" class="pixel-btn pixel-btn-sm" id="btn-car-reset-angle" style="font-size: 0.72rem; padding: 4px 8px;">
-                  ⟲ Reset Angle
+              <!-- Shared 3D Viewport Controls -->
+              <div class="studio-controls-row">
+                <button type="button" class="pixel-btn pixel-btn-sm btn-studio-control" id="btn-car-reset-angle" title="Restore default camera angle">
+                  Reset Angle
                 </button>
-                <button type="button" class="pixel-btn pixel-btn-sm" id="btn-car-toggle-spin" style="font-size: 0.72rem; padding: 4px 8px;">
-                  Auto-Spin: ON
+                <button type="button" class="pixel-btn pixel-btn-sm btn-studio-control spin-active" id="btn-car-toggle-spin" title="Toggle continuous rotation">
+                  Auto Spin: ON
                 </button>
-                <button type="button" class="pixel-btn pixel-btn-sm" id="btn-reset-car-appearance" style="font-size: 0.72rem; padding: 4px 8px;">
-                  ↺ Reset Defaults
+                <button type="button" class="pixel-btn pixel-btn-sm btn-studio-control" id="btn-car-reset-default" title="Restore default appearance">
+                  Reset to Default
                 </button>
               </div>
 
@@ -923,34 +936,25 @@ if (!empty($_SESSION['auth_user'])) {
               <!-- Customizer Category Panels Container -->
               <div class="character-customizer-controls" id="car-customizer-panels">
                 
-                <!-- Category 1: Body Style (8 Distinct 3D Models) -->
+                <!-- Category 1: Body Style (5 Distinct 3D Models) -->
                 <div class="customizer-tab-panel" id="car-tab-model" data-tab="model">
                   <div class="customizer-group">
-                    <div class="customizer-label"><span>Vehicle Body Style (8 Options)</span></div>
+                    <div class="customizer-label"><span>Vehicle Body Style</span></div>
                     <div class="customizer-options-row" id="car-model-options">
                       <button type="button" class="customizer-chip-btn" data-style="sedan" title="Classic everyday passenger car">
-                        <span class="car-style-badge-icon">🚗</span> Sedan
+                        Sedan
                       </button>
                       <button type="button" class="customizer-chip-btn active" data-style="pickup" title="Pickup truck with visible open cargo bed">
-                        <span class="car-style-badge-icon">🛻</span> Pickup Truck
+                        Pickup Truck
                       </button>
                       <button type="button" class="customizer-chip-btn" data-style="coupe" title="Low, sleek sporty body with aggressive stance">
-                        <span class="car-style-badge-icon">🏎️</span> Sport Coupe
+                        Sport Coupe
                       </button>
-                      <button type="button" class="customizer-chip-btn" data-style="suv" title="Larger family vehicle with taller body and roof rails">
-                        <span class="car-style-badge-icon">🚙</span> SUV
-                      </button>
-                      <button type="button" class="customizer-chip-btn" data-style="jeep" title="Rugged off-road body with roll-cage and rear spare tire">
-                        <span class="car-style-badge-icon">🧗</span> Jeep / Off-Road
+                      <button type="button" class="customizer-chip-btn" data-style="suv" title="Rugged off-road vehicle with high ground clearance">
+                        Off-Road SUV
                       </button>
                       <button type="button" class="customizer-chip-btn" data-style="hatchback" title="Compact city car with short rear and sloped hatch">
-                        <span class="car-style-badge-icon">🚘</span> Hatchback
-                      </button>
-                      <button type="button" class="customizer-chip-btn" data-style="van" title="Spacious, boxier people carrier with multi-row windows">
-                        <span class="car-style-badge-icon">🚐</span> Van / MPV
-                      </button>
-                      <button type="button" class="customizer-chip-btn" data-style="supercar" title="Low-profile exotic sports car with dramatic wedge silhouette">
-                        <span class="car-style-badge-icon">⚡</span> Supercar
+                        Hatchback
                       </button>
                     </div>
                   </div>
@@ -2069,9 +2073,41 @@ if (!empty($_SESSION['auth_user'])) {
       // Initialize 3D when on profile section
       setTimeout(initCreate3D, 200);
 
-      window.addEventListener('hashchange', () => {
-        if (window.location.hash === '#profile') {
-          setTimeout(initCreate3D, 150);
+      // Shared 3D viewing controls for Avatar Studio
+      document.getElementById('btn-avatar-reset-angle')?.addEventListener('click', () => {
+        if (createChar3D) {
+          createChar3D.resetAngle();
+        }
+      });
+
+      const avatarSpinBtn = document.getElementById('btn-avatar-toggle-spin');
+      if (avatarSpinBtn) {
+        avatarSpinBtn.addEventListener('click', () => {
+          if (createChar3D) {
+            const isSpinning = createChar3D.toggleAutoRotate();
+            avatarSpinBtn.textContent = `Auto Spin: ${isSpinning ? 'ON' : 'OFF'}`;
+            avatarSpinBtn.classList.toggle('spin-active', isSpinning);
+          }
+        });
+      }
+
+      document.getElementById('btn-avatar-reset-default')?.addEventListener('click', () => {
+        createCharConfig = {
+          gender: 'female',
+          feature: 'natural',
+          hair: 'ponytail',
+          hairColor: '#261e1b',
+          clothes: 'vest',
+          clothesColor: '#ea580c',
+          skinColor: '#fed7aa'
+        };
+        syncCustomizerUI('create', createCharConfig, () => createChar3D);
+        if (createChar3D) {
+          createChar3D.resetToDefaults();
+        }
+        if (avatarSpinBtn) {
+          avatarSpinBtn.textContent = 'Auto Spin: ON';
+          avatarSpinBtn.classList.add('spin-active');
         }
       });
 
@@ -3083,8 +3119,8 @@ if (!empty($_SESSION['auth_user'])) {
         sedan: 'Sedan',
         pickup: 'Pickup Truck',
         coupe: 'Sport Coupe',
-        suv: 'SUV',
-        jeep: 'Jeep / Off-Road',
+        suv: 'Off-Road SUV',
+        jeep: 'Off-Road SUV',
         hatchback: 'Hatchback',
         compact: 'Hatchback',
         van: 'Van / MPV',
@@ -3204,7 +3240,7 @@ if (!empty($_SESSION['auth_user'])) {
         if (data && data.snapshot) {
           return `<div class="car-avatar-portrait"><img src="${data.snapshot}" alt="3D Vehicle"></div>`;
         }
-        return `<div class="car-avatar-portrait"><span style="font-size: 1.8rem;">🚗</span></div>`;
+        return `<div class="car-avatar-portrait"><span class="profile-avatar-fallback">CAR</span></div>`;
       }
       window.renderCarPortrait = renderCarPortrait;
 
@@ -3397,10 +3433,8 @@ if (!empty($_SESSION['auth_user'])) {
 
         // Reset Camera Angle
         document.getElementById('btn-car-reset-angle')?.addEventListener('click', () => {
-          if (carStudio3D && carStudio3D.carGroup) {
-            carStudio3D.carGroup.rotation.y = -0.45;
-            carStudio3D.rotationVelocity = 0;
-            carStudio3D.render();
+          if (carStudio3D) {
+            carStudio3D.resetAngle();
           }
         });
 
@@ -3409,14 +3443,15 @@ if (!empty($_SESSION['auth_user'])) {
         if (spinBtn) {
           spinBtn.addEventListener('click', () => {
             if (carStudio3D) {
-              carStudio3D.options.autoRotate = !carStudio3D.options.autoRotate;
-              spinBtn.textContent = `Auto-Spin: ${carStudio3D.options.autoRotate ? 'ON' : 'OFF'}`;
+              const isSpinning = carStudio3D.toggleAutoRotate();
+              spinBtn.textContent = `Auto Spin: ${isSpinning ? 'ON' : 'OFF'}`;
+              spinBtn.classList.toggle('spin-active', isSpinning);
             }
           });
         }
 
-        // Reset Appearance button
-        document.getElementById('btn-reset-car-appearance')?.addEventListener('click', () => {
+        // Reset Appearance to Default (Keep registration fields such as license plate separate)
+        const handleResetCarAppearance = () => {
           carStudioConfig = {
             bodyStyle: 'pickup',
             paintColor: '#ea580c',
@@ -3424,9 +3459,18 @@ if (!empty($_SESSION['auth_user'])) {
             detail: 'snorkel'
           };
           syncCarCustomizerUI();
-          if (carStudio3D) carStudio3D.resetToDefaults();
+          if (carStudio3D) {
+            carStudio3D.resetToDefaults();
+          }
+          if (spinBtn) {
+            spinBtn.textContent = 'Auto Spin: ON';
+            spinBtn.classList.add('spin-active');
+          }
           updateCarLiveSummary();
-        });
+        };
+
+        document.getElementById('btn-car-reset-default')?.addEventListener('click', handleResetCarAppearance);
+        document.getElementById('btn-reset-car-appearance')?.addEventListener('click', handleResetCarAppearance);
       }
 
       function resetCarStudioForm() {

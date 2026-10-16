@@ -967,6 +967,39 @@
       };
     }
 
+    resetAngle() {
+      if (this.charGroup) {
+        this.charGroup.rotation.y = 0.35; // default 3/4 hero pose
+        this.rotationVelocity = 0;
+        this.render();
+      }
+    }
+
+    toggleAutoRotate() {
+      this.options.autoRotate = !this.options.autoRotate;
+      this.rotationVelocity = 0;
+      return this.options.autoRotate;
+    }
+
+    setAutoRotate(enabled) {
+      this.options.autoRotate = Boolean(enabled);
+      this.rotationVelocity = 0;
+      return this.options.autoRotate;
+    }
+
+    resetToDefaults() {
+      this.updateConfig({
+        gender: 'female',
+        feature: 'natural',
+        hair: 'ponytail',
+        hairColor: '#261e1b',
+        clothes: 'vest',
+        clothesColor: '#ea580c',
+        skinColor: '#fed7aa'
+      });
+      this.resetAngle();
+    }
+
     destroy() {
       if (this.animationFrameId) {
         cancelAnimationFrame(this.animationFrameId);

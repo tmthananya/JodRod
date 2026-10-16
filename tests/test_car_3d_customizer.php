@@ -84,9 +84,9 @@ function make_call($url, $method = 'GET', $data = null, $cookies = [], $headers 
 }
 
 // -------------------------------------------------------------
-// Test 1: Verify 3D Car Engine Architecture (assets/js/car_3d.js)
+// Test 1: Verify 3D Engine Architecture & Shared Controls
 // -------------------------------------------------------------
-echo "Test 1: Inspecting 3D Car Engine in assets/js/car_3d.js...\n";
+echo "Test 1: Inspecting 3D Engines in assets/js/car_3d.js and character_3d.js...\n";
 $carJsPath = __DIR__ . '/../assets/js/car_3d.js';
 assert(file_exists($carJsPath), "assets/js/car_3d.js must exist");
 $carJs = file_get_contents($carJsPath);
@@ -94,15 +94,27 @@ $carJs = file_get_contents($carJsPath);
 assert(strpos($carJs, 'class Car3D') !== false, "Must define class Car3D");
 assert(strpos($carJs, 'window.Car3D = Car3D') !== false, "Must export Car3D to window");
 
-// 8 Distinct 3D Model Builders
+// 5 Main distinct 3D Model Builders (plus backward-compatible fallbacks)
 assert(strpos($carJs, 'buildSedan') !== false, "Must support Sedan model");
 assert(strpos($carJs, 'buildPickup') !== false, "Must support Pickup Truck model");
 assert(strpos($carJs, 'buildCoupe') !== false, "Must support Sport Coupe model");
-assert(strpos($carJs, 'buildSUV') !== false, "Must support SUV model");
-assert(strpos($carJs, 'buildJeep') !== false, "Must support Jeep / Off-Road model");
+assert(strpos($carJs, 'buildSUV') !== false, "Must support Off-Road SUV model");
 assert(strpos($carJs, 'buildHatchback') !== false, "Must support Hatchback model");
-assert(strpos($carJs, 'buildVan') !== false, "Must support Van / MPV model");
-assert(strpos($carJs, 'buildSupercar') !== false, "Must support Supercar model");
+
+// Shared viewing control methods on Car3D
+assert(strpos($carJs, 'resetAngle()') !== false, "Car3D must implement resetAngle");
+assert(strpos($carJs, 'toggleAutoRotate()') !== false, "Car3D must implement toggleAutoRotate");
+assert(strpos($carJs, 'setAutoRotate(') !== false, "Car3D must implement setAutoRotate");
+assert(strpos($carJs, 'resetToDefaults()') !== false, "Car3D must have resetToDefaults method");
+
+// Shared viewing control methods on Character3D
+$charJsPath = __DIR__ . '/../assets/js/character_3d.js';
+assert(file_exists($charJsPath), "assets/js/character_3d.js must exist");
+$charJs = file_get_contents($charJsPath);
+assert(strpos($charJs, 'resetAngle()') !== false, "Character3D must implement resetAngle");
+assert(strpos($charJs, 'toggleAutoRotate()') !== false, "Character3D must implement toggleAutoRotate");
+assert(strpos($charJs, 'setAutoRotate(') !== false, "Character3D must implement setAutoRotate");
+assert(strpos($charJs, 'resetToDefaults()') !== false, "Character3D must implement resetToDefaults");
 
 // Engine Features
 assert(strpos($carJs, 'buildWheels') !== false, "Must support customizable wheels");
@@ -110,13 +122,12 @@ assert(strpos($carJs, 'buildDetails') !== false, "Must support cosmetic details"
 assert(strpos($carJs, 'renderFallback') !== false, "Must provide 2D fallback renderer");
 assert(strpos($carJs, 'targetScale') !== false, "Must support smooth transition scaling");
 assert(strpos($carJs, 'updateConfig') !== false, "Must have updateConfig method");
-assert(strpos($carJs, 'resetToDefaults') !== false, "Must have resetToDefaults method");
 assert(strpos($carJs, 'getSnapshot') !== false, "Must generate snapshot data URL");
 assert(strpos($carJs, 'bindEvents') !== false, "Must bind drag-to-rotate events");
-echo "   [PASS] 3D Car Engine architecture and 8 distinct body styles verified.\n\n";
+echo "   [PASS] 3D Engines & viewing control methods verified.\n\n";
 
 // -------------------------------------------------------------
-// Test 2: Inspect HTML & 16-Bit Studio Structure in index.php
+// Test 2: Inspect Shared 3D Viewing Controls & 5 Body Styles in index.php
 // -------------------------------------------------------------
 echo "Test 2: Inspecting HTML & 16-Bit Studio UI in index.php...\n";
 $htmlRes = make_call("$baseUrl/index.php");
@@ -131,23 +142,41 @@ assert(strpos($html, 'src="assets/js/character_3d.js"') !== false, "index.php mu
 assert(strpos($html, 'id="nav-vehicles"') !== false, "Navbar must contain #nav-vehicles");
 assert(strpos($html, 'id="section-vehicles"') !== false, "DOM must contain #section-vehicles");
 
+// 1. Shared 3D Viewing Controls on Avatar Customizer
+assert(strpos($html, 'id="btn-avatar-reset-angle"') !== false, "Avatar customizer must contain #btn-avatar-reset-angle");
+assert(strpos($html, 'id="btn-avatar-toggle-spin"') !== false, "Avatar customizer must contain #btn-avatar-toggle-spin");
+assert(strpos($html, 'id="btn-avatar-reset-default"') !== false, "Avatar customizer must contain #btn-avatar-reset-default");
+
+// 2. Shared 3D Viewing Controls on Car Customizer
+assert(strpos($html, 'id="btn-car-reset-angle"') !== false, "Car customizer must contain #btn-car-reset-angle");
+assert(strpos($html, 'id="btn-car-toggle-spin"') !== false, "Car customizer must contain #btn-car-toggle-spin");
+assert(strpos($html, 'id="btn-car-reset-default"') !== false, "Car customizer must contain #btn-car-reset-default");
+
 // Studio Components
 assert(strpos($html, 'id="car-3d-viewport"') !== false, "Must contain #car-3d-viewport");
 assert(strpos($html, 'id="car-studio-canvas"') !== false, "Must contain #car-studio-canvas");
 assert(strpos($html, 'id="car-studio-live-summary"') !== false, "Must contain #car-studio-live-summary");
-assert(strpos($html, 'id="btn-car-reset-angle"') !== false, "Must contain #btn-car-reset-angle");
-assert(strpos($html, 'id="btn-car-toggle-spin"') !== false, "Must contain #btn-car-toggle-spin");
 assert(strpos($html, 'id="car-customizer-tabs"') !== false, "Must contain #car-customizer-tabs");
 
-// All 8 Body Styles in HTML
-assert(strpos($html, 'data-style="sedan"') !== false, "Must have sedan option");
-assert(strpos($html, 'data-style="pickup"') !== false, "Must have pickup option");
-assert(strpos($html, 'data-style="coupe"') !== false, "Must have coupe option");
-assert(strpos($html, 'data-style="suv"') !== false, "Must have suv option");
-assert(strpos($html, 'data-style="jeep"') !== false, "Must have jeep option");
-assert(strpos($html, 'data-style="hatchback"') !== false, "Must have hatchback option");
-assert(strpos($html, 'data-style="van"') !== false, "Must have van option");
-assert(strpos($html, 'data-style="supercar"') !== false, "Must have supercar option");
+// Extract #car-model-options block to verify strictly the 5 vehicle body styles
+preg_match('/<div[^>]*id="car-model-options"[^>]*>(.*?)<\/div>/s', $html, $optMatches);
+assert(!empty($optMatches[1]), "Must find #car-model-options container");
+$modelOptionsHtml = $optMatches[1];
+
+// Exactly 5 Body Styles in HTML
+assert(strpos($modelOptionsHtml, 'data-style="sedan"') !== false, "Must have Sedan option");
+assert(strpos($modelOptionsHtml, 'data-style="pickup"') !== false, "Must have Pickup Truck option");
+assert(strpos($modelOptionsHtml, 'data-style="coupe"') !== false, "Must have Sport Coupe option");
+assert(strpos($modelOptionsHtml, 'data-style="suv"') !== false, "Must have Off-Road SUV option");
+assert(strpos($modelOptionsHtml, 'data-style="hatchback"') !== false, "Must have Hatchback option");
+
+// Ensure reduced choices: NO jeep, van, supercar buttons in #car-model-options
+assert(strpos($modelOptionsHtml, 'data-style="jeep"') === false, "Must not offer redundant jeep in 5 options");
+assert(strpos($modelOptionsHtml, 'data-style="van"') === false, "Must not offer van in 5 options");
+assert(strpos($modelOptionsHtml, 'data-style="supercar"') === false, "Must not offer supercar in 5 options");
+
+// Verify NO emojis in car-model-options buttons
+assert(!preg_match('/[\x{10000}-\x{10FFFF}]|[\x{2600}-\x{27BF}]/u', $modelOptionsHtml), "No emojis in car body style options");
 
 // Color Swatches & Custom Picker
 assert(strpos($html, 'data-color="#dc2626"') !== false, "Must have Red color swatch");
@@ -164,14 +193,13 @@ assert(strpos($html, 'id="car-color-picker-input"') !== false, "Must have custom
 assert(strpos($html, 'data-wheels="standard"') !== false, "Must have standard wheels option");
 assert(strpos($html, 'data-wheels="sport"') !== false, "Must have sport wheels option");
 assert(strpos($html, 'data-wheels="offroad"') !== false, "Must have offroad wheels option");
-assert(strpos($html, 'id="btn-reset-car-appearance"') !== false, "Must contain #btn-reset-car-appearance button");
 
 // Form & List
 assert(strpos($html, 'id="vehicle-studio-form"') !== false, "Must contain #vehicle-studio-form");
 assert(strpos($html, 'id="vehicle-studio-plate"') !== false, "Must contain #vehicle-studio-plate input");
 assert(strpos($html, 'id="btn-submit-car-studio"') !== false, "Must contain #btn-submit-car-studio button");
 assert(strpos($html, 'id="vehicle-studio-list-container"') !== false, "Must contain #vehicle-studio-list-container");
-echo "   [PASS] HTML & 16-Bit Studio UI structure verified.\n\n";
+echo "   [PASS] HTML & 16-Bit Studio UI structure with 5 clean options and shared controls verified.\n\n";
 
 // -------------------------------------------------------------
 // Test 3: Authenticate User and Test 3D Vehicle Registration API

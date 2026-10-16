@@ -1346,6 +1346,26 @@
       this.render();
     }
 
+    resetAngle() {
+      if (this.carGroup) {
+        this.carGroup.rotation.y = -0.45; // default hero angle
+        this.rotationVelocity = 0;
+        this.render();
+      }
+    }
+
+    toggleAutoRotate() {
+      this.options.autoRotate = !this.options.autoRotate;
+      this.rotationVelocity = 0;
+      return this.options.autoRotate;
+    }
+
+    setAutoRotate(enabled) {
+      this.options.autoRotate = Boolean(enabled);
+      this.rotationVelocity = 0;
+      return this.options.autoRotate;
+    }
+
     resetToDefaults() {
       this.updateConfig({
         bodyStyle: 'pickup',
@@ -1353,6 +1373,7 @@
         wheelStyle: 'standard',
         detail: 'snorkel'
       });
+      this.resetAngle();
     }
 
     resize() {
