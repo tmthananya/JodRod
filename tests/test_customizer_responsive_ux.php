@@ -23,32 +23,32 @@ assert(strpos($html, 'id="btn-car-reset-angle"') !== false, "Car must have #btn-
 assert(strpos($html, 'id="btn-car-toggle-spin"') !== false, "Car must have #btn-car-toggle-spin");
 assert(strpos($html, 'id="btn-car-reset-default"') !== false, "Car must have #btn-car-reset-default");
 
-// Check exact 5 car body styles in #car-model-options
+// Check car body styles in #car-model-options (Sport Coupe removed)
 preg_match('/<div[^>]*id="car-model-options"[^>]*>(.*?)<\/div>/s', $html, $matches);
 assert(!empty($matches[1]), "Must find #car-model-options");
 $optionsHtml = $matches[1];
 
-$expectedStyles = ['sedan', 'pickup', 'coupe', 'suv', 'hatchback'];
+$expectedStyles = ['sedan', 'pickup', 'suv', 'hatchback'];
 foreach ($expectedStyles as $style) {
     assert(strpos($optionsHtml, "data-style=\"$style\"") !== false, "Must include body style option: $style");
 }
 
-// Ensure no other body styles are in the options container
-$disallowedStyles = ['jeep', 'van', 'supercar', 'compact'];
+// Ensure coupe and other body styles are NOT in the options container
+$disallowedStyles = ['coupe', 'jeep', 'van', 'supercar', 'compact'];
 foreach ($disallowedStyles as $disallowed) {
     assert(strpos($optionsHtml, "data-style=\"$disallowed\"") === false, "Must NOT include body style option: $disallowed");
 }
 
 // Check labels have no emojis
 preg_match_all('/<button[^>]*class="customizer-chip-btn[^"]*"[^>]*>(.*?)<\/button>/s', $optionsHtml, $btnMatches);
-assert(count($btnMatches[1]) === 5, "Must have exactly 5 vehicle style buttons");
+assert(count($btnMatches[1]) === 4, "Must have exactly 4 vehicle style buttons");
 
 foreach ($btnMatches[1] as $btnText) {
     $cleanText = trim(strip_tags($btnText));
     // Verify no emoji in button label
     assert(!preg_match('/[\x{10000}-\x{10FFFF}]|[\x{2600}-\x{27BF}]/u', $cleanText), "Button text '$cleanText' must not contain emojis");
 }
-echo "   [PASS] 5 vehicle body styles and clean text labels verified.\n\n";
+echo "   [PASS] 4 vehicle body styles (Sport Coupe removed) and clean text labels verified.\n\n";
 
 // 2. Check CSS Responsive Rules
 echo "Step 2: Checking CSS responsive styles in assets/css/style.css...\n";

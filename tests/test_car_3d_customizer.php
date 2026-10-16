@@ -163,17 +163,17 @@ preg_match('/<div[^>]*id="car-model-options"[^>]*>(.*?)<\/div>/s', $html, $optMa
 assert(!empty($optMatches[1]), "Must find #car-model-options container");
 $modelOptionsHtml = $optMatches[1];
 
-// Exactly 5 Body Styles in HTML
+// Body Styles in HTML (Sport Coupe removed)
 assert(strpos($modelOptionsHtml, 'data-style="sedan"') !== false, "Must have Sedan option");
 assert(strpos($modelOptionsHtml, 'data-style="pickup"') !== false, "Must have Pickup Truck option");
-assert(strpos($modelOptionsHtml, 'data-style="coupe"') !== false, "Must have Sport Coupe option");
 assert(strpos($modelOptionsHtml, 'data-style="suv"') !== false, "Must have Off-Road SUV option");
 assert(strpos($modelOptionsHtml, 'data-style="hatchback"') !== false, "Must have Hatchback option");
 
-// Ensure reduced choices: NO jeep, van, supercar buttons in #car-model-options
-assert(strpos($modelOptionsHtml, 'data-style="jeep"') === false, "Must not offer redundant jeep in 5 options");
-assert(strpos($modelOptionsHtml, 'data-style="van"') === false, "Must not offer van in 5 options");
-assert(strpos($modelOptionsHtml, 'data-style="supercar"') === false, "Must not offer supercar in 5 options");
+// Ensure coupe, jeep, van, supercar buttons are NOT in #car-model-options
+assert(strpos($modelOptionsHtml, 'data-style="coupe"') === false, "Must not offer coupe in options");
+assert(strpos($modelOptionsHtml, 'data-style="jeep"') === false, "Must not offer redundant jeep in options");
+assert(strpos($modelOptionsHtml, 'data-style="van"') === false, "Must not offer van in options");
+assert(strpos($modelOptionsHtml, 'data-style="supercar"') === false, "Must not offer supercar in options");
 
 // Verify NO emojis in car-model-options buttons
 assert(!preg_match('/[\x{10000}-\x{10FFFF}]|[\x{2600}-\x{27BF}]/u', $modelOptionsHtml), "No emojis in car body style options");

@@ -947,9 +947,6 @@ if (!empty($_SESSION['auth_user'])) {
                       <button type="button" class="customizer-chip-btn active" data-style="pickup" title="Pickup truck with visible open cargo bed">
                         Pickup Truck
                       </button>
-                      <button type="button" class="customizer-chip-btn" data-style="coupe" title="Low, sleek sporty body with aggressive stance">
-                        Sport Coupe
-                      </button>
                       <button type="button" class="customizer-chip-btn" data-style="suv" title="Rugged off-road vehicle with high ground clearance">
                         Off-Road SUV
                       </button>
