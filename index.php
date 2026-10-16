@@ -890,77 +890,119 @@ if (!empty($_SESSION['auth_user'])) {
               <div class="character-3d-viewport vehicle-3d-viewport" id="car-3d-viewport">
                 <canvas id="car-studio-canvas"></canvas>
                 <div class="viewport-hint">Drag to rotate 360°</div>
-                <div class="viewport-badge">3D VEHICLE</div>
+                <div class="viewport-badge">3D GARAGE</div>
               </div>
 
-              <!-- Logical Customizer Category Tabs -->
-              <div class="customizer-tabs-nav" id="car-customizer-tabs" role="tablist">
+              <!-- Viewport Studio Controls & Reset Angle -->
+              <div class="vehicle-studio-controls-row">
+                <button type="button" class="pixel-btn pixel-btn-sm" id="btn-car-reset-angle" style="font-size: 0.72rem; padding: 4px 8px;">
+                  ⟲ Reset Angle
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-sm" id="btn-car-toggle-spin" style="font-size: 0.72rem; padding: 4px 8px;">
+                  Auto-Spin: ON
+                </button>
+                <button type="button" class="pixel-btn pixel-btn-sm" id="btn-reset-car-appearance" style="font-size: 0.72rem; padding: 4px 8px;">
+                  ↺ Reset Defaults
+                </button>
+              </div>
+
+              <!-- Live Studio Selection Summary Bar -->
+              <div id="car-studio-live-summary" class="car-studio-summary-bar">
+                <div><strong>GARAGE:</strong> <span id="summary-car-style">Pickup Truck</span> (<span id="summary-car-color">Hi-Vis Orange</span>)</div>
+                <div><span class="car-studio-summary-tag" id="summary-car-setup">Standard • Snorkel</span></div>
+              </div>
+
+              <!-- Customizer Category Tabs -->
+              <div class="customizer-tabs-nav" id="car-customizer-tabs" role="tablist" style="margin-top: 14px;">
                 <button type="button" class="customizer-tab-btn active" data-tab="model" role="tab" aria-selected="true">Body Style</button>
                 <button type="button" class="customizer-tab-btn" data-tab="paint" role="tab" aria-selected="false">Paint Color</button>
                 <button type="button" class="customizer-tab-btn" data-tab="wheels" role="tab" aria-selected="false">Wheels</button>
-                <button type="button" class="customizer-tab-btn" data-tab="details" role="tab" aria-selected="false">Flood Gear</button>
+                <button type="button" class="customizer-tab-btn" data-tab="details" role="tab" aria-selected="false">Cosmetics</button>
               </div>
 
               <!-- Customizer Category Panels Container -->
               <div class="character-customizer-controls" id="car-customizer-panels">
                 
-                <!-- Category 1: Body Style -->
+                <!-- Category 1: Body Style (8 Distinct 3D Models) -->
                 <div class="customizer-tab-panel" id="car-tab-model" data-tab="model">
                   <div class="customizer-group">
-                    <div class="customizer-label"><span>Vehicle Body Style</span></div>
+                    <div class="customizer-label"><span>Vehicle Body Style (8 Options)</span></div>
                     <div class="customizer-options-row" id="car-model-options">
-                      <button type="button" class="customizer-chip-btn active" data-style="pickup">Rescue Pickup</button>
-                      <button type="button" class="customizer-chip-btn" data-style="suv">4x4 Offroad SUV</button>
-                      <button type="button" class="customizer-chip-btn" data-style="van">Emergency Van</button>
-                      <button type="button" class="customizer-chip-btn" data-style="compact">Compact Car</button>
+                      <button type="button" class="customizer-chip-btn" data-style="sedan" title="Classic everyday passenger car">
+                        <span class="car-style-badge-icon">🚗</span> Sedan
+                      </button>
+                      <button type="button" class="customizer-chip-btn active" data-style="pickup" title="Pickup truck with visible open cargo bed">
+                        <span class="car-style-badge-icon">🛻</span> Pickup Truck
+                      </button>
+                      <button type="button" class="customizer-chip-btn" data-style="coupe" title="Low, sleek sporty body with aggressive stance">
+                        <span class="car-style-badge-icon">🏎️</span> Sport Coupe
+                      </button>
+                      <button type="button" class="customizer-chip-btn" data-style="suv" title="Larger family vehicle with taller body and roof rails">
+                        <span class="car-style-badge-icon">🚙</span> SUV
+                      </button>
+                      <button type="button" class="customizer-chip-btn" data-style="jeep" title="Rugged off-road body with roll-cage and rear spare tire">
+                        <span class="car-style-badge-icon">🧗</span> Jeep / Off-Road
+                      </button>
+                      <button type="button" class="customizer-chip-btn" data-style="hatchback" title="Compact city car with short rear and sloped hatch">
+                        <span class="car-style-badge-icon">🚘</span> Hatchback
+                      </button>
+                      <button type="button" class="customizer-chip-btn" data-style="van" title="Spacious, boxier people carrier with multi-row windows">
+                        <span class="car-style-badge-icon">🚐</span> Van / MPV
+                      </button>
+                      <button type="button" class="customizer-chip-btn" data-style="supercar" title="Low-profile exotic sports car with dramatic wedge silhouette">
+                        <span class="car-style-badge-icon">⚡</span> Supercar
+                      </button>
                     </div>
-                  </div>
-                  <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
-                    <button type="button" class="pixel-btn pixel-btn-sm" id="btn-reset-car-appearance" style="font-size: 0.75rem; padding: 6px 10px;">
-                      Reset Appearance
-                    </button>
                   </div>
                 </div>
 
-                <!-- Category 2: Paint Color -->
+                <!-- Category 2: Paint Color (8 Colors + Orange + Custom Picker) -->
                 <div class="customizer-tab-panel" id="car-tab-paint" data-tab="paint" style="display: none;">
                   <div class="customizer-group">
                     <div class="customizer-label"><span>Body Paint Finish</span></div>
                     <div class="color-swatch-row" id="car-paint-colors">
-                      <button type="button" class="color-swatch-btn active" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Rescue Orange"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#f8fafc" style="background: #f8fafc;" title="Flood Relief White"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#15803d" style="background: #15803d;" title="Tactical Green"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#475569" style="background: #475569;" title="Matte Slate"></button>
-                      <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Deep Onyx"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Red"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#2563eb" style="background: #2563eb;" title="Blue"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#18181b" style="background: #18181b;" title="Black"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#f8fafc" style="background: #f8fafc;" title="White"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#94a3b8" style="background: #94a3b8;" title="Silver"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#16a34a" style="background: #16a34a;" title="Green"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Yellow"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#9333ea" style="background: #9333ea;" title="Purple"></button>
+                      <button type="button" class="color-swatch-btn active" data-color="#ea580c" style="background: #ea580c;" title="Rescue Orange"></button>
+                      <div class="color-picker-swatch-wrapper" title="Choose Custom Color">
+                        <button type="button" class="color-swatch-btn color-swatch-custom" id="btn-car-custom-color" title="Custom Color Picker">
+                          <input type="color" id="car-color-picker-input" class="color-picker-input-hidden" value="#ea580c" aria-label="Pick custom paint color">
+                        </button>
+                      </div>
+                    </div>
+                    <div style="font-size: 0.72rem; color: #64748b; margin-top: 6px;">
+                      Tip: Click the rainbow swatch to open the custom color palette.
                     </div>
                   </div>
                 </div>
 
-                <!-- Category 3: Wheels -->
+                <!-- Category 3: Wheels (Standard, Sport, Off-Road) -->
                 <div class="customizer-tab-panel" id="car-tab-wheels" data-tab="wheels" style="display: none;">
                   <div class="customizer-group">
                     <div class="customizer-label"><span>Wheel & Suspension Setup</span></div>
                     <div class="customizer-options-row" id="car-wheels-options">
-                      <button type="button" class="customizer-chip-btn active" data-wheels="flood">High-Clearance Flood</button>
-                      <button type="button" class="customizer-chip-btn" data-wheels="offroad">All-Terrain Offroad</button>
-                      <button type="button" class="customizer-chip-btn" data-wheels="steelie">Heavy Steelies</button>
+                      <button type="button" class="customizer-chip-btn active" data-wheels="standard">Standard Utility</button>
                       <button type="button" class="customizer-chip-btn" data-wheels="sport">Sport Alloys</button>
+                      <button type="button" class="customizer-chip-btn" data-wheels="offroad">Off-Road Mud Lugs</button>
                     </div>
                   </div>
                 </div>
 
-                <!-- Category 4: Flood Gear / Details -->
+                <!-- Category 4: Contextual Cosmetics & Accessories -->
                 <div class="customizer-tab-panel" id="car-tab-details" data-tab="details" style="display: none;">
                   <div class="customizer-group">
-                    <div class="customizer-label"><span>Flood Relief Equipment</span></div>
+                    <div class="customizer-label"><span id="car-details-label">Compatible Accessories</span></div>
                     <div class="customizer-options-row" id="car-details-options">
-                      <button type="button" class="customizer-chip-btn active" data-detail="snorkel">Snorkel & Lift</button>
-                      <button type="button" class="customizer-chip-btn" data-detail="roofrack">Roof Rack & Lights</button>
-                      <button type="button" class="customizer-chip-btn" data-detail="beacon">Emergency Beacon</button>
-                      <button type="button" class="customizer-chip-btn" data-detail="standard">Standard Clean</button>
+                      <!-- Dynamically rendered based on active bodyStyle -->
+                    </div>
+                    <div style="font-size: 0.72rem; color: #64748b; margin-top: 6px;" id="car-details-hint">
+                      Showing accessories supported for the selected vehicle.
                     </div>
                   </div>
                 </div>
@@ -3032,10 +3074,102 @@ if (!empty($_SESSION['auth_user'])) {
       let carStudioConfig = {
         bodyStyle: 'pickup',
         paintColor: '#ea580c',
-        wheelStyle: 'flood',
+        wheelStyle: 'standard',
         detail: 'snorkel'
       };
       let registeredCarsData = {};
+
+      const CAR_STYLE_LABELS = {
+        sedan: 'Sedan',
+        pickup: 'Pickup Truck',
+        coupe: 'Sport Coupe',
+        suv: 'SUV',
+        jeep: 'Jeep / Off-Road',
+        hatchback: 'Hatchback',
+        compact: 'Hatchback',
+        van: 'Van / MPV',
+        supercar: 'Supercar'
+      };
+
+      const CAR_COLOR_LABELS = {
+        '#dc2626': 'Red',
+        '#2563eb': 'Blue',
+        '#18181b': 'Black',
+        '#f8fafc': 'White',
+        '#94a3b8': 'Silver',
+        '#16a34a': 'Green',
+        '#eab308': 'Yellow',
+        '#9333ea': 'Purple',
+        '#ea580c': 'Hi-Vis Orange'
+      };
+
+      const CAR_WHEEL_LABELS = {
+        standard: 'Standard Utility',
+        steelie: 'Standard Steelies',
+        sport: 'Sport Alloys',
+        sporty: 'Sport Alloys',
+        offroad: 'Off-Road Mud Lugs',
+        flood: 'High-Water Flotation'
+      };
+
+      const CAR_DETAIL_LABELS = {
+        none: 'Clean Aero',
+        standard: 'Standard Clean',
+        spoiler: 'Downforce Spoiler',
+        snorkel: 'Deep Flood Snorkel',
+        roofrack: 'Roof Rack & Spotlights',
+        beacon: 'Emergency Hazard Beacon'
+      };
+
+      const COMPATIBLE_DETAILS = {
+        pickup: [
+          { id: 'none', label: 'Clean (No Accessories)' },
+          { id: 'snorkel', label: 'Deep Flood Snorkel' },
+          { id: 'roofrack', label: 'Roof Rack & Spotlights' },
+          { id: 'beacon', label: 'Hazard Strobe Beacon' }
+        ],
+        jeep: [
+          { id: 'none', label: 'Clean (No Accessories)' },
+          { id: 'snorkel', label: 'Deep Flood Snorkel' },
+          { id: 'roofrack', label: 'Roof Rack & Spotlights' },
+          { id: 'beacon', label: 'Hazard Strobe Beacon' }
+        ],
+        suv: [
+          { id: 'none', label: 'Standard (Clean)' },
+          { id: 'roofrack', label: 'Roof Cargo Basket & Lights' },
+          { id: 'beacon', label: 'Hazard Strobe Beacon' }
+        ],
+        van: [
+          { id: 'none', label: 'Standard (Clean)' },
+          { id: 'roofrack', label: 'Roof Cargo Basket & Lights' },
+          { id: 'beacon', label: 'Hazard Strobe Beacon' }
+        ],
+        coupe: [
+          { id: 'none', label: 'Clean Aero' },
+          { id: 'spoiler', label: 'GT Downforce Wing' }
+        ],
+        supercar: [
+          { id: 'none', label: 'Clean Aero' },
+          { id: 'spoiler', label: 'GT Downforce Wing' }
+        ],
+        sedan: [
+          { id: 'none', label: 'Standard Clean' },
+          { id: 'spoiler', label: 'Sport Decklid Wing' },
+          { id: 'beacon', label: 'Emergency Lightbar' }
+        ],
+        hatchback: [
+          { id: 'none', label: 'Standard Clean' },
+          { id: 'spoiler', label: 'Sport Roof Spoiler' },
+          { id: 'roofrack', label: 'Compact Roof Basket' },
+          { id: 'beacon', label: 'Emergency Lightbar' }
+        ],
+        compact: [
+          { id: 'none', label: 'Standard Clean' },
+          { id: 'spoiler', label: 'Sport Roof Spoiler' },
+          { id: 'roofrack', label: 'Compact Roof Basket' },
+          { id: 'beacon', label: 'Emergency Lightbar' }
+        ]
+      };
 
       function parseCarData(modelRaw) {
         if (!modelRaw) return null;
@@ -3057,24 +3191,8 @@ if (!empty($_SESSION['auth_user'])) {
         const data = parseCarData(modelRaw);
         if (data) {
           if (data.label && data.label.trim()) return data.label.trim();
-          const styleLabels = {
-            pickup: 'Rescue Pickup',
-            suv: '4x4 Offroad SUV',
-            van: 'Emergency Van',
-            compact: 'Compact Car'
-          };
-          const colorLabels = {
-            '#ea580c': 'Hi-Vis Orange',
-            '#f8fafc': 'White',
-            '#eab308': 'Yellow',
-            '#dc2626': 'Red',
-            '#0284c7': 'Blue',
-            '#15803d': 'Green',
-            '#475569': 'Slate',
-            '#1e293b': 'Black'
-          };
-          const s = styleLabels[data.bodyStyle] || 'Rescue Vehicle';
-          const c = colorLabels[data.paintColor] ? ` (${colorLabels[data.paintColor]})` : '';
+          const s = CAR_STYLE_LABELS[data.bodyStyle] || 'Rescue Vehicle';
+          const c = CAR_COLOR_LABELS[data.paintColor] ? ` (${CAR_COLOR_LABELS[data.paintColor]})` : (data.paintColor ? ` (${data.paintColor})` : '');
           return `${s}${c}`;
         }
         return modelRaw || 'Standard Vehicle';
@@ -3093,13 +3211,11 @@ if (!empty($_SESSION['auth_user'])) {
       function getCarSpecsBadge(modelRaw) {
         const data = parseCarData(modelRaw);
         if (data) {
-          const styleLabels = { pickup: 'Pickup', suv: '4x4 SUV', van: 'Van', compact: 'Compact' };
-          const wheelLabels = { flood: 'Flood Wheels', offroad: 'All-Terrain', steelie: 'Steelies', sport: 'Sport Alloys' };
-          const detailLabels = { snorkel: 'Snorkel', roofrack: 'Roof Rack', beacon: 'Beacon', standard: 'Clean' };
-
-          const styleName = styleLabels[data.bodyStyle] || '3D Car';
-          const wheelName = wheelLabels[data.wheelStyle] || '';
-          const detailName = detailLabels[data.detail] ? ` &bull; ${detailLabels[data.detail]}` : '';
+          const styleName = CAR_STYLE_LABELS[data.bodyStyle] || '3D Car';
+          const wheelName = CAR_WHEEL_LABELS[data.wheelStyle] || '';
+          const detailName = (data.detail && data.detail !== 'none' && CAR_DETAIL_LABELS[data.detail])
+            ? ` &bull; ${CAR_DETAIL_LABELS[data.detail]}`
+            : '';
           return `<span class="profile-card-specs-tag">3D &bull; ${styleName}${wheelName ? ' &bull; ' + wheelName : ''}${detailName}</span>`;
         }
         return `<span class="profile-card-specs-tag">Vehicle</span>`;
@@ -3115,6 +3231,56 @@ if (!empty($_SESSION['auth_user'])) {
         el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
+      function updateCarLiveSummary() {
+        const styleEl = document.getElementById('summary-car-style');
+        const colorEl = document.getElementById('summary-car-color');
+        const setupEl = document.getElementById('summary-car-setup');
+
+        const sName = CAR_STYLE_LABELS[carStudioConfig.bodyStyle] || 'Vehicle';
+        const cName = CAR_COLOR_LABELS[carStudioConfig.paintColor] || carStudioConfig.paintColor || 'Custom';
+        const wName = CAR_WHEEL_LABELS[carStudioConfig.wheelStyle] || 'Standard';
+        const dName = (carStudioConfig.detail && carStudioConfig.detail !== 'none')
+          ? (CAR_DETAIL_LABELS[carStudioConfig.detail] || carStudioConfig.detail)
+          : 'Clean Aero';
+
+        if (styleEl) styleEl.textContent = sName;
+        if (colorEl) colorEl.textContent = cName;
+        if (setupEl) setupEl.textContent = `${wName} • ${dName}`;
+      }
+
+      function renderDetailsOptions() {
+        const container = document.getElementById('car-details-options');
+        if (!container) return;
+
+        const styleKey = carStudioConfig.bodyStyle || 'pickup';
+        const options = COMPATIBLE_DETAILS[styleKey] || COMPATIBLE_DETAILS['pickup'];
+
+        // If current detail not in compatible options, switch to first allowed
+        const allowedIds = options.map(o => o.id);
+        if (!allowedIds.includes(carStudioConfig.detail)) {
+          carStudioConfig.detail = options[0].id;
+          if (carStudio3D) carStudio3D.updateConfig({ detail: carStudioConfig.detail });
+        }
+
+        let html = '';
+        options.forEach(opt => {
+          const isActive = (opt.id === carStudioConfig.detail);
+          html += `<button type="button" class="customizer-chip-btn ${isActive ? 'active' : ''}" data-detail="${opt.id}">${opt.label}</button>`;
+        });
+        container.innerHTML = html;
+
+        // Rebind click events
+        container.querySelectorAll('.customizer-chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            container.querySelectorAll('.customizer-chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carStudioConfig.detail = btn.dataset.detail;
+            if (carStudio3D) carStudio3D.updateConfig({ detail: carStudioConfig.detail });
+            updateCarLiveSummary();
+          });
+        });
+      }
+
       function initCarStudio3D() {
         const canvas = document.getElementById('car-studio-canvas');
         if (!canvas || !window.Car3D) return;
@@ -3124,6 +3290,7 @@ if (!empty($_SESSION['auth_user'])) {
           carStudio3D.updateConfig(carStudioConfig);
           carStudio3D.resize();
         }
+        updateCarLiveSummary();
       }
 
       function syncCarCustomizerUI() {
@@ -3133,19 +3300,33 @@ if (!empty($_SESSION['auth_user'])) {
         });
 
         // 2. Paint color swatch active state
-        document.querySelectorAll('#car-paint-colors .color-swatch-btn').forEach(b => {
-          b.classList.toggle('active', (b.dataset.color || '').toLowerCase() === (carStudioConfig.paintColor || '').toLowerCase());
+        let matchedSwatch = false;
+        document.querySelectorAll('#car-paint-colors .color-swatch-btn:not(.color-swatch-custom)').forEach(b => {
+          const isMatch = (b.dataset.color || '').toLowerCase() === (carStudioConfig.paintColor || '').toLowerCase();
+          b.classList.toggle('active', isMatch);
+          if (isMatch) matchedSwatch = true;
         });
+
+        // Custom color picker state
+        const customBtn = document.getElementById('btn-car-custom-color');
+        const colorInput = document.getElementById('car-color-picker-input');
+        if (customBtn) {
+          customBtn.classList.toggle('active', !matchedSwatch);
+        }
+        if (colorInput && carStudioConfig.paintColor) {
+          colorInput.value = carStudioConfig.paintColor;
+        }
 
         // 3. Wheel style active state
         document.querySelectorAll('#car-wheels-options .customizer-chip-btn').forEach(b => {
           b.classList.toggle('active', b.dataset.wheels === carStudioConfig.wheelStyle);
         });
 
-        // 4. Flood gear active state
-        document.querySelectorAll('#car-details-options .customizer-chip-btn').forEach(b => {
-          b.classList.toggle('active', b.dataset.detail === carStudioConfig.detail);
-        });
+        // 4. Render compatible cosmetic details for active body style
+        renderDetailsOptions();
+
+        // 5. Update summary text
+        updateCarLiveSummary();
       }
 
       function setupCarCustomizerListeners() {
@@ -3167,25 +3348,41 @@ if (!empty($_SESSION['auth_user'])) {
           });
         });
 
-        // Model selection
+        // Model selection (8 options)
         document.querySelectorAll('#car-model-options .customizer-chip-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             document.querySelectorAll('#car-model-options .customizer-chip-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             carStudioConfig.bodyStyle = btn.dataset.style;
+            renderDetailsOptions();
             if (carStudio3D) carStudio3D.updateConfig({ bodyStyle: carStudioConfig.bodyStyle });
+            updateCarLiveSummary();
           });
         });
 
         // Paint color swatches
-        document.querySelectorAll('#car-paint-colors .color-swatch-btn').forEach(btn => {
+        document.querySelectorAll('#car-paint-colors .color-swatch-btn:not(.color-swatch-custom)').forEach(btn => {
           btn.addEventListener('click', () => {
             document.querySelectorAll('#car-paint-colors .color-swatch-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             carStudioConfig.paintColor = btn.dataset.color;
             if (carStudio3D) carStudio3D.updateConfig({ paintColor: carStudioConfig.paintColor });
+            updateCarLiveSummary();
           });
         });
+
+        // Custom Color Picker input
+        const customColorInput = document.getElementById('car-color-picker-input');
+        if (customColorInput) {
+          customColorInput.addEventListener('input', (e) => {
+            const chosen = e.target.value;
+            document.querySelectorAll('#car-paint-colors .color-swatch-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-car-custom-color')?.classList.add('active');
+            carStudioConfig.paintColor = chosen;
+            if (carStudio3D) carStudio3D.updateConfig({ paintColor: chosen });
+            updateCarLiveSummary();
+          });
+        }
 
         // Wheel options
         document.querySelectorAll('#car-wheels-options .customizer-chip-btn').forEach(btn => {
@@ -3194,29 +3391,41 @@ if (!empty($_SESSION['auth_user'])) {
             btn.classList.add('active');
             carStudioConfig.wheelStyle = btn.dataset.wheels;
             if (carStudio3D) carStudio3D.updateConfig({ wheelStyle: carStudioConfig.wheelStyle });
+            updateCarLiveSummary();
           });
         });
 
-        // Flood gear options
-        document.querySelectorAll('#car-details-options .customizer-chip-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            document.querySelectorAll('#car-details-options .customizer-chip-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            carStudioConfig.detail = btn.dataset.detail;
-            if (carStudio3D) carStudio3D.updateConfig({ detail: carStudioConfig.detail });
-          });
+        // Reset Camera Angle
+        document.getElementById('btn-car-reset-angle')?.addEventListener('click', () => {
+          if (carStudio3D && carStudio3D.carGroup) {
+            carStudio3D.carGroup.rotation.y = -0.45;
+            carStudio3D.rotationVelocity = 0;
+            carStudio3D.render();
+          }
         });
+
+        // Toggle Auto-Spin
+        const spinBtn = document.getElementById('btn-car-toggle-spin');
+        if (spinBtn) {
+          spinBtn.addEventListener('click', () => {
+            if (carStudio3D) {
+              carStudio3D.options.autoRotate = !carStudio3D.options.autoRotate;
+              spinBtn.textContent = `Auto-Spin: ${carStudio3D.options.autoRotate ? 'ON' : 'OFF'}`;
+            }
+          });
+        }
 
         // Reset Appearance button
         document.getElementById('btn-reset-car-appearance')?.addEventListener('click', () => {
           carStudioConfig = {
             bodyStyle: 'pickup',
             paintColor: '#ea580c',
-            wheelStyle: 'flood',
+            wheelStyle: 'standard',
             detail: 'snorkel'
           };
           syncCarCustomizerUI();
           if (carStudio3D) carStudio3D.resetToDefaults();
+          updateCarLiveSummary();
         });
       }
 
@@ -3244,11 +3453,12 @@ if (!empty($_SESSION['auth_user'])) {
         carStudioConfig = {
           bodyStyle: 'pickup',
           paintColor: '#ea580c',
-          wheelStyle: 'flood',
+          wheelStyle: 'standard',
           detail: 'snorkel'
         };
         syncCarCustomizerUI();
         if (carStudio3D) carStudio3D.resetToDefaults();
+        updateCarLiveSummary();
       }
       window.resetCarStudioForm = resetCarStudioForm;
 
@@ -3283,15 +3493,15 @@ if (!empty($_SESSION['auth_user'])) {
           carStudioConfig = {
             bodyStyle: parsed.bodyStyle || 'pickup',
             paintColor: parsed.paintColor || '#ea580c',
-            wheelStyle: parsed.wheelStyle || 'flood',
-            detail: parsed.detail || 'snorkel'
+            wheelStyle: parsed.wheelStyle || 'standard',
+            detail: parsed.detail !== undefined ? parsed.detail : 'snorkel'
           };
         } else {
           if (nameInput) nameInput.value = car.model || '';
           carStudioConfig = {
             bodyStyle: 'pickup',
             paintColor: '#ea580c',
-            wheelStyle: 'flood',
+            wheelStyle: 'standard',
             detail: 'snorkel'
           };
         }
