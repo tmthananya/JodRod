@@ -65,10 +65,20 @@ if ($checkRes['success'] && !empty($checkRes['data'])) {
     exit;
 }
 
+$modelToSave = null;
+if (!empty($model)) {
+    json_decode($model);
+    if (json_last_error() === JSON_ERROR_NONE) {
+        $modelToSave = $model;
+    } else {
+        $modelToSave = htmlspecialchars($model, ENT_QUOTES, 'UTF-8');
+    }
+}
+
 $payload = [
     'user_id'       => $uid,
     'license_plate' => htmlspecialchars($licensePlate, ENT_QUOTES, 'UTF-8'),
-    'model'         => !empty($model) ? htmlspecialchars($model, ENT_QUOTES, 'UTF-8') : null,
+    'model'         => $modelToSave,
     'created_at'    => date('c'),
     'updated_at'    => date('c')
 ];

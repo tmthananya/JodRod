@@ -530,11 +530,12 @@ class ParkingMapController {
       const carsJson = await carsRes.json();
       if (carsJson.success && Array.isArray(carsJson.data) && carsJson.data.length > 0) {
         const cars = carsJson.data;
+        const getLabel = (m) => (window.getCarDisplayLabel ? window.getCarDisplayLabel(m) : (m || 'Standard'));
         if (cars.length === 1) {
           selectedCarId = cars[0].id;
-          selectedCarInfo = `Vehicle: ${cars[0].license_plate} (${cars[0].model || 'Standard'})\n`;
+          selectedCarInfo = `Vehicle: ${cars[0].license_plate} (${getLabel(cars[0].model)})\n`;
         } else {
-          const carOptions = cars.map((c, i) => `${i + 1}. ${c.license_plate} (${c.model || 'Standard'})`).join('\n');
+          const carOptions = cars.map((c, i) => `${i + 1}. ${c.license_plate} (${getLabel(c.model)})`).join('\n');
           const choice = window.prompt(
             `Select which vehicle to request parking at "${spaceName}":\n\n${carOptions}\n\nEnter number (1-${cars.length}):`,
             '1'

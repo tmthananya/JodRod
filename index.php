@@ -63,6 +63,11 @@ if (!empty($_SESSION['auth_user'])) {
           </a>
         </li>
         <li>
+          <a href="#vehicles" class="nav-link" id="nav-vehicles">
+            My Vehicles
+          </a>
+        </li>
+        <li>
           <a href="#profile" class="nav-link" id="nav-profile">
             My Profile
           </a>
@@ -828,6 +833,171 @@ if (!empty($_SESSION['auth_user'])) {
       </div>
     </section>
 
+    <!-- ========================================================
+         6. VEHICLES SECTION: 3D CAR CUSTOMIZER STUDIO
+         Matches the exact 16-bit retro UX/UI patterns of My Profile & 3D Avatar
+         ======================================================== -->
+    <section id="section-vehicles" class="nav-content-section">
+      <div class="profile-header-bar">
+        <div>
+          <h2 class="section-title">My Vehicles & 3D Customizer</h2>
+          <p class="section-subtitle">Register, inspect, and customize your 3D flood rescue vehicles with real-time 3D preview.</p>
+        </div>
+        <a href="#home" class="pixel-btn btn-back-home">&larr; Back to Home</a>
+      </div>
+
+      <!-- Vehicle Action Alert Box -->
+      <div id="vehicle-action-alert" class="alert-message" role="alert" style="display: none; margin-bottom: 20px;"></div>
+
+      <div class="actions-grid" style="align-items: start; margin-bottom: 24px;">
+        <!-- Left: 3D Vehicle Customizer Studio (Dedicated Studio & Registration) -->
+        <div class="form-card" id="left-vehicle-container">
+          <h3 id="vehicle-studio-title" style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+            Register Vehicle
+          </h3>
+          <p id="vehicle-studio-desc" style="font-size: 0.88rem; color: #64748b; margin-bottom: 18px;">
+            Customize your 3D flood vehicle and link your license plate for reservations.
+          </p>
+
+          <form id="vehicle-studio-form" novalidate>
+            <input type="hidden" id="vehicle-studio-id" name="id" value="">
+
+            <div id="vehicle-badge-bar" style="display: none; align-items: center; justify-content: space-between; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 12px; margin-bottom: 14px;">
+              <span style="font-size: 0.8rem; font-weight: 700; color: #166534;">Editing Active Vehicle</span>
+              <span style="font-size: 0.75rem; font-family: monospace; color: #475569;" id="vehicle-id-tag">#...</span>
+            </div>
+
+            <div class="form-group">
+              <label for="vehicle-studio-plate" class="form-label">License Plate *</label>
+              <input type="text" id="vehicle-studio-plate" name="license_plate" class="form-input" placeholder="e.g. 1กข-9999" required autocomplete="off">
+              <div class="form-help">Vehicle registration license plate. Must be unique to your account.</div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+              <label for="vehicle-studio-name" class="form-label">Vehicle Label (Optional)</label>
+              <input type="text" id="vehicle-studio-name" name="custom_label" class="form-input" placeholder="e.g. Toyota Hilux Rescue" autocomplete="off">
+              <div class="form-help">Custom description or friendly name to identify your car in parking lots.</div>
+            </div>
+
+            <!-- 3D Vehicle Studio Viewport -->
+            <div class="form-group" style="margin-top: 18px;">
+              <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>3D Car Studio</span>
+                <span style="font-size: 0.72rem; color: #0284c7; font-weight: 700;">LIVE 3D VIEWPORT</span>
+              </label>
+
+              <!-- 3D Viewport Frame -->
+              <div class="character-3d-viewport vehicle-3d-viewport" id="car-3d-viewport">
+                <canvas id="car-studio-canvas"></canvas>
+                <div class="viewport-hint">Drag to rotate 360°</div>
+                <div class="viewport-badge">3D VEHICLE</div>
+              </div>
+
+              <!-- Logical Customizer Category Tabs -->
+              <div class="customizer-tabs-nav" id="car-customizer-tabs" role="tablist">
+                <button type="button" class="customizer-tab-btn active" data-tab="model" role="tab" aria-selected="true">Body Style</button>
+                <button type="button" class="customizer-tab-btn" data-tab="paint" role="tab" aria-selected="false">Paint Color</button>
+                <button type="button" class="customizer-tab-btn" data-tab="wheels" role="tab" aria-selected="false">Wheels</button>
+                <button type="button" class="customizer-tab-btn" data-tab="details" role="tab" aria-selected="false">Flood Gear</button>
+              </div>
+
+              <!-- Customizer Category Panels Container -->
+              <div class="character-customizer-controls" id="car-customizer-panels">
+                
+                <!-- Category 1: Body Style -->
+                <div class="customizer-tab-panel" id="car-tab-model" data-tab="model">
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>Vehicle Body Style</span></div>
+                    <div class="customizer-options-row" id="car-model-options">
+                      <button type="button" class="customizer-chip-btn active" data-style="pickup">Rescue Pickup</button>
+                      <button type="button" class="customizer-chip-btn" data-style="suv">4x4 Offroad SUV</button>
+                      <button type="button" class="customizer-chip-btn" data-style="van">Emergency Van</button>
+                      <button type="button" class="customizer-chip-btn" data-style="compact">Compact Car</button>
+                    </div>
+                  </div>
+                  <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
+                    <button type="button" class="pixel-btn pixel-btn-sm" id="btn-reset-car-appearance" style="font-size: 0.75rem; padding: 6px 10px;">
+                      Reset Appearance
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Category 2: Paint Color -->
+                <div class="customizer-tab-panel" id="car-tab-paint" data-tab="paint" style="display: none;">
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>Body Paint Finish</span></div>
+                    <div class="color-swatch-row" id="car-paint-colors">
+                      <button type="button" class="color-swatch-btn active" data-color="#ea580c" style="background: #ea580c;" title="Hi-Vis Rescue Orange"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#f8fafc" style="background: #f8fafc;" title="Flood Relief White"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#eab308" style="background: #eab308;" title="Safety Yellow"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#dc2626" style="background: #dc2626;" title="Emergency Red"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#0284c7" style="background: #0284c7;" title="Flood Blue"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#15803d" style="background: #15803d;" title="Tactical Green"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#475569" style="background: #475569;" title="Matte Slate"></button>
+                      <button type="button" class="color-swatch-btn" data-color="#1e293b" style="background: #1e293b;" title="Deep Onyx"></button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Category 3: Wheels -->
+                <div class="customizer-tab-panel" id="car-tab-wheels" data-tab="wheels" style="display: none;">
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>Wheel & Suspension Setup</span></div>
+                    <div class="customizer-options-row" id="car-wheels-options">
+                      <button type="button" class="customizer-chip-btn active" data-wheels="flood">High-Clearance Flood</button>
+                      <button type="button" class="customizer-chip-btn" data-wheels="offroad">All-Terrain Offroad</button>
+                      <button type="button" class="customizer-chip-btn" data-wheels="steelie">Heavy Steelies</button>
+                      <button type="button" class="customizer-chip-btn" data-wheels="sport">Sport Alloys</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Category 4: Flood Gear / Details -->
+                <div class="customizer-tab-panel" id="car-tab-details" data-tab="details" style="display: none;">
+                  <div class="customizer-group">
+                    <div class="customizer-label"><span>Flood Relief Equipment</span></div>
+                    <div class="customizer-options-row" id="car-details-options">
+                      <button type="button" class="customizer-chip-btn active" data-detail="snorkel">Snorkel & Lift</button>
+                      <button type="button" class="customizer-chip-btn" data-detail="roofrack">Roof Rack & Lights</button>
+                      <button type="button" class="customizer-chip-btn" data-detail="beacon">Emergency Beacon</button>
+                      <button type="button" class="customizer-chip-btn" data-detail="standard">Standard Clean</button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+              <button type="submit" id="btn-submit-car-studio" class="pixel-btn pixel-btn-green" style="flex: 1; padding: 12px; font-size: 1rem;">
+                Save Vehicle
+              </button>
+              <button type="button" id="btn-cancel-car-studio" class="pixel-btn pixel-btn-sm" style="display: none; padding: 12px 18px; background: #f1f5f9; border-color: #cbd5e1; color: #475569;">
+                Cancel
+              </button>
+              <button type="button" id="btn-delete-car-studio" class="pixel-btn pixel-btn-sm pixel-btn-red" style="display: none; padding: 12px 14px;" title="Permanently delete vehicle">
+                Delete Vehicle
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Right: My Registered Vehicles List -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+              My Registered Vehicles
+            </h3>
+            <span class="status-pill status-available" id="vehicle-count-pill">0 Vehicles</span>
+          </div>
+
+          <div id="vehicle-studio-list-container">
+            <div class="empty-spaces-notice">Loading registered vehicles...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     </div> <!-- /#main-app-content -->
 
   </main>
@@ -921,6 +1091,12 @@ if (!empty($_SESSION['auth_user'])) {
           <input type="text" id="car-modal-model" class="form-input" placeholder="e.g. Toyota Hilux (White)" autocomplete="off">
           <div class="form-help">Optional model description to identify your vehicle in flood relief lots.</div>
         </div>
+        <div style="margin-top: 14px; padding: 10px; background: #eff6ff; border: 1px dashed #93c5fd; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+          <span style="font-size: 0.8rem; color: #1e40af; font-weight: 700;">Customize appearance in 3D:</span>
+          <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-blue" id="btn-modal-open-3d-studio" style="font-size: 0.76rem; padding: 6px 10px;">
+            Open 3D Studio
+          </button>
+        </div>
         <div class="modal-actions" style="margin-top: 20px;">
           <button type="button" class="pixel-btn pixel-btn-sm" id="btn-cancel-car-modal">Cancel</button>
           <button type="submit" class="pixel-btn pixel-btn-green" id="btn-submit-car-modal">
@@ -993,6 +1169,7 @@ if (!empty($_SESSION['auth_user'])) {
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="assets/js/character_3d.js"></script>
+  <script src="assets/js/car_3d.js"></script>
   <script src="assets/js/parking_map.js"></script>
 
   <!-- ========================================================
@@ -1179,6 +1356,7 @@ if (!empty($_SESSION['auth_user'])) {
         '#map': document.getElementById('nav-map'),
         '#my-spaces': document.getElementById('nav-my-spaces'),
         '#my-reservations': document.getElementById('nav-my-reservations'),
+        '#vehicles': document.getElementById('nav-vehicles'),
         '#profile': document.getElementById('nav-profile')
       };
 
@@ -1187,6 +1365,7 @@ if (!empty($_SESSION['auth_user'])) {
         '#map': document.getElementById('section-map'),
         '#my-spaces': document.getElementById('section-my-spaces'),
         '#my-reservations': document.getElementById('section-my-reservations'),
+        '#vehicles': document.getElementById('section-vehicles'),
         '#points': document.getElementById('section-points'),
         '#profile': document.getElementById('section-profile')
       };
@@ -1203,10 +1382,14 @@ if (!empty($_SESSION['auth_user'])) {
         let rawHash = window.location.hash || '';
         let [hashPath, hashQuery] = rawHash.split('?');
         let hash = hashPath;
-        if (!hash || hash === '#' || hash === '#dashboard' || hash === '#my-car' || hash === '#home') {
+        if (!hash || hash === '#' || hash === '#dashboard' || hash === '#home') {
           hash = '#map';
           window.location.hash = '#map';
           return;
+        }
+
+        if (hash === '#my-car' || hash === '#my-cars' || hash === '#my-vehicles' || hash === '#cars' || hash === '#car' || hash === '#create-vehicle' || hash === '#vehicle-studio') {
+          hash = '#vehicles';
         }
 
         const isOfferAction = (hash === '#offer-parking' || hash === '#offer-lot' || hash === '#offer-space' || (hash === '#my-spaces' && hashQuery && hashQuery.includes('action=offer')));
@@ -1251,6 +1434,21 @@ if (!empty($_SESSION['auth_user'])) {
         if (hash === '#my-reservations') {
           loadCars();
           loadReservations();
+        }
+
+        // Load vehicles and resize 3D car studio if vehicles section is shown
+        if (hash === '#vehicles') {
+          if (typeof loadStudioCars === 'function') {
+            loadStudioCars();
+          }
+          setTimeout(() => {
+            if (typeof initCarStudio3D === 'function') {
+              initCarStudio3D();
+            }
+            if (carStudio3D && typeof carStudio3D.resize === 'function') {
+              carStudio3D.resize();
+            }
+          }, 60);
         }
 
         // Load owner incoming requests if my-spaces section is shown
@@ -2828,7 +3026,481 @@ if (!empty($_SESSION['auth_user'])) {
       window.loadReservations = loadReservations;
 
       // ========================================================
-      // VEHICLES (CARS) MANAGEMENT CONTROLLER
+      // 3D CAR CUSTOMIZER STUDIO & VEHICLES CONTROLLER
+      // ========================================================
+      let carStudio3D = null;
+      let carStudioConfig = {
+        bodyStyle: 'pickup',
+        paintColor: '#ea580c',
+        wheelStyle: 'flood',
+        detail: 'snorkel'
+      };
+      let registeredCarsData = {};
+
+      function parseCarData(modelRaw) {
+        if (!modelRaw) return null;
+        let str = modelRaw;
+        if (typeof str === 'string' && str.includes('&quot;')) {
+          str = str.replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, '&');
+        }
+        if (typeof str === 'object' && str !== null) return str;
+        try {
+          if (typeof str === 'string' && str.trim().startsWith('{')) {
+            return JSON.parse(str);
+          }
+        } catch (e) {}
+        return null;
+      }
+      window.parseCarData = parseCarData;
+
+      function getCarDisplayLabel(modelRaw) {
+        const data = parseCarData(modelRaw);
+        if (data) {
+          if (data.label && data.label.trim()) return data.label.trim();
+          const styleLabels = {
+            pickup: 'Rescue Pickup',
+            suv: '4x4 Offroad SUV',
+            van: 'Emergency Van',
+            compact: 'Compact Car'
+          };
+          const colorLabels = {
+            '#ea580c': 'Hi-Vis Orange',
+            '#f8fafc': 'White',
+            '#eab308': 'Yellow',
+            '#dc2626': 'Red',
+            '#0284c7': 'Blue',
+            '#15803d': 'Green',
+            '#475569': 'Slate',
+            '#1e293b': 'Black'
+          };
+          const s = styleLabels[data.bodyStyle] || 'Rescue Vehicle';
+          const c = colorLabels[data.paintColor] ? ` (${colorLabels[data.paintColor]})` : '';
+          return `${s}${c}`;
+        }
+        return modelRaw || 'Standard Vehicle';
+      }
+      window.getCarDisplayLabel = getCarDisplayLabel;
+
+      function renderCarPortrait(modelRaw) {
+        const data = parseCarData(modelRaw);
+        if (data && data.snapshot) {
+          return `<div class="car-avatar-portrait"><img src="${data.snapshot}" alt="3D Vehicle"></div>`;
+        }
+        return `<div class="car-avatar-portrait"><span style="font-size: 1.8rem;">🚗</span></div>`;
+      }
+      window.renderCarPortrait = renderCarPortrait;
+
+      function getCarSpecsBadge(modelRaw) {
+        const data = parseCarData(modelRaw);
+        if (data) {
+          const styleLabels = { pickup: 'Pickup', suv: '4x4 SUV', van: 'Van', compact: 'Compact' };
+          const wheelLabels = { flood: 'Flood Wheels', offroad: 'All-Terrain', steelie: 'Steelies', sport: 'Sport Alloys' };
+          const detailLabels = { snorkel: 'Snorkel', roofrack: 'Roof Rack', beacon: 'Beacon', standard: 'Clean' };
+
+          const styleName = styleLabels[data.bodyStyle] || '3D Car';
+          const wheelName = wheelLabels[data.wheelStyle] || '';
+          const detailName = detailLabels[data.detail] ? ` &bull; ${detailLabels[data.detail]}` : '';
+          return `<span class="profile-card-specs-tag">3D &bull; ${styleName}${wheelName ? ' &bull; ' + wheelName : ''}${detailName}</span>`;
+        }
+        return `<span class="profile-card-specs-tag">Vehicle</span>`;
+      }
+      window.getCarSpecsBadge = getCarSpecsBadge;
+
+      function showVehicleAlert(type, message) {
+        const el = document.getElementById('vehicle-action-alert');
+        if (!el) return;
+        el.className = `alert-message ${type}`;
+        el.innerHTML = message;
+        el.style.display = 'block';
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function initCarStudio3D() {
+        const canvas = document.getElementById('car-studio-canvas');
+        if (!canvas || !window.Car3D) return;
+        if (!carStudio3D) {
+          carStudio3D = new window.Car3D(canvas, carStudioConfig);
+        } else {
+          carStudio3D.updateConfig(carStudioConfig);
+          carStudio3D.resize();
+        }
+      }
+
+      function syncCarCustomizerUI() {
+        // 1. Body style active state
+        document.querySelectorAll('#car-model-options .customizer-chip-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.style === carStudioConfig.bodyStyle);
+        });
+
+        // 2. Paint color swatch active state
+        document.querySelectorAll('#car-paint-colors .color-swatch-btn').forEach(b => {
+          b.classList.toggle('active', (b.dataset.color || '').toLowerCase() === (carStudioConfig.paintColor || '').toLowerCase());
+        });
+
+        // 3. Wheel style active state
+        document.querySelectorAll('#car-wheels-options .customizer-chip-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.wheels === carStudioConfig.wheelStyle);
+        });
+
+        // 4. Flood gear active state
+        document.querySelectorAll('#car-details-options .customizer-chip-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.detail === carStudioConfig.detail);
+        });
+      }
+
+      function setupCarCustomizerListeners() {
+        // Tab switching
+        const tabBtns = document.querySelectorAll('#car-customizer-tabs .customizer-tab-btn');
+        const panels = document.querySelectorAll('#car-customizer-panels .customizer-tab-panel');
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            tabBtns.forEach(b => {
+              const isActive = (b === btn);
+              b.classList.toggle('active', isActive);
+              b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            panels.forEach(p => {
+              p.style.display = (p.dataset.tab === targetTab) ? 'block' : 'none';
+            });
+          });
+        });
+
+        // Model selection
+        document.querySelectorAll('#car-model-options .customizer-chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('#car-model-options .customizer-chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carStudioConfig.bodyStyle = btn.dataset.style;
+            if (carStudio3D) carStudio3D.updateConfig({ bodyStyle: carStudioConfig.bodyStyle });
+          });
+        });
+
+        // Paint color swatches
+        document.querySelectorAll('#car-paint-colors .color-swatch-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('#car-paint-colors .color-swatch-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carStudioConfig.paintColor = btn.dataset.color;
+            if (carStudio3D) carStudio3D.updateConfig({ paintColor: carStudioConfig.paintColor });
+          });
+        });
+
+        // Wheel options
+        document.querySelectorAll('#car-wheels-options .customizer-chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('#car-wheels-options .customizer-chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carStudioConfig.wheelStyle = btn.dataset.wheels;
+            if (carStudio3D) carStudio3D.updateConfig({ wheelStyle: carStudioConfig.wheelStyle });
+          });
+        });
+
+        // Flood gear options
+        document.querySelectorAll('#car-details-options .customizer-chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('#car-details-options .customizer-chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carStudioConfig.detail = btn.dataset.detail;
+            if (carStudio3D) carStudio3D.updateConfig({ detail: carStudioConfig.detail });
+          });
+        });
+
+        // Reset Appearance button
+        document.getElementById('btn-reset-car-appearance')?.addEventListener('click', () => {
+          carStudioConfig = {
+            bodyStyle: 'pickup',
+            paintColor: '#ea580c',
+            wheelStyle: 'flood',
+            detail: 'snorkel'
+          };
+          syncCarCustomizerUI();
+          if (carStudio3D) carStudio3D.resetToDefaults();
+        });
+      }
+
+      function resetCarStudioForm() {
+        const titleEl = document.getElementById('vehicle-studio-title');
+        const descEl = document.getElementById('vehicle-studio-desc');
+        const badgeBar = document.getElementById('vehicle-badge-bar');
+        const idInput = document.getElementById('vehicle-studio-id');
+        const plateInput = document.getElementById('vehicle-studio-plate');
+        const nameInput = document.getElementById('vehicle-studio-name');
+        const cancelBtn = document.getElementById('btn-cancel-car-studio');
+        const deleteBtn = document.getElementById('btn-delete-car-studio');
+        const submitBtn = document.getElementById('btn-submit-car-studio');
+
+        if (titleEl) titleEl.textContent = 'Register Vehicle';
+        if (descEl) descEl.textContent = 'Customize your 3D flood vehicle and link your license plate for reservations.';
+        if (badgeBar) badgeBar.style.display = 'none';
+        if (idInput) idInput.value = '';
+        if (plateInput) plateInput.value = '';
+        if (nameInput) nameInput.value = '';
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+        if (submitBtn) submitBtn.innerHTML = 'Save Vehicle';
+
+        carStudioConfig = {
+          bodyStyle: 'pickup',
+          paintColor: '#ea580c',
+          wheelStyle: 'flood',
+          detail: 'snorkel'
+        };
+        syncCarCustomizerUI();
+        if (carStudio3D) carStudio3D.resetToDefaults();
+      }
+      window.resetCarStudioForm = resetCarStudioForm;
+
+      function editVehicleInStudio(carId) {
+        const car = registeredCarsData[carId];
+        if (!car) return;
+
+        window.location.hash = '#vehicles';
+        const titleEl = document.getElementById('vehicle-studio-title');
+        const descEl = document.getElementById('vehicle-studio-desc');
+        const badgeBar = document.getElementById('vehicle-badge-bar');
+        const idTag = document.getElementById('vehicle-id-tag');
+        const idInput = document.getElementById('vehicle-studio-id');
+        const plateInput = document.getElementById('vehicle-studio-plate');
+        const nameInput = document.getElementById('vehicle-studio-name');
+        const cancelBtn = document.getElementById('btn-cancel-car-studio');
+        const deleteBtn = document.getElementById('btn-delete-car-studio');
+        const submitBtn = document.getElementById('btn-submit-car-studio');
+
+        if (titleEl) titleEl.textContent = 'Edit Vehicle Details';
+        if (descEl) descEl.textContent = 'Update your 3D customization and registration details.';
+        if (badgeBar) badgeBar.style.display = 'flex';
+        if (idTag) idTag.textContent = `#${car.id.slice(0, 8)} (${car.id.slice(-4)})`;
+        if (idInput) idInput.value = car.id;
+        if (plateInput) plateInput.value = car.license_plate || '';
+        if (submitBtn) submitBtn.innerHTML = 'Save Vehicle';
+
+        // Parse customizer options
+        const parsed = parseCarData(car.model);
+        if (parsed) {
+          if (nameInput) nameInput.value = parsed.label || '';
+          carStudioConfig = {
+            bodyStyle: parsed.bodyStyle || 'pickup',
+            paintColor: parsed.paintColor || '#ea580c',
+            wheelStyle: parsed.wheelStyle || 'flood',
+            detail: parsed.detail || 'snorkel'
+          };
+        } else {
+          if (nameInput) nameInput.value = car.model || '';
+          carStudioConfig = {
+            bodyStyle: 'pickup',
+            paintColor: '#ea580c',
+            wheelStyle: 'flood',
+            detail: 'snorkel'
+          };
+        }
+
+        syncCarCustomizerUI();
+        if (carStudio3D) {
+          carStudio3D.updateConfig(carStudioConfig);
+        } else {
+          setTimeout(initCarStudio3D, 120);
+        }
+
+        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        if (deleteBtn) deleteBtn.style.display = 'inline-block';
+        document.getElementById('left-vehicle-container')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      window.editVehicleInStudio = editVehicleInStudio;
+
+      document.getElementById('btn-cancel-car-studio')?.addEventListener('click', resetCarStudioForm);
+
+      document.getElementById('btn-delete-car-studio')?.addEventListener('click', async () => {
+        const idInput = document.getElementById('vehicle-studio-id');
+        const plateInput = document.getElementById('vehicle-studio-plate');
+        const carId = idInput ? idInput.value.trim() : '';
+        const plate = plateInput ? plateInput.value.trim() : 'this vehicle';
+        if (!carId) return;
+
+        await deleteCar(carId, plate);
+        resetCarStudioForm();
+        await loadStudioCars();
+      });
+
+      // Submit Studio Form
+      document.getElementById('vehicle-studio-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const idInput = document.getElementById('vehicle-studio-id');
+        const plateInput = document.getElementById('vehicle-studio-plate');
+        const nameInput = document.getElementById('vehicle-studio-name');
+        const submitBtn = document.getElementById('btn-submit-car-studio');
+
+        const carId = idInput ? idInput.value.trim() : '';
+        const plate = plateInput ? plateInput.value.trim() : '';
+        const customName = nameInput ? nameInput.value.trim() : '';
+
+        if (!plate) {
+          showVehicleAlert('error', 'Please enter a vehicle license plate.');
+          if (plateInput) plateInput.focus();
+          return;
+        }
+
+        // Generate 3D snapshot from canvas
+        const snapshot = carStudio3D ? carStudio3D.getSnapshot(0.82) : '';
+        const modelPayload = JSON.stringify({
+          bodyStyle: carStudioConfig.bodyStyle,
+          paintColor: carStudioConfig.paintColor,
+          wheelStyle: carStudioConfig.wheelStyle,
+          detail: carStudioConfig.detail,
+          label: customName || getCarDisplayLabel(JSON.stringify(carStudioConfig)),
+          snapshot: snapshot
+        });
+
+        const isUpdate = Boolean(carId);
+        const endpoint = isUpdate ? 'api/update_car.php' : 'api/create_car.php';
+        const payload = isUpdate
+          ? { id: carId, license_plate: plate, model: modelPayload }
+          : { license_plate: plate, model: modelPayload };
+
+        try {
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Saving...';
+          }
+
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': window.csrfToken || ''
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success) {
+            showVehicleAlert('success', isUpdate
+              ? `<strong>Vehicle Saved:</strong> "${plate}" customization updated successfully.`
+              : `<strong>Vehicle Registered:</strong> "${plate}" customized and saved in Supabase.`
+            );
+            resetCarStudioForm();
+            await loadStudioCars();
+            if (typeof loadCars === 'function') await loadCars();
+            if (typeof loadDashboard === 'function') await loadDashboard();
+          } else {
+            showVehicleAlert('error', `<strong>Failed to save vehicle:</strong> ${json.error || 'Server error'}`);
+          }
+        } catch (err) {
+          showVehicleAlert('error', `<strong>Network error:</strong> ${err.message}`);
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Save Vehicle';
+          }
+        }
+      });
+
+      async function loadStudioCars() {
+        const container = document.getElementById('vehicle-studio-list-container');
+        const countPill = document.getElementById('vehicle-count-pill');
+        if (!container) return;
+
+        if (!currentUser) {
+          container.innerHTML = '<div class="empty-spaces-notice">Please sign in to view and customize your vehicles.</div>';
+          return;
+        }
+
+        try {
+          container.innerHTML = '<div class="empty-spaces-notice"><span>⏳</span> Loading your registered vehicles...</div>';
+          const res = await fetch('api/get_cars.php?_t=' + Date.now());
+          const json = await res.json();
+
+          if (!res.ok || !json.success) {
+            container.innerHTML = `<div class="empty-spaces-notice" style="color: #ef4444;">Could not load vehicles: ${json.error || 'Database error'}</div>`;
+            return;
+          }
+
+          const cars = json.data || [];
+          registeredCarsData = {};
+          cars.forEach(c => {
+            registeredCarsData[c.id] = c;
+          });
+
+          if (countPill) {
+            countPill.textContent = `${cars.length} ${cars.length === 1 ? 'Vehicle' : 'Vehicles'}`;
+          }
+
+          if (cars.length === 0) {
+            container.innerHTML = `
+              <div class="empty-spaces-notice">
+                No vehicles registered yet. Use the 3D Car Studio on the left to customize and register your vehicle.
+              </div>
+            `;
+            return;
+          }
+
+          let html = '';
+          cars.forEach(c => {
+            const displayLabel = getCarDisplayLabel(c.model);
+            const specsBadge = getCarSpecsBadge(c.model);
+            const portraitHtml = renderCarPortrait(c.model);
+
+            html += `
+              <div class="profile-card" id="studio-car-${c.id}" style="margin-bottom: 12px; background: #ffffff;">
+                <div class="profile-card-left" style="align-items: center; gap: 14px;">
+                  ${portraitHtml}
+                  <div style="flex: 1; min-width: 0;">
+                    <div class="profile-card-name" style="font-size: 1.15rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px;">
+                      <span>${c.license_plate}</span>
+                    </div>
+                    <div style="font-size: 0.84rem; color: #475569; font-weight: 700; margin-bottom: 3px;">
+                      ${displayLabel}
+                    </div>
+                    ${specsBadge}
+                    <div style="margin-top: 6px;">
+                      <span class="profile-clean-id" title="Full UUID: ${c.id} (Click to copy)" onclick="navigator.clipboard?.writeText('${c.id}'); const h = this.querySelector('.id-copy-hint'); if(h) { h.textContent='Copied!'; setTimeout(()=>h.textContent='Copy', 1500); }">
+                        <span class="id-hash">#</span>${c.id.slice(0, 8)}
+                        <span class="id-copy-hint" title="Copy UUID">Copy</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-top: 10px; border-top: 1px dashed #e2e8f0; padding-top: 10px;">
+                  <button type="button" class="pixel-btn pixel-btn-sm btn-edit-studio-car" data-id="${c.id}" title="Edit in 3D Studio">
+                    Edit in 3D
+                  </button>
+                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-studio-car" data-id="${c.id}" data-plate="${c.license_plate}" title="Delete Vehicle">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+
+          container.innerHTML = html;
+
+          container.querySelectorAll('.btn-edit-studio-car').forEach(btn => {
+            btn.addEventListener('click', () => {
+              editVehicleInStudio(btn.dataset.id);
+            });
+          });
+
+          container.querySelectorAll('.btn-delete-studio-car').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              await deleteCar(btn.dataset.id, btn.dataset.plate);
+              await loadStudioCars();
+            });
+          });
+
+        } catch (err) {
+          container.innerHTML = `<div class="empty-spaces-notice" style="color: #ef4444;">Network error: ${err.message}</div>`;
+        }
+      }
+      window.loadStudioCars = loadStudioCars;
+
+      setupCarCustomizerListeners();
+      setTimeout(() => {
+        initCarStudio3D();
+      }, 200);
+
+      // ========================================================
+      // VEHICLES (CARS) MANAGEMENT CONTROLLER (MY RESERVATIONS SYNC)
       // ========================================================
       async function loadCars() {
         const container = document.getElementById('cars-list-container');
@@ -2845,30 +3517,41 @@ if (!empty($_SESSION['auth_user'])) {
           }
 
           const cars = json.data || [];
+          cars.forEach(c => {
+            registeredCarsData[c.id] = c;
+          });
+
           if (cars.length === 0) {
             container.innerHTML = `
-              <div style="font-size: 0.88rem; color: #64748b; background: #f8fafc; padding: 10px; border-radius: 4px; border: 1px solid #e2e8f0;">
-                No vehicles registered yet. Click "Add Vehicle" above to register your car in Supabase.
+              <div style="font-size: 0.88rem; color: #64748b; background: #f8fafc; padding: 12px; border-radius: 4px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <span>No vehicles registered yet. Click "Add Vehicle" to customize in 3D.</span>
+                <a href="#vehicles" class="pixel-btn pixel-btn-sm pixel-btn-green">Open 3D Car Studio</a>
               </div>
             `;
             return;
           }
 
-          let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">';
+          let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">';
           cars.forEach(c => {
+            const portraitHtml = renderCarPortrait(c.model);
+            const displayLabel = getCarDisplayLabel(c.model);
+            const specsBadge = getCarSpecsBadge(c.model);
+
             html += `
-              <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 4px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <div style="font-weight: 800; font-size: 1rem; color: #0f172a;">${c.license_plate}</div>
-                  <div style="font-size: 0.82rem; color: #64748b;">${c.model || 'Standard Vehicle'}</div>
-                </div>
-                <div style="display: flex; gap: 6px;">
-                  <button type="button" class="pixel-btn pixel-btn-sm btn-edit-car" data-id="${c.id}" data-plate="${c.license_plate}" data-model="${c.model || ''}" title="Edit Vehicle Details">
-                    Edit
-                  </button>
-                  <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${c.id}" data-plate="${c.license_plate}" title="Delete Vehicle">
-                    Delete
-                  </button>
+              <div style="background: #ffffff; border: 2px solid var(--border-pixel); border-radius: 4px; padding: 12px; display: flex; gap: 12px; align-items: center; box-shadow: var(--shadow-pixel-sm);">
+                ${portraitHtml}
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 800; font-size: 1.05rem; color: #0f172a;">${c.license_plate}</div>
+                  <div style="font-size: 0.84rem; color: #475569; font-weight: 700; margin-bottom: 2px;">${displayLabel}</div>
+                  ${specsBadge}
+                  <div style="margin-top: 6px; display: flex; gap: 6px;">
+                    <button type="button" class="pixel-btn pixel-btn-sm btn-edit-car" data-id="${c.id}" data-plate="${c.license_plate}" data-model="${c.model || ''}" title="Edit in 3D Studio">
+                      Edit
+                    </button>
+                    <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${c.id}" data-plate="${c.license_plate}" title="Delete Vehicle">
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             `;
@@ -2883,10 +3566,8 @@ if (!empty($_SESSION['auth_user'])) {
       window.loadCars = loadCars;
 
       document.getElementById('btn-toggle-add-car')?.addEventListener('click', () => {
-        const form = document.getElementById('add-car-form');
-        if (form) {
-          form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        }
+        window.location.hash = '#vehicles';
+        resetCarStudioForm();
       });
 
       document.getElementById('btn-cancel-add-car')?.addEventListener('click', () => {
@@ -2923,6 +3604,7 @@ if (!empty($_SESSION['auth_user'])) {
             if (modelInput) modelInput.value = '';
             document.getElementById('add-car-form').style.display = 'none';
             await loadCars();
+            if (typeof loadStudioCars === 'function') await loadStudioCars();
             if (typeof loadDashboard === 'function') await loadDashboard();
           } else {
             showReservationAlert('error', `<strong>Failed to register vehicle:</strong> ${json.error || 'Server error'}`);
@@ -2949,19 +3631,23 @@ if (!empty($_SESSION['auth_user'])) {
           const json = await res.json();
           if (res.ok && json.success) {
             showReservationAlert('success', `Vehicle "${plate}" deleted from Supabase.`);
+            showVehicleAlert('success', `Vehicle "${plate}" deleted from Supabase.`);
             if (typeof showDashboardAlert === 'function') {
               showDashboardAlert('success', `Vehicle "${plate}" deleted from Supabase.`);
             }
             await loadCars();
+            if (typeof loadStudioCars === 'function') await loadStudioCars();
             if (typeof loadDashboard === 'function') await loadDashboard();
           } else {
             showReservationAlert('error', `<strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
+            showVehicleAlert('error', `<strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
             if (typeof showDashboardAlert === 'function') {
               showDashboardAlert('error', `<strong>Failed to delete vehicle:</strong> ${json.error || 'Server error'}`);
             }
           }
         } catch (err) {
           showReservationAlert('error', `<strong>Network error:</strong> ${err.message}`);
+          showVehicleAlert('error', `<strong>Network error:</strong> ${err.message}`);
         }
       }
 
@@ -4278,11 +4964,28 @@ if (!empty($_SESSION['auth_user'])) {
 
       document.getElementById('btn-close-car-modal')?.addEventListener('click', closeCarModal);
       document.getElementById('btn-cancel-car-modal')?.addEventListener('click', closeCarModal);
-      document.getElementById('btn-dash-add-car')?.addEventListener('click', () => openCarModal(null));
-      document.getElementById('btn-dash-add-car-sec')?.addEventListener('click', () => openCarModal(null));
+      document.getElementById('btn-modal-open-3d-studio')?.addEventListener('click', () => {
+        const carId = carModalIdInput ? carModalIdInput.value.trim() : '';
+        closeCarModal();
+        if (carId && typeof editVehicleInStudio === 'function') {
+          editVehicleInStudio(carId);
+        } else {
+          window.location.hash = '#vehicles';
+          if (typeof resetCarStudioForm === 'function') resetCarStudioForm();
+        }
+      });
+      document.getElementById('btn-dash-add-car')?.addEventListener('click', () => {
+        window.location.hash = '#vehicles';
+        if (typeof resetCarStudioForm === 'function') resetCarStudioForm();
+      });
+      document.getElementById('btn-dash-add-car-sec')?.addEventListener('click', () => {
+        window.location.hash = '#vehicles';
+        if (typeof resetCarStudioForm === 'function') resetCarStudioForm();
+      });
       document.addEventListener('click', (e) => {
         if (e.target.closest('.btn-dash-add-car-trigger')) {
-          openCarModal(null);
+          window.location.hash = '#vehicles';
+          if (typeof resetCarStudioForm === 'function') resetCarStudioForm();
         }
       });
       document.getElementById('btn-dash-refresh')?.addEventListener('click', loadDashboard);
@@ -4686,11 +5389,15 @@ if (!empty($_SESSION['auth_user'])) {
 
         const editCarBtn = e.target.closest('.btn-edit-car');
         if (editCarBtn) {
-          openCarModal({
-            id: editCarBtn.dataset.id,
-            license_plate: editCarBtn.dataset.plate,
-            model: editCarBtn.dataset.model
-          });
+          if (typeof editVehicleInStudio === 'function') {
+            editVehicleInStudio(editCarBtn.dataset.id);
+          } else {
+            openCarModal({
+              id: editCarBtn.dataset.id,
+              license_plate: editCarBtn.dataset.plate,
+              model: editCarBtn.dataset.model
+            });
+          }
         }
 
         const openReserveCarBtn = e.target.closest('.btn-open-reserve-car');

@@ -1256,7 +1256,10 @@ textarea.form-input:focus {
 }
 
 #create-feature-options,
-#edit-feature-options {
+#edit-feature-options,
+#car-model-options,
+#car-wheels-options,
+#car-details-options {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6px;
@@ -1388,7 +1391,8 @@ textarea.form-input:focus {
   flex: 1;
 }
 
-.profile-avatar-portrait {
+.profile-avatar-portrait,
+.car-avatar-portrait {
   width: 72px;
   height: 72px;
   border-radius: 6px;
@@ -1402,7 +1406,8 @@ textarea.form-input:focus {
   justify-content: center;
 }
 
-.profile-avatar-portrait img {
+.profile-avatar-portrait img,
+.car-avatar-portrait img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -2158,7 +2163,10 @@ textarea.form-input:focus {
   #create-clothes-styles,
   #edit-clothes-styles,
   #create-hair-styles,
-  #edit-hair-styles {
+  #edit-hair-styles,
+  #car-model-options,
+  #car-wheels-options,
+  #car-details-options {
     grid-template-columns: repeat(2, 1fr);
     gap: 4px;
   }
@@ -2187,7 +2195,8 @@ textarea.form-input:focus {
     min-height: 38px;
   }
 
-  .character-3d-viewport {
+  .character-3d-viewport,
+  .vehicle-3d-viewport {
     height: clamp(270px, 44vh, 320px);
     min-height: 270px;
   }
@@ -3153,5 +3162,24 @@ textarea.form-input:focus {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+/* Ultra-compact screens (320px - 360px) */
+@media (max-width: 360px) {
+  #car-model-options,
+  #car-wheels-options,
+  #car-details-options {
+    grid-template-columns: 1fr;
+  }
+  .customizer-tab-btn {
+    font-size: 0.68rem;
+    padding: 5px 3px;
+  }
+  .color-swatch-btn {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+  }
 }
 
