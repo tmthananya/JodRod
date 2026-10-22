@@ -581,17 +581,37 @@
 
         <!-- Section 6 -->
         <section id="th-sec-6" class="policy-section">
-          <h2>6. ระยะเวลาเก็บรักษาและวิธีลบบัญชีหรือข้อมูล (Data Retention & Deletion)</h2>
+          <h2>6. ระยะเวลาเก็บรักษาและวิธีลบบัญชีหรือข้อมูล (Data Retention & Account Deletion)</h2>
           <p>
             เราจะเก็บรักษาข้อมูลของท่านไว้ตราบเท่าที่บัญชีผู้ใช้ของท่านยังคงเปิดใช้งานอยู่ หรือตราบเท่าที่จำเป็นสำหรับการประสานงานช่วยเหลือ
           </p>
-          <h3>การจัดการและลบข้อมูลด้วยตนเองภายในแอป</h3>
+          
+          <h3>6.1 การจัดการและลบข้อมูลด้วยตนเองภายในแอป (In-App Self-Service Deletion)</h3>
+          <p>ท่านสามารถลบข้อมูลบางส่วนได้ด้วยตนเองทันทีโดยไม่ต้องลบบัญชี:</p>
           <ul>
-            <li><strong>ลบข้อมูลรถยนต์:</strong> ท่านสามารถกดลบรถยนต์ของท่านออกจากระบบได้ทันทีที่หน้า "My Vehicles"</li>
-            <li><strong>ลบสถานที่จอดรถ:</strong> เจ้าของพื้นที่สามารถกดลบหรือปิดรายการที่จอดรถของตนได้ที่หน้า "My Parking Lots"</li>
-            <li><strong>ลบโปรไฟล์:</strong> ท่านสามารถกดลบข้อมูลโปรไฟล์สมาชิกได้จากหน้า "My Profile"</li>
-            <li><strong>การขอลบบัญชีถาวร (Complete Account Deletion):</strong> หากท่านประสงค์จะลบบัญชีผู้ใช้ ข้อมูลประจำตัว และข้อมูลที่เกี่ยวข้องทั้งหมดอย่างถาวร สามารถส่งคำขอมายังอีเมลติดต่อของผู้พัฒนาที่ระบุไว้ด้านล่าง เมื่อคำขอได้รับการดำเนินการ ข้อมูลทั้งหมดจะถูกลบออกจากฐานข้อมูล Supabase ด้วยระบบ Cascade Deletion อย่างสมบูรณ์</li>
+            <li><strong>ลบข้อมูลรถยนต์:</strong> ไปที่เมนู "My Vehicles" &rarr; กดลบรถยนต์ที่ลงทะเบียนไว้ ข้อมูลทะเบียนและรุ่นรถจะถูกลบทันที</li>
+            <li><strong>ลบสถานที่จอดรถ:</strong> ไปที่เมนู "My Parking Lots" &rarr; เจ้าของพื้นที่สามารถกดลบจุดจอดรถของตนออกจากแผนที่ได้ทันที</li>
+            <li><strong>ลบโปรไฟล์:</strong> ไปที่เมนู "My Profile" &rarr; กดปุ่มลบโปรไฟล์เพื่อลบชื่อและอวตารออกจากระบบ</li>
           </ul>
+
+          <h3>6.2 ขั้นตอนการขอลบบัญชีและข้อมูลทั้งหมดอย่างถาวร (Complete Account Deletion Request)</h3>
+          <p>
+            หากท่านต้องการลบบัญชีผู้ใช้ JodRod และข้อมูลที่เกี่ยวข้องทั้งหมดออกจากระบบฐานข้อมูลอย่างถาวร สามารถดำเนินการตามขั้นตอนดังนี้:
+          </p>
+          <ol>
+            <li><strong>ส่งอีเมลขอลบข้อมูล:</strong> ส่งอีเมลจากที่อยู่อีเมลที่ท่านใช้ลงทะเบียนในแอป JodRod มาที่ <a href="mailto:thananyatammy@gmail.com">thananyatammy@gmail.com</a> โดยระบุหัวข้อ <code>"ขอลบบัญชี JodRod (Account Deletion Request)"</code></li>
+            <li><strong>การยืนยันตัวตนและการดำเนินการ:</strong> ผู้พัฒนา (Thananya Lertnibuna) จะทำการตรวจสอบและดำเนินการลบบัญชีของท่านออกจากระบบ Supabase ภายใน 7 วันทำการ</li>
+            <li><strong>ประเภทข้อมูลที่ถูกลบอย่างถาวร:</strong>
+              <ul>
+                <li>ข้อมูลบัญชีและอีเมลล็อกอินใน Supabase Auth</li>
+                <li>ข้อมูลโปรไฟล์และชื่อที่แสดงในระบบ</li>
+                <li>ข้อมูลรถยนต์ทุกคันที่ผูกไว้กับบัญชี</li>
+                <li>ประวัติการจองและบันทึกข้อความทั้งหมด (Cascade Deletion)</li>
+                <li>รายการพื้นที่จอดรถที่ท่านเป็นเจ้าของ</li>
+              </ul>
+            </li>
+            <li><strong>ระยะเวลาการเก็บรักษาเพิ่มเติม:</strong> ไม่มีการเก็บรักษาข้อมูลส่วนบุคคลใดๆ ตกค้างไว้หลังจากการลบเสร็จสิ้น</li>
+          </ol>
         </section>
 
         <!-- Section 7 -->
@@ -813,17 +833,37 @@
 
         <!-- Section 6 EN -->
         <section id="en-sec-6" class="policy-section">
-          <h2>6. Data Retention and Your Deletion Rights</h2>
+          <h2>6. Data Retention and Account Deletion</h2>
           <p>
-            We retain your information for as long as your account remains active or as needed to maintain your community parking listings.
+            We retain your personal data only for as long as your account remains active or as necessary to coordinate community flood parking assistance.
           </p>
-          <h3>In-App Self-Service Deletion</h3>
+          
+          <h3>6.1 In-App Self-Service Deletion</h3>
+          <p>You can manage and delete individual records directly within the application at any time:</p>
           <ul>
-            <li><strong>Delete Vehicles:</strong> You can remove any registered vehicle at any time from the "My Vehicles" section.</li>
-            <li><strong>Delete Parking Spaces:</strong> Parking space hosts can remove their listings at any time from the "My Parking Lots" section.</li>
-            <li><strong>Delete Profile:</strong> You can permanently remove your member profile from the "My Profile" section.</li>
-            <li><strong>Complete Account Deletion:</strong> If you wish to permanently delete your entire account, authentication credentials, and all associated data, you may submit an account deletion request to the developer contact email below. Once processed, your account and all linked records are permanently purged via database cascade deletion.</li>
+            <li><strong>Delete Vehicles:</strong> Remove registered cars anytime from the "My Vehicles" section.</li>
+            <li><strong>Delete Parking Spaces:</strong> Remove parking listings anytime from the "My Parking Lots" section.</li>
+            <li><strong>Delete Profile:</strong> Delete your display name and avatar from the "My Profile" section.</li>
           </ul>
+
+          <h3>6.2 Complete Account Deletion Request</h3>
+          <p>
+            To permanently delete your JodRod account, authentication credentials, and all associated personal records:
+          </p>
+          <ol>
+            <li><strong>Submit Request by Email:</strong> Send an email from your registered email address to <a href="mailto:thananyatammy@gmail.com">thananyatammy@gmail.com</a> with the subject line <code>"JodRod Account Deletion Request"</code>.</li>
+            <li><strong>Verification and Processing:</strong> The developer (Thananya Lertnibuna) will verify ownership and permanently purge your account from Supabase within 7 business days.</li>
+            <li><strong>Data Categories Permanently Deleted:</strong>
+              <ul>
+                <li>Authentication credentials and email address in Supabase Auth</li>
+                <li>User profile and display name</li>
+                <li>All registered vehicle records (license plates and models)</li>
+                <li>All parking reservation histories and notes (via database cascade deletion)</li>
+                <li>Owned parking space listings</li>
+              </ul>
+            </li>
+            <li><strong>Retention Policy:</strong> No residual personal data or backups are retained once the deletion is finalized.</li>
+          </ol>
         </section>
 
         <!-- Section 7 EN -->
