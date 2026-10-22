@@ -73,10 +73,10 @@ export default function App() {
     if (!targetUrl) {
       try {
         const parsed = new URL(currentUrl);
-        targetUrl = `${parsed.protocol}//${parsed.host}/privacy-policy.html`;
+        targetUrl = `${parsed.protocol}//${parsed.host}/privacy/`;
       } catch {
         const base = currentUrl.split('/#')[0].split('#')[0].replace(/\/+$/, '');
-        targetUrl = `${base}/privacy-policy.html`;
+        targetUrl = `${base}/privacy/`;
       }
     }
 
@@ -344,7 +344,7 @@ export default function App() {
             setCanGoBack(navState.canGoBack);
           }}
           onShouldStartLoadWithRequest={(request) => {
-            if (request.url && request.url.includes('privacy-policy.html')) {
+            if (request.url && (request.url.includes('/privacy') || request.url.includes('privacy-policy.html'))) {
               Linking.openURL(request.url).catch(() => {});
               return false;
             }

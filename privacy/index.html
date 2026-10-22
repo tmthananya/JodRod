@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - JodRod (นโยบายความเป็นส่วนตัว จอดรถ)</title>
+  <meta name="description" content="Privacy Policy for JodRod Flood Parking Community application (TH/EN). นโยบายความเป็นส่วนตัวสำหรับแอปพลิเคชันจอดรถ">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --text-heading: #0f172a;
+      --accent-blue: #0284c7;
+      --accent-blue-hover: #0369a1;
+      --accent-green: #10b981;
+      --border-color: #e2e8f0;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Thai", Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #f8fafc;
+      color: var(--text-main);
+      line-height: 1.7;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Sticky Navigation Bar */
+    .header {
+      background-color: var(--bg-primary);
+      color: #ffffff;
+      padding: 14px 20px;
+      border-bottom: 2px solid #334155;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .header-brand-icon {
+      font-size: 26px;
+    }
+
+    .header-brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      display: block;
+    }
+
+    .header-brand-tagline {
+      display: block;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Language Switcher Buttons */
+    .lang-switcher {
+      display: inline-flex;
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 2px;
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .lang-btn.active {
+      background-color: #2563eb;
+      color: #ffffff;
+    }
+
+    .header-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      background-color: #334155;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: background-color 0.15s ease;
+    }
+
+    .header-back-btn:hover {
+      background-color: #475569;
+    }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 44px 20px 48px;
+      text-align: center;
+      border-bottom: 1px solid #334155;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(2, 132, 199, 0.25);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    .hero-title {
+      font-size: 2.1rem;
+      font-weight: 900;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .hero-meta {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .hero-meta code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #38bdf8;
+    }
+
+    /* Content Container */
+    .content-container {
+      max-width: 900px;
+      margin: -24px auto 60px;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      padding: 36px 40px;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 22px 18px;
+      }
+      .hero-title {
+        font-size: 1.65rem;
+      }
+    }
+
+    /* Callout */
+    .callout {
+      background-color: #f0f9ff;
+      border-left: 4px solid var(--accent-blue);
+      padding: 14px 18px;
+      border-radius: 0 6px 6px 0;
+      margin: 18px 0;
+      font-size: 0.92rem;
+      color: #0369a1;
+    }
+
+    .callout strong {
+      color: #075985;
+    }
+
+    .callout-success {
+      background-color: #f0fdf4;
+      border-left-color: var(--accent-green);
+      color: #166534;
+    }
+
+    .callout-success strong {
+      color: #14532d;
+    }
+
+    /* Table of Contents */
+    .toc {
+      background-color: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin: 24px 0 32px;
+    }
+
+    .toc-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 10px;
+    }
+
+    .toc-list {
+      list-style-type: decimal;
+      padding-left: 20px;
+      columns: 2;
+      column-gap: 24px;
+    }
+
+    @media (max-width: 640px) {
+      .toc-list {
+        columns: 1;
+      }
+    }
+
+    .toc-list li {
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+    }
+
+    .toc-list a {
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .toc-list a:hover {
+      text-decoration: underline;
+    }
+
+    /* Sections */
+    .policy-section {
+      margin-bottom: 34px;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .policy-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 10px;
+      padding-bottom: 0;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-heading);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #334155;
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    ul, ol {
+      margin-left: 22px;
+      margin-bottom: 14px;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    strong {
+      color: #0f172a;
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.88rem;
+    }
+
+    .data-table th, .data-table td {
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .data-table tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+    }
+
+    a:hover {
+      color: var(--accent-blue-hover);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px 16px 40px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Language containers */
+    .lang-content {
+      display: none;
+    }
+
+    .lang-content.active {
+      display: block;
+    }
+
+    @media print {
+      .header, .header-actions, .toc, .lang-switcher {
+        display: none !important;
+      }
+      .lang-content {
+        display: block !important;
+      }
+      .card {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+      }
+      body {
+        background-color: #ffffff;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="../index.php" class="header-brand" title="Return to JodRod">
+        <span class="header-brand-icon">🚗</span>
+        <div>
+          <span class="header-brand-title">JODROD</span>
+          <span class="header-brand-tagline">Flood Parking Community</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <!-- Language Switcher -->
+        <div class="lang-switcher" role="group" aria-label="Language Switcher">
+          <button type="button" class="lang-btn active" id="btn-lang-th" onclick="switchLanguage('th')">🇹🇭 ภาษาไทย</button>
+          <button type="button" class="lang-btn" id="btn-lang-en" onclick="switchLanguage('en')">🇬🇧 English</button>
+        </div>
+
+        <a href="../index.php" class="header-back-btn">
+          <span>&larr;</span>
+          <span>กลับหน้าแอป</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <section class="hero">
+    <div class="hero-badge" id="hero-badge">นโยบายทางการ / Official Policy</div>
+    <h1 class="hero-title" id="hero-title">นโยบายความเป็นส่วนตัว (Privacy Policy)</h1>
+    <p class="hero-meta">
+      <strong>แอปพลิเคชัน:</strong> JodRod (จอดรถ) &bull; 
+      <strong>Package Name:</strong> <code>com.tmthananya.jodrod</code><br>
+      <strong>วันที่มีผลบังคับใช้:</strong> 22 ตุลาคม 2026 &bull; 
+      <strong>ปรับปรุงล่าสุด:</strong> 22 ตุลาคม 2026
+    </p>
+  </section>
+
+  <!-- Content Container -->
+  <main class="content-container">
+    <div class="card">
+
+      <!-- ========================================================
+           THAI CONTENT (ภาษาไทย)
+           ======================================================== -->
+      <div id="content-th" class="lang-content active">
+
+        <p>
+          ยินดีต้อนรับสู่ <strong>JodRod (จอดรถ)</strong> ("เรา", "พวกเรา" หรือ "บริการของเรา") JodRod เป็นแพลตฟอร์มชุมชนเพื่อสาธารณประโยชน์ (Civic Disaster Relief) สร้างขึ้นเพื่อช่วยเหลือเจ้าของรถยนต์ในการค้นหาและแบ่งปันพื้นที่จอดรถบนที่สูงที่ปลอดภัยในช่วงสถานการณ์อุทกภัย (น้ำท่วม) โดยเชื่อมโยงระหว่างผู้ต้องการที่จอดรถและเจ้าของพื้นที่หรือผู้มีจิตอาสาในชุมชน
+        </p>
+        <p>
+          นโยบายความเป็นส่วนตัวฉบับนี้อธิบายถึงแนวทางปฏิบัติในการเก็บรวบรวม ใช้ จัดเก็บ ปกป้อง และลบข้อมูลของท่าน เมื่อท่านใช้งานระบบเว็บแอปพลิเคชันและแอปพลิเคชันมือถือ JodRod (Android Package: <code>com.tmthananya.jodrod</code>) เพื่อให้สอดคล้องกับข้อกำหนดของ Google Play และพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล (PDPA)
+        </p>
+
+        <div class="callout callout-success">
+          <strong>คำมั่นสัญญาต่อชุมชน:</strong> JodRod ถูกพัฒนาขึ้นเพื่อการประสานงานช่วยเหลือผู้ประสบภัยน้ำท่วมเท่านั้น เรา<strong>ไม่มีการแสดงโฆษณา ไม่มีการติดตามพิกัด GPS เบื้องหลัง และไม่มีการนำข้อมูลส่วนบุคคลของท่านไปขายหรือแสวงหาผลประโยชน์ในเชิงพาณิชย์โดยเด็ดขาด</strong>
+        </div>
+
+        <!-- Table of Contents TH -->
+        <nav class="toc" aria-label="สารบัญ">
+          <div class="toc-title">สารบัญเนื้อหา</div>
+          <ol class="toc-list">
+            <li><a href="#th-sec-1">ข้อมูลที่เก็บรวบรวม</a></li>
+            <li><a href="#th-sec-2">ข้อมูลที่ไม่มีการเก็บรวบรวม</a></li>
+            <li><a href="#th-sec-3">วัตถุประสงค์ในการใช้ข้อมูล</a></li>
+            <li><a href="#th-sec-4">การจัดเก็บข้อมูลและผู้ให้บริการโครงสร้างพื้นฐาน</a></li>
+            <li><a href="#th-sec-5">การแชร์และเปิดเผยข้อมูล</a></li>
+            <li><a href="#th-sec-6">ระยะเวลาเก็บรักษาและวิธีลบบัญชี/ข้อมูล</a></li>
+            <li><a href="#th-sec-7">สิทธิ์ของผู้ใช้ตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล</a></li>
+            <li><a href="#th-sec-8">การขอสิทธิ์บนอุปกรณ์ (Permissions)</a></li>
+            <li><a href="#th-sec-9">บริการภายนอกที่เกี่ยวข้อง</a></li>
+            <li><a href="#th-sec-10">ความเป็นส่วนตัวของเด็กและเยาวชน</a></li>
+            <li><a href="#th-sec-11">มาตรการรักษาความปลอดภัยของข้อมูล</a></li>
+            <li><a href="#th-sec-12">การแก้ไขนโยบายและช่องทางติดต่อผู้พัฒนา</a></li>
+          </ol>
+        </nav>
+
+        <!-- Section 1 -->
+        <section id="th-sec-1" class="policy-section">
+          <h2>1. ข้อมูลที่เราเก็บรวบรวมและวิธีการเก็บ</h2>
+          <p>
+            เราเก็บรวบรวมเฉพาะข้อมูลเท่าที่จำเป็นอย่างยิ่งต่อการดำเนินงานค้นหาพื้นที่จอดรถน้ำท่วม การจองพื้นที่ และการประสานงานช่วยเหลือในชุมชน โดยข้อมูลทั้งหมดเป็นข้อมูลที่ท่านให้ไว้ด้วยความสมัครใจผ่านหน้าจอการใช้งานของแอปพลิเคชัน:
+          </p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>หมวดหมู่ข้อมูล</th>
+                <th>ฟิลด์ข้อมูลที่ตรวจพบ</th>
+                <th>วัตถุประสงค์การจัดเก็บ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ข้อมูลบัญชีผู้ใช้</strong></td>
+                <td>ที่อยู่อีเมล (`email`) และรหัสผ่านที่เข้ารหัส (`password`)</td>
+                <td>ใช้ในการสมัครสมาชิก ยืนยันตัวตน และจัดการเซสชันความปลอดภัยผ่านระบบ Supabase Auth</td>
+              </tr>
+              <tr>
+                <td><strong>ข้อมูลโปรไฟล์ชุมชน</strong></td>
+                <td>ชื่อที่ใช้แสดง (`name`) และรหัสภาพไอคอนจำลอง (`avatar`)</td>
+                <td>ใช้แสดงตัวตนต่อสมาชิกในชุมชน JodRod เมื่อประสานงานขอความช่วยเหลือหรือเปิดพื้นที่จอดรถ</td>
+              </tr>
+              <tr>
+                <td><strong>ข้อมูลยานพาหนะ</strong></td>
+                <td>หมายเลขทะเบียนรถ (`license_plate`) และยี่ห้อ/รุ่นรถ (`model`)</td>
+                <td>ใช้เพื่อให้เจ้าของพื้นที่จอดรถสามารถตรวจสอบความถูกต้องของรถที่เข้ามาจอด ป้องกันการแอบอ้าง</td>
+              </tr>
+              <tr>
+                <td><strong>ข้อมูลสถานที่จอดรถ</strong></td>
+                <td>ชื่อสถานที่หรือจุดสังเกต, พิกัดละติจูดและลองจิจูดจากการปักหมุด, ความจุรถ, จำนวนช่องจอดว่าง และสถานะพื้นที่</td>
+                <td>ใช้แสดงจุดจอดรถน้ำท่วมบนแผนที่ชุมชนแบบเรียลไทม์ เพื่อให้ผู้ประสบภัยสามารถค้นหาจุดปลอดภัยได้</td>
+              </tr>
+              <tr>
+                <td><strong>ข้อมูลการจองที่จอดรถ</strong></td>
+                <td>รหัสจุดจอด, รหัสรถยนต์ที่จอง, สถานะการจอง (ยืนยัน/ยกเลิก/เสร็จสิ้น) และข้อความบันทึกเพิ่มเติม (`notes`)</td>
+                <td>ใช้ในการยืนยันสิทธิ์การเข้าจอดรถและสื่อสารเวลาที่คาดว่าจะเดินทางมาถึง</td>
+              </tr>
+              <tr>
+                <td><strong>ข้อมูลเซสชันทางเทคนิค</strong></td>
+                <td>Cookie เซสชัน (`PHPSESSID`) และโทเค็นรักษาความปลอดภัย (`csrf_token`)</td>
+                <td>ใช้รักษาการคงอยู่ในระบบและป้องกันภัยคุกคามทางไซเบอร์ประเภท Cross-Site Request Forgery (CSRF)</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="th-sec-2" class="policy-section">
+          <h2>2. ข้อมูลที่ยืนยันว่าไม่มีการเก็บรวบรวม</h2>
+          <p>เพื่อความโปร่งใส เราขอชี้แจงอย่างชัดเจนว่าแอปพลิเคชัน JodRod <strong>ไม่เก็บรวบรวม</strong>ข้อมูลดังต่อไปนี้:</p>
+          <ul>
+            <li><strong>ไม่มีการติดตามพิกัด GPS เบื้องหลัง (No Background GPS Tracking):</strong> แอปไม่มีการแอบดึงพิกัดตำแหน่งอุปกรณ์ของท่าน ข้อมูลพิกัดสถานที่จอดรถเกิดจากการที่เจ้าของพื้นที่เลือกปักหมุดบนแผนที่ (Manual Pin Drop) ด้วยตนเองเท่านั้น</li>
+            <li><strong>ไม่มีข้อมูลการเงินหรือบัตรเครดิต:</strong> JodRod เป็นระบบจิตอาสาเพื่อชุมชนโดยไม่มีค่าใช้จ่าย จึงไม่มีการเรียกเก็บเงิน ไม่มีระบบชำระเงิน หรือเชื่อมต่อบัญชีธนาคารใดๆ</li>
+            <li><strong>ไม่มีการเข้าถึงกล้องหรือไมโครโฟน:</strong> ไม่มีการขอสิทธิ์กล้องหรือการบันทึกเสียง</li>
+            <li><strong>ไม่มีการเข้าถึงคลังรูปภาพส่วนตัว:</strong> รหัสภาพอวตารเป็นการเลือกรูปไอคอนสำเร็จรูปที่เตรียมไว้ในระบบเท่านั้น ไม่มีการอัปโหลดไฟล์ภาพจริงจากเครื่อง</li>
+            <li><strong>ไม่มีการเข้าถึงสมุดรายชื่อโทรศัพท์:</strong> ไม่มีการอ่านข้อมูลผู้ติดต่อในโทรศัพท์</li>
+            <li><strong>ไม่มีการติดตั้งระบบติดตามโฆษณา (No Advertising SDKs):</strong> ไม่มีการเก็บ Advertising ID หรือส่งข้อมูลให้เครือข่ายโฆษณา</li>
+          </ul>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="th-sec-3" class="policy-section">
+          <h2>3. วัตถุประสงค์ในการนำข้อมูลไปใช้</h2>
+          <p>เรานำข้อมูลส่วนบุคคลไปใช้เพื่อวัตถุประสงค์ในการบรรเทาสาธารณภัยชุมชนอย่างจำกัด ได้แก่:</p>
+          <ul>
+            <li>ช่วยให้ประชาชนค้นหาจุดจอดรถที่พ้นระดับน้ำท่วมบนแผนที่เชิงโต้ตอบได้อย่างรวดเร็ว</li>
+            <li>ให้เจ้าของพื้นที่สามารถบริหารจัดการจำนวนที่จอด อัปเดตสถานะว่าง/เต็ม และตรวจสอบรถที่ขอเข้าจอดได้</li>
+            <li>จัดการระบบการลงชื่อเข้าใช้งานและการรักษาความปลอดภัยของบัญชีผู้ใช้</li>
+            <li>ป้องกันการจองซ้ำซ้อน การสแปม หรือการบันทึกข้อมูลที่ไม่ถูกต้องในชุมชน</li>
+          </ul>
+        </section>
+
+        <!-- Section 4 -->
+        <section id="th-sec-4" class="policy-section">
+          <h2>4. การจัดเก็บข้อมูลและผู้ให้บริการโครงสร้างพื้นฐาน</h2>
+          <p>
+            ข้อมูลของ JodRod ถูกจัดเก็บบนระบบฐานข้อมูลคลาวด์ <strong>Supabase Inc. (PostgreSQL Database & GoTrue Authentication)</strong>
+          </p>
+          <ul>
+            <li><strong>Row Level Security (RLS):</strong> มีการบังคับใช้กฎ RLS ในระดับฐานข้อมูล ทำให้ผู้ใช้แต่ละคนสามารถแก้ไขหรือลบได้เฉพาะข้อมูลของตนเองเท่านั้น</li>
+            <li><strong>การแยกความลับของระบบ:</strong> กุญแจเชื่อมต่อฐานข้อมูลระดับสูง (Service Keys) ถูกเก็บรักษาอย่างปลอดภัยบนเซิร์ฟเวอร์ Backend และไม่ถูกเปิดเผยลงในโค้ดฝั่ง Client</li>
+          </ul>
+        </section>
+
+        <!-- Section 5 -->
+        <section id="th-sec-5" class="policy-section">
+          <h2>5. การแชร์และเปิดเผยข้อมูล</h2>
+          <p>
+            เนื่องจาก JodRod เป็นเครือข่ายประสานงานระหว่างชุมชน ข้อมูลบางส่วนจึงมีความจำเป็นต้องแสดงต่อผู้อื่นเพื่อการช่วยเหลือเกื้อกูล:
+          </p>
+          <ul>
+            <li><strong>ข้อมูลสาธารณะบนแผนที่:</strong> ชื่อพื้นที่จอดรถ, พิกัดปักหมุด, ความจุ และสถานะ จะปรากฏบนแผนที่ให้ผู้ใช้ทุกคนเห็น เพื่อประโยชน์ในการอพยพรถหนีน้ำท่วม</li>
+            <li><strong>ข้อมูลระหว่างคู่กรณีการจอง:</strong> เมื่อท่านทำการจองที่จอดรถ ข้อมูลทะเบียนรถ รุ่นรถ และข้อความบันทึก จะปรากฏแก่เจ้าของพื้นที่จอดนั้นๆ เพื่อการอำนวยความสะดวกในการเปิดทางเข้าจอด</li>
+            <li><strong>ผู้ให้บริการเทคโนโลยี:</strong>
+              <ul>
+                <li><strong>Supabase Inc.:</strong> ผู้ให้บริการโครงสร้างพื้นฐานฐานข้อมูลและระบบยืนยันตัวตน</li>
+                <li><strong>OpenStreetMap Foundation:</strong> ผู้ให้บริการแผนที่แบบโอเพนซอร์ส (การดาวน์โหลดรูปแผนที่ในแอปจะส่ง IP Address ตามมาตรฐานคำขอเว็บ)</li>
+              </ul>
+            </li>
+            <li><strong>การไม่จำหน่ายข้อมูล:</strong> เรา<strong>ไม่เคยและจะไม่มีวันขาย</strong> แลกเปลี่ยน หรือให้เช่าข้อมูลส่วนบุคคลแก่โบรกเกอร์ข้อมูลหรือบริษัทโฆษณา</li>
+          </ul>
+        </section>
+
+        <!-- Section 6 -->
+        <section id="th-sec-6" class="policy-section">
+          <h2>6. ระยะเวลาเก็บรักษาและวิธีลบบัญชีหรือข้อมูล (Data Retention & Deletion)</h2>
+          <p>
+            เราจะเก็บรักษาข้อมูลของท่านไว้ตราบเท่าที่บัญชีผู้ใช้ของท่านยังคงเปิดใช้งานอยู่ หรือตราบเท่าที่จำเป็นสำหรับการประสานงานช่วยเหลือ
+          </p>
+          <h3>การจัดการและลบข้อมูลด้วยตนเองภายในแอป</h3>
+          <ul>
+            <li><strong>ลบข้อมูลรถยนต์:</strong> ท่านสามารถกดลบรถยนต์ของท่านออกจากระบบได้ทันทีที่หน้า "My Vehicles"</li>
+            <li><strong>ลบสถานที่จอดรถ:</strong> เจ้าของพื้นที่สามารถกดลบหรือปิดรายการที่จอดรถของตนได้ที่หน้า "My Parking Lots"</li>
+            <li><strong>ลบโปรไฟล์:</strong> ท่านสามารถกดลบข้อมูลโปรไฟล์สมาชิกได้จากหน้า "My Profile"</li>
+            <li><strong>การขอลบบัญชีถาวร (Complete Account Deletion):</strong> หากท่านประสงค์จะลบบัญชีผู้ใช้ ข้อมูลประจำตัว และข้อมูลที่เกี่ยวข้องทั้งหมดอย่างถาวร สามารถส่งคำขอมายังอีเมลติดต่อของผู้พัฒนาที่ระบุไว้ด้านล่าง เมื่อคำขอได้รับการดำเนินการ ข้อมูลทั้งหมดจะถูกลบออกจากฐานข้อมูล Supabase ด้วยระบบ Cascade Deletion อย่างสมบูรณ์</li>
+          </ul>
+        </section>
+
+        <!-- Section 7 -->
+        <section id="th-sec-7" class="policy-section">
+          <h2>7. สิทธิ์ของผู้ใช้ตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล</h2>
+          <p>ท่านมีสิทธิ์ตามกฎหมายคุ้มครองข้อมูลส่วนบุคคล (PDPA) รวมถึง:</p>
+          <ul>
+            <li>สิทธิ์ในการเข้าถึงและขอรับสำเนาข้อมูลส่วนบุคคลของท่าน</li>
+            <li>สิทธิ์ในการขอให้แก้ไขข้อมูลให้ถูกต้องและเป็นปัจจุบัน</li>
+            <li>สิทธิ์ในการขอลบ ทำลาย หรือระงับการใช้ข้อมูลส่วนบุคคล</li>
+            <li>สิทธิ์ในการคัดค้านหรือเพิกถอนความยินยอมในการประมวลผลข้อมูล</li>
+          </ul>
+        </section>
+
+        <!-- Section 8 -->
+        <section id="th-sec-8" class="policy-section">
+          <h2>8. การขอสิทธิ์บนอุปกรณ์ (Device Permissions)</h2>
+          <p>
+            แอปพลิเคชัน JodRod (Android Package: <code>com.tmthananya.jodrod</code>) ขอเฉพาะสิทธิ์ขั้นพื้นฐานของระบบเท่านั้น:
+          </p>
+          <ul>
+            <li><strong>การเข้าถึงอินเทอร์เน็ต (`android.permission.INTERNET`):</strong> ใช้สำหรับติดต่อสื่อสารกับเซิร์ฟเวอร์ฐานข้อมูลและดาวน์โหลดแผนที่</li>
+            <li><strong>การตรวจสอบสถานะเครือข่าย (`android.permission.ACCESS_NETWORK_STATE`):</strong> ใช้ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตเพื่อแจ้งเตือนเมื่อหลุดการเชื่อมต่อ</li>
+          </ul>
+          <p><em>ไม่มีการขอสิทธิ์ในกลุ่มสิทธิ์ที่มีความเสี่ยงสูง (Dangerous Permissions) เช่น พิกัด GPS, กล้อง, สมุดรายชื่อ หรือไฟล์ในเครื่อง</em></p>
+        </section>
+
+        <!-- Section 9 -->
+        <section id="th-sec-9" class="policy-section">
+          <h2>9. บริการภายนอกและนโยบายความเป็นส่วนตัวที่เกี่ยวข้อง</h2>
+          <ul>
+            <li><strong>Supabase Privacy Policy:</strong> <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">https://supabase.com/privacy</a></li>
+            <li><strong>OpenStreetMap Privacy Policy:</strong> <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer">https://wiki.osmfoundation.org/wiki/Privacy_Policy</a></li>
+            <li><strong>Cloudflare Privacy Policy:</strong> <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">https://www.cloudflare.com/privacypolicy/</a></li>
+          </ul>
+        </section>
+
+        <!-- Section 10 -->
+        <section id="th-sec-10" class="policy-section">
+          <h2>10. ความเป็นส่วนตัวของเด็กและเยาวชน</h2>
+          <p>
+            JodRod จัดทำขึ้นสำหรับเจ้าของยานพาหนะและเจ้าของอสังหาริมทรัพย์ที่มีอำนาจในการตัดสินใจ โดยบริการนี้ไม่ได้มุ่งเป้าหรือออกแบบมาเพื่อเก็บข้อมูลจากเด็กที่มีอายุต่ำกว่า 13 ปี (หรือต่ำกว่าเกณฑ์บรรลุนิติภาวะในแต่ละเขตอำนาจศาล) หากพบว่ามีการจัดเก็บข้อมูลของเด็กโดยปราศจากความยินยอมจากผู้ปกครอง เราจะดำเนินการลบข้อมูลดังกล่าวโดยทันที
+          </p>
+        </section>
+
+        <!-- Section 11 -->
+        <section id="th-sec-11" class="policy-section">
+          <h2>11. มาตรการรักษาความปลอดภัยของข้อมูล</h2>
+          <p>เราใช้มาตรการทางเทคนิคตามมาตรฐานความปลอดภัย:</p>
+          <ul>
+            <li>รหัสผ่านได้รับการแฮช (Cryptographic Hash) ด้วยอัลกอริทึมมาตรฐานสากลผ่าน Supabase Auth</li>
+            <li>ระบบฐานข้อมูลมีการแบ่งแยกการเข้าถึงด้วย Row Level Security (RLS)</li>
+            <li>มีกลไกตรวจสอบโทเค็นป้องกัน CSRF ทุกครั้งที่มีการส่งคำขอเปลี่ยนแปลงข้อมูล</li>
+            <li>Cookie เซสชันถูกตั้งค่าด้วยแอตทริบิวต์ `HttpOnly` และ `SameSite=Lax`</li>
+          </ul>
+          <p><em>ข้อจำกัดความรับผิดชอบ: แม้เราจะดำเนินมาตรการรักษาความปลอดภัยอย่างเข้มงวด แต่ไม่มีการส่งผ่านข้อมูลทางอินเทอร์เน็ตหรือระบบจัดเก็บข้อมูลอิเล็กทรอนิกส์ใดที่มีความปลอดภัย 100% สมบูรณ์แบบ เราจึงไม่สามารถรับประกันความปลอดภัยโดยสมบูรณ์ได้อย่างไร้ข้อผิดพลาด</em></p>
+        </section>
+
+        <!-- Section 12 -->
+        <section id="th-sec-12" class="policy-section">
+          <h2>12. การแก้ไขนโยบายและช่องทางติดต่อผู้พัฒนา</h2>
+          <p>
+            เราอาจปรับปรุงนโยบายความเป็นส่วนตัวนี้เป็นครั้งคราวเพื่อให้สอดคล้องกับฟีเจอร์ใหม่หรือข้อกฎหมาย โดยจะแจ้งให้ทราบผ่านการอัปเดต "วันที่แก้ไขล่าสุด" ที่ระบุไว้บนหน้านี้
+          </p>
+          <h3>ข้อมูลผู้พัฒนาและช่องทางติดต่อ</h3>
+          <p>หากท่านมีข้อสงสัย ข้อเสนอแนะ หรือต้องการใช้สิทธิ์ขอลบข้อมูลส่วนบุคคล กรุณาติดต่อได้ที่:</p>
+          <ul>
+            <li><strong>ชื่อผู้พัฒนา:</strong> Thananya Lertnibuna</li>
+            <li><strong>แอปพลิเคชัน:</strong> JodRod (จอดรถ - Flood Parking Community)</li>
+            <li><strong>อีเมลติดต่อ:</strong> <a href="mailto:thananyatammy@gmail.com">thananyatammy@gmail.com</a></li>
+            <li><strong>Repository โครงการ:</strong> <a href="https://github.com/tmthananya/JodRod" target="_blank" rel="noopener noreferrer">https://github.com/tmthananya/JodRod</a></li>
+          </ul>
+        </section>
+
+      </div>
+
+      <!-- ========================================================
+           ENGLISH CONTENT (English)
+           ======================================================== -->
+      <div id="content-en" class="lang-content">
+
+        <p>
+          Welcome to <strong>JodRod</strong> ("we," "our," or "us"). JodRod is a civic, non-profit community disaster relief initiative designed to help motor vehicle owners evacuate their cars to safe, elevated ground during flood emergencies and to enable property owners and community members to offer safe parking spaces.
+        </p>
+        <p>
+          This Privacy Policy explains how JodRod collects, uses, stores, protects, and deletes your information when you use our web application and mobile application (Android Package: <code>com.tmthananya.jodrod</code>). This policy is designed to comply with Google Play Developer Policy and applicable data privacy regulations.
+        </p>
+
+        <div class="callout callout-success">
+          <strong>Our Civic Commitment:</strong> JodRod is built exclusively for emergency flood parking coordination. We do not display advertisements, we do not track your background GPS movements, and we will never sell or monetize your personal information.
+        </div>
+
+        <!-- Table of Contents EN -->
+        <nav class="toc" aria-label="Table of Contents">
+          <div class="toc-title">Table of Contents</div>
+          <ol class="toc-list">
+            <li><a href="#en-sec-1">Information We Collect</a></li>
+            <li><a href="#en-sec-2">Information We Do Not Collect</a></li>
+            <li><a href="#en-sec-3">How We Use Your Information</a></li>
+            <li><a href="#en-sec-4">Storage and Database Infrastructure</a></li>
+            <li><a href="#en-sec-5">Information Sharing & Disclosure</a></li>
+            <li><a href="#en-sec-6">Data Retention & Deletion Rights</a></li>
+            <li><a href="#en-sec-7">Your Legal Rights</a></li>
+            <li><a href="#en-sec-8">Device Permissions</a></li>
+            <li><a href="#en-sec-9">Third-Party Services</a></li>
+            <li><a href="#en-sec-10">Children's Privacy</a></li>
+            <li><a href="#en-sec-11">Security Practices</a></li>
+            <li><a href="#en-sec-12">Policy Updates & Contact</a></li>
+          </ol>
+        </nav>
+
+        <!-- Section 1 EN -->
+        <section id="en-sec-1" class="policy-section">
+          <h2>1. Information We Collect and How It Is Collected</h2>
+          <p>
+            We collect only the minimal data strictly necessary to facilitate flood parking discovery, spot reservations, and community mutual aid. All collected information is voluntarily provided by you through the application interface:
+          </p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Data Fields Collected</th>
+                <th>Collection Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Account Credentials</strong></td>
+                <td>Email address and hashed password</td>
+                <td>Account registration, authentication, session security, and password resets via Supabase Auth.</td>
+              </tr>
+              <tr>
+                <td><strong>Community Profile</strong></td>
+                <td>Display name (`name`) and selected avatar preset identifier (`avatar`)</td>
+                <td>Identifying community members when offering parking or requesting relief coordination.</td>
+              </tr>
+              <tr>
+                <td><strong>Vehicle Information</strong></td>
+                <td>License plate number (`license_plate`) and vehicle model/description (`model`)</td>
+                <td>Allowing space hosts to verify incoming vehicles and prevent unauthorized parking.</td>
+              </tr>
+              <tr>
+                <td><strong>Parking Space Listings</strong></td>
+                <td>Location name/landmark, manually dropped pin coordinates (lat/lng), total capacity, available spots, status</td>
+                <td>Displaying safe elevated parking spots on the community map to neighbors during floods.</td>
+              </tr>
+              <tr>
+                <td><strong>Reservation Records</strong></td>
+                <td>Selected parking spot, associated vehicle, status, and arrival notes (`notes`)</td>
+                <td>Mutual arrival confirmation between drivers and space providers.</td>
+              </tr>
+              <tr>
+                <td><strong>Technical Session Data</strong></td>
+                <td>Session cookie (`PHPSESSID`) and CSRF security token (`csrf_token`)</td>
+                <td>Maintaining authenticated session state and preventing Cross-Site Request Forgery (CSRF).</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Section 2 EN -->
+        <section id="en-sec-2" class="policy-section">
+          <h2>2. Information We Do Not Collect</h2>
+          <p>To maintain complete transparency, we explicitly verify that JodRod does <strong>not</strong> collect or process:</p>
+          <ul>
+            <li><strong>No Background GPS Tracking:</strong> We do not track your device's physical location silently or in the background. Geographic coordinates for parking spaces are designated manually by the space owner dropping a pin on the interactive map.</li>
+            <li><strong>No Payment or Financial Data:</strong> JodRod is a free civic utility. We do not process payments, fees, credit cards, or banking information.</li>
+            <li><strong>No Camera or Microphone Access:</strong> We do not access or request camera or audio hardware.</li>
+            <li><strong>No Personal Photo Library Access:</strong> Avatars are selected from pre-configured preset illustrations; we do not read your photo gallery or upload image files.</li>
+            <li><strong>No Contacts or Device Phonebook:</strong> We do not inspect, read, or upload your contacts.</li>
+            <li><strong>No Advertising or Behavioral Trackers:</strong> We do not run third-party advertising SDKs, ad networks, or user profiling trackers.</li>
+          </ul>
+        </section>
+
+        <!-- Section 3 EN -->
+        <section id="en-sec-3" class="policy-section">
+          <h2>3. How We Use Your Information</h2>
+          <p>We use the collected information strictly for civic emergency relief operations, specifically to:</p>
+          <ul>
+            <li>Allow vehicle owners in flood-prone areas to discover safe, elevated parking spaces on a real-time interactive map.</li>
+            <li>Allow property owners and volunteers to register, update capacity, and close their available parking spaces.</li>
+            <li>Facilitate mutual reservation requests and arrival verification between drivers and parking hosts.</li>
+            <li>Verify authenticated user accounts and safeguard account security.</li>
+            <li>Prevent duplicate reservations, abuse, and vandalism of community listings.</li>
+          </ul>
+        </section>
+
+        <!-- Section 4 EN -->
+        <section id="en-sec-4" class="policy-section">
+          <h2>4. Storage, Hosting, and Database Services</h2>
+          <p>
+            JodRod stores user accounts, profiles, vehicle records, parking listings, and reservation requests in a cloud-hosted <strong>PostgreSQL database managed by Supabase Inc.</strong>
+          </p>
+          <ul>
+            <li><strong>Row Level Security (RLS):</strong> Our database implements strict Row Level Security policies. Users can only edit or delete their own listings, vehicles, profiles, and reservations.</li>
+            <li><strong>Backend Credential Isolation:</strong> Database access credentials and API service tokens are securely stored on our backend server environment and are never exposed in client-side code or public repositories.</li>
+          </ul>
+        </section>
+
+        <!-- Section 5 EN -->
+        <section id="en-sec-5" class="policy-section">
+          <h2>5. Information Sharing and Disclosure</h2>
+          <p>
+            Because JodRod is a community-driven mutual aid network, certain information is shared among community members to fulfill the app's purpose:
+          </p>
+          <ul>
+            <li><strong>Public Community Information:</strong> Parking space names, geographic pin coordinates (latitude/longitude), total capacity, and available slot counts are publicly visible on the map to all users searching for flood parking.</li>
+            <li><strong>Reservation Coordination:</strong> When you reserve a parking space, the owner of that parking space can view the reservation details, including the assigned vehicle license plate, vehicle model, and arrival notes, to verify your vehicle.</li>
+            <li><strong>Infrastructure Service Providers:</strong>
+              <ul>
+                <li><strong>Supabase Inc.:</strong> Cloud database hosting and user authentication provider.</li>
+                <li><strong>OpenStreetMap Foundation:</strong> Map tile provider for rendering map layers in Leaflet. Standard HTTP requests (including your IP address and user-agent) are sent to OpenStreetMap tile servers when map tiles are downloaded.</li>
+              </ul>
+            </li>
+            <li><strong>No Sale or Commercial Transfer:</strong> We do not sell, rent, trade, or monetize any user personal data with data brokers, advertisers, or commercial third parties.</li>
+          </ul>
+        </section>
+
+        <!-- Section 6 EN -->
+        <section id="en-sec-6" class="policy-section">
+          <h2>6. Data Retention and Your Deletion Rights</h2>
+          <p>
+            We retain your information for as long as your account remains active or as needed to maintain your community parking listings.
+          </p>
+          <h3>In-App Self-Service Deletion</h3>
+          <ul>
+            <li><strong>Delete Vehicles:</strong> You can remove any registered vehicle at any time from the "My Vehicles" section.</li>
+            <li><strong>Delete Parking Spaces:</strong> Parking space hosts can remove their listings at any time from the "My Parking Lots" section.</li>
+            <li><strong>Delete Profile:</strong> You can permanently remove your member profile from the "My Profile" section.</li>
+            <li><strong>Complete Account Deletion:</strong> If you wish to permanently delete your entire account, authentication credentials, and all associated data, you may submit an account deletion request to the developer contact email below. Once processed, your account and all linked records are permanently purged via database cascade deletion.</li>
+          </ul>
+        </section>
+
+        <!-- Section 7 EN -->
+        <section id="en-sec-7" class="policy-section">
+          <h2>7. Your Legal Rights</h2>
+          <p>Subject to applicable data protection laws (such as PDPA or GDPR), you have the right to:</p>
+          <ul>
+            <li>Request access to and a copy of your personal data.</li>
+            <li>Request rectification of inaccurate or outdated information.</li>
+            <li>Request deletion or restriction of processing of your personal data.</li>
+            <li>Withdraw consent or object to data processing.</li>
+          </ul>
+        </section>
+
+        <!-- Section 8 EN -->
+        <section id="en-sec-8" class="policy-section">
+          <h2>8. Device Permissions (Android & iOS)</h2>
+          <p>
+            The JodRod mobile application (Android Package: <code>com.tmthananya.jodrod</code>) requests only minimal system privileges:
+          </p>
+          <ul>
+            <li><strong>Internet Access (`android.permission.INTERNET`):</strong> Required for connecting to the application server and loading OpenStreetMap map tiles.</li>
+            <li><strong>Network State (`android.permission.ACCESS_NETWORK_STATE`):</strong> Used to detect network connectivity and assist with offline/reconnection status.</li>
+          </ul>
+          <p><em>No sensitive runtime permissions (such as GPS background tracking, camera, contacts, or external storage) are requested or used.</em></p>
+        </section>
+
+        <!-- Section 9 EN -->
+        <section id="en-sec-9" class="policy-section">
+          <h2>9. Third-Party Services and Their Policies</h2>
+          <ul>
+            <li><strong>Supabase Privacy Policy:</strong> <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">https://supabase.com/privacy</a></li>
+            <li><strong>OpenStreetMap Privacy Policy:</strong> <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer">https://wiki.osmfoundation.org/wiki/Privacy_Policy</a></li>
+            <li><strong>Cloudflare Privacy Policy:</strong> <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">https://www.cloudflare.com/privacypolicy/</a></li>
+          </ul>
+        </section>
+
+        <!-- Section 10 EN -->
+        <section id="en-sec-10" class="policy-section">
+          <h2>10. Children's Privacy</h2>
+          <p>
+            JodRod is designed for motor vehicle drivers, property owners, and community coordinators. It is not directed at children under the age of 13 (or under 16 in certain jurisdictions), and we do not knowingly collect personal information from children. If you become aware that a child has provided us with personal information, please contact us immediately, and we will promptly delete such information.
+          </p>
+        </section>
+
+        <!-- Section 11 EN -->
+        <section id="en-sec-11" class="policy-section">
+          <h2>11. Security Practices</h2>
+          <p>We employ standard industry security measures to safeguard your personal data:</p>
+          <ul>
+            <li>Passwords are hashed using industry-standard salted cryptographic algorithms via Supabase Auth.</li>
+            <li>Row Level Security (RLS) policies are enforced in the database to prevent unauthorized access.</li>
+            <li>All state-modifying requests are protected with cryptographic CSRF tokens (`X-CSRF-Token`).</li>
+            <li>Session cookies utilize `HttpOnly` and `SameSite=Lax` security attributes.</li>
+          </ul>
+          <p><em>Disclaimer: While we take standard reasonable technical measures to protect your data, no method of transmission over the Internet or method of electronic storage is 100% secure. We cannot warrant or guarantee absolute security.</em></p>
+        </section>
+
+        <!-- Section 12 EN -->
+        <section id="en-sec-12" class="policy-section">
+          <h2>12. Policy Updates & Developer Contact Information</h2>
+          <p>
+            We may update this Privacy Policy from time to time. Any revisions will be published on this page with an updated "Last Updated" date.
+          </p>
+          <h3>Developer & Contact Information</h3>
+          <p>If you have questions, concerns, feedback, or requests regarding this Privacy Policy or account deletion, please contact:</p>
+          <ul>
+            <li><strong>Developer:</strong> Thananya Lertnibuna</li>
+            <li><strong>Application:</strong> JodRod (Flood Parking Community)</li>
+            <li><strong>Contact Email:</strong> <a href="mailto:thananyatammy@gmail.com">thananyatammy@gmail.com</a></li>
+            <li><strong>Project Repository:</strong> <a href="https://github.com/tmthananya/JodRod" target="_blank" rel="noopener noreferrer">https://github.com/tmthananya/JodRod</a></li>
+          </ul>
+        </section>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 JodRod &bull; Flood Parking Community &bull; Civic Relief Initiative</p>
+  </footer>
+
+  <script>
+    function switchLanguage(lang) {
+      const thContent = document.getElementById('content-th');
+      const enContent = document.getElementById('content-en');
+      const thBtn = document.getElementById('btn-lang-th');
+      const enBtn = document.getElementById('btn-lang-en');
+      const heroBadge = document.getElementById('hero-badge');
+      const heroTitle = document.getElementById('hero-title');
+
+      if (lang === 'en') {
+        thContent.classList.remove('active');
+        enContent.classList.add('active');
+        thBtn.classList.remove('active');
+        enBtn.classList.add('active');
+        heroBadge.textContent = 'Official Policy';
+        heroTitle.textContent = 'Privacy Policy';
+        document.documentElement.lang = 'en';
+      } else {
+        enContent.classList.remove('active');
+        thContent.classList.add('active');
+        enBtn.classList.remove('active');
+        thBtn.classList.add('active');
+        heroBadge.textContent = 'นโยบายทางการ / Official Policy';
+        heroTitle.textContent = 'นโยบายความเป็นส่วนตัว (Privacy Policy)';
+        document.documentElement.lang = 'th';
+      }
+    }
+  </script>
+
+</body>
+</html>
