@@ -152,6 +152,11 @@ if (!empty($_SESSION['auth_user'])) {
           <div class="auth-switch-text" id="auth-switch-prompt" style="margin-top: 14px; text-align: center; font-size: 0.88rem; color: #64748b;">
             Don't have an account? <a href="#" id="link-switch-to-signup" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Sign up now</a>
           </div>
+          <div style="margin-top: 16px; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+            <a href="privacy-policy.html" target="_blank" rel="noopener noreferrer" style="font-size: 0.82rem; color: #64748b; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+              <span>🛡️</span> <span>Privacy Policy</span>
+            </a>
+          </div>
         </form>
       </div>
     </section>
@@ -663,6 +668,11 @@ if (!empty($_SESSION['auth_user'])) {
             <button type="button" id="btn-open-my-profile-editor" class="pixel-btn pixel-btn-blue" style="width: 100%; padding: 12px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
               Edit My Profile
             </button>
+            <div style="margin-top: 14px; text-align: center;">
+              <a href="privacy-policy.html" target="_blank" rel="noopener noreferrer" style="font-size: 0.85rem; color: #64748b; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+                <span>🛡️</span> <span>Privacy Policy</span>
+              </a>
+            </div>
           </div>
 
           <!-- 2. Editor Mode: Editable details form -->
@@ -1202,7 +1212,8 @@ if (!empty($_SESSION['auth_user'])) {
   <footer>
     <p>
       <strong>JodRod &bull; Flood Parking Community</strong> &bull; Civic Disaster Relief Initiative<br>
-      Connecting neighbors to keep vehicles safe during flood emergencies.
+      Connecting neighbors to keep vehicles safe during flood emergencies.<br>
+      <a href="privacy-policy.html" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline; font-size: 0.88rem; display: inline-block; margin-top: 6px;">🛡️ Privacy Policy</a>
     </p>
   </footer>
 

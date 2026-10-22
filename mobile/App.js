@@ -20,10 +20,18 @@ const APP_PORT = '8088';
 const APP_ROUTE = '/#map';
 
 // Known hosts
-const CURRENT_MAC_IP = '172.20.10.2';
+const CURRENT_MAC_IP = '192.168.0.247';
 const LOCALHOST_IP = '127.0.0.1';
 const HOTSPOT_IP = '172.20.10.2';
 const HOME_WIFI_IP = '192.168.70.187';
+
+/**
+ * PUBLIC_PRIVACY_POLICY_URL:
+ * Publicly accessible HTTPS URL for Google Play Console submission.
+ * Update via process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL or edit this variable before release.
+ * If empty, falls back to the current server's /privacy-policy.html.
+ */
+export const PUBLIC_PRIVACY_POLICY_URL = process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL || '';
 
 /**
  * Automatically determine the best initial URL based on platform & environment:
@@ -59,6 +67,33 @@ export default function App() {
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showConfig, setShowConfig] = useState(false);
+
+  const handleOpenPrivacyPolicy = async () => {
+    let targetUrl = PUBLIC_PRIVACY_POLICY_URL;
+    if (!targetUrl) {
+      try {
+        const parsed = new URL(currentUrl);
+        targetUrl = `${parsed.protocol}//${parsed.host}/privacy-policy.html`;
+      } catch {
+        const base = currentUrl.split('/#')[0].split('#')[0].replace(/\/+$/, '');
+        targetUrl = `${base}/privacy-policy.html`;
+      }
+    }
+
+    try {
+      const supported = await Linking.canOpenURL(targetUrl);
+      if (supported) {
+        await Linking.openURL(targetUrl);
+      } else if (webViewRef.current) {
+        setCurrentUrl(targetUrl);
+      }
+    } catch (err) {
+      console.warn('Could not open external privacy policy URL:', err);
+      if (webViewRef.current) {
+        setCurrentUrl(targetUrl);
+      }
+    }
+  };
 
   // Handle Android physical back button
   useEffect(() => {
@@ -110,6 +145,12 @@ export default function App() {
         <View style={styles.webHeader}>
           <Text style={styles.webTitle}>🚗 JodRod (Desktop Mode)</Text>
           <View style={styles.webActions}>
+            <TouchableOpacity
+              style={styles.webPrivacyBtn}
+              onPress={handleOpenPrivacyPolicy}
+            >
+              <Text style={styles.webPrivacyBtnText}>Privacy Policy 🛡️</Text>
+            </TouchableOpacity>
             <Text style={styles.webUrlText}>{currentUrl}</Text>
             <TouchableOpacity
               style={styles.openBrowserBtn}
@@ -143,9 +184,18 @@ export default function App() {
           <Text style={styles.topBarUrl} numberOfLines={1}>{currentUrl}</Text>
           <Text style={styles.topBarChevron}>{showConfig ? '▲' : '▼'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.reloadMiniBtn} onPress={handleReload}>
-          <Text style={styles.reloadMiniText}>🔄</Text>
-        </TouchableOpacity>
+        <View style={styles.topBarRight}>
+          <TouchableOpacity
+            style={styles.privacyPillBtn}
+            onPress={handleOpenPrivacyPolicy}
+            accessibilityLabel="Privacy Policy"
+          >
+            <Text style={styles.privacyPillText}>Privacy</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.reloadMiniBtn} onPress={handleReload}>
+            <Text style={styles.reloadMiniText}>🔄</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Collapsible IP Switcher */}
@@ -208,6 +258,12 @@ export default function App() {
               <Text style={styles.applyBtnText}>Connect</Text>
             </TouchableOpacity>
           </View>
+
+          <View style={styles.drawerFooterRow}>
+            <TouchableOpacity style={styles.drawerPrivacyLink} onPress={handleOpenPrivacyPolicy}>
+              <Text style={styles.drawerPrivacyText}>🛡️ View Privacy Policy (Google Play) ↗</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
 
@@ -261,6 +317,10 @@ export default function App() {
           <TouchableOpacity style={styles.retryButton} onPress={handleReload}>
             <Text style={styles.retryButtonText}>🔄 Retry Connection</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.errorPrivacyBtn} onPress={handleOpenPrivacyPolicy}>
+            <Text style={styles.errorPrivacyBtnText}>🛡️ View Privacy Policy</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <WebView
@@ -282,6 +342,13 @@ export default function App() {
           )}
           onNavigationStateChange={(navState) => {
             setCanGoBack(navState.canGoBack);
+          }}
+          onShouldStartLoadWithRequest={(request) => {
+            if (request.url && request.url.includes('privacy-policy.html')) {
+              Linking.openURL(request.url).catch(() => {});
+              return false;
+            }
+            return true;
           }}
           onError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
@@ -550,5 +617,62 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 15,
     fontWeight: '600',
+  },
+  topBarRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  privacyPillBtn: {
+    backgroundColor: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#38bdf8',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  privacyPillText: {
+    color: '#38bdf8',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  webPrivacyBtn: {
+    backgroundColor: '#0369a1',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  webPrivacyBtnText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  drawerFooterRow: {
+    marginTop: 12,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#334155',
+    alignItems: 'center',
+  },
+  drawerPrivacyLink: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  drawerPrivacyText: {
+    color: '#38bdf8',
+    fontSize: 12,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  errorPrivacyBtn: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  errorPrivacyBtnText: {
+    color: '#94a3b8',
+    fontSize: 13,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
 });
