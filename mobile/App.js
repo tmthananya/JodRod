@@ -31,7 +31,7 @@ const HOME_WIFI_IP = '192.168.70.187';
  * Update via process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL or edit this variable before release.
  * If empty, falls back to the current server's /privacy-policy.html.
  */
-export const PUBLIC_PRIVACY_POLICY_URL = process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL || '';
+export const PUBLIC_PRIVACY_POLICY_URL = process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL || 'https://tmthananya.github.io/JodRod/privacy/';
 
 /**
  * Automatically determine the best initial URL based on platform & environment:
