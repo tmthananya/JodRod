@@ -75,7 +75,12 @@ if (!$carFetch['success'] || empty($carFetch['data'][0])) {
 }
 
 $cPlate = $carFetch['data'][0]['license_plate'] ?? '';
-$cModel = $carFetch['data'][0]['model'] ?? 'Standard';
+$rawModel = $carFetch['data'][0]['model'] ?? 'Standard';
+$cModel = $rawModel;
+$decodedModel = json_decode($rawModel, true);
+if (json_last_error() === JSON_ERROR_NONE && is_array($decodedModel)) {
+    $cModel = !empty($decodedModel['label']) ? trim($decodedModel['label']) : 'Standard';
+}
 $carMetaPrefix = !empty($cPlate) ? "[Vehicle: {$cPlate} | {$cModel}]" : '';
 
 $finalNotes = $carMetaPrefix;

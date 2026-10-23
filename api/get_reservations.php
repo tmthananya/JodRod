@@ -109,6 +109,14 @@ if ($asOwner) {
                 }
             }
 
+            // Extract human-readable car model name if stored as JSON
+            if (!empty($item['cars']) && !empty($item['cars']['model'])) {
+                $decodedCarModel = json_decode($item['cars']['model'], true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decodedCarModel)) {
+                    $item['cars']['model'] = !empty($decodedCarModel['label']) ? trim($decodedCarModel['label']) : 'Standard';
+                }
+            }
+
             // Clean visible notes for display
             if (!empty($item['notes'])) {
                 $item['notes'] = trim(preg_replace('/\[Vehicle:[^\]]+\]\s*/i', '', $item['notes']));
@@ -179,6 +187,14 @@ if ($asOwner) {
                         'license_plate' => trim($m[1]),
                         'model'         => isset($m[2]) ? trim($m[2]) : 'Standard'
                     ];
+                }
+            }
+
+            // Extract human-readable car model name if stored as JSON
+            if (!empty($item['cars']) && !empty($item['cars']['model'])) {
+                $decodedCarModel = json_decode($item['cars']['model'], true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decodedCarModel)) {
+                    $item['cars']['model'] = !empty($decodedCarModel['label']) ? trim($decodedCarModel['label']) : 'Standard';
                 }
             }
             if (!empty($item['notes'])) {

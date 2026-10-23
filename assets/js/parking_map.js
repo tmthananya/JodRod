@@ -544,7 +544,7 @@ class ParkingMapController {
           const idx = parseInt(choice, 10) - 1;
           if (cars[idx]) {
             selectedCarId = cars[idx].id;
-            selectedCarInfo = `Vehicle: ${cars[idx].license_plate}\n`;
+            selectedCarInfo = `Vehicle: ${cars[idx].license_plate} (${getLabel(cars[idx].model)})\n`;
           }
         }
       }

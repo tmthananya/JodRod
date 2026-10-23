@@ -897,9 +897,9 @@ if (!empty($_SESSION['auth_user'])) {
             </div>
 
             <div class="form-group" style="margin-top: 14px;">
-              <label for="vehicle-studio-name" class="form-label">Vehicle Label (Optional)</label>
-              <input type="text" id="vehicle-studio-name" name="custom_label" class="form-input" placeholder="e.g. Toyota Hilux Rescue" autocomplete="off">
-              <div class="form-help">Custom description or friendly name to identify your car in parking lots.</div>
+              <label for="vehicle-studio-name" class="form-label">Car Model *</label>
+              <input type="text" id="vehicle-studio-name" name="custom_label" class="form-input" placeholder="e.g. Toyota Hilux (White)" required autocomplete="off">
+              <div class="form-help">Vehicle make and model name (e.g. Toyota Hilux, Honda Civic).</div>
             </div>
 
             <!-- 3D Vehicle Studio Viewport -->
@@ -2771,7 +2771,8 @@ if (!empty($_SESSION['auth_user'])) {
 
           const car = r.cars || {};
           const plate = car.license_plate || 'Unlinked Vehicle';
-          const model = car.model ? ` (${car.model})` : '';
+          const carModelName = getCarDisplayLabel(car.model);
+          const model = carModelName ? ` (${carModelName})` : '';
           const createdAtFormatted = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
           const lat = space.latitude ? parseFloat(space.latitude).toFixed(4) : null;
           const lng = space.longitude ? parseFloat(space.longitude).toFixed(4) : null;
@@ -2837,7 +2838,7 @@ if (!empty($_SESSION['auth_user'])) {
         const spaceName = space.name || 'Flood Safe Parking Lot';
         const car = r.cars || {};
         const plate = car.license_plate || 'Unlinked Vehicle';
-        const model = car.model || 'Standard Vehicle';
+        const model = getCarDisplayLabel(car.model);
         const status = (r.status || 'pending').toLowerCase();
         const isConfirmed = (status === 'confirmed' || status === 'active');
         const isPending = (status === 'pending');
@@ -3235,9 +3236,7 @@ if (!empty($_SESSION['auth_user'])) {
         const data = parseCarData(modelRaw);
         if (data) {
           if (data.label && data.label.trim()) return data.label.trim();
-          const s = CAR_STYLE_LABELS[data.bodyStyle] || 'Rescue Vehicle';
-          const c = CAR_COLOR_LABELS[data.paintColor] ? ` (${CAR_COLOR_LABELS[data.paintColor]})` : (data.paintColor ? ` (${data.paintColor})` : '');
-          return `${s}${c}`;
+          return 'Standard Vehicle';
         }
         return modelRaw || 'Standard Vehicle';
       }
@@ -3603,6 +3602,12 @@ if (!empty($_SESSION['auth_user'])) {
           return;
         }
 
+        if (!customName) {
+          showVehicleAlert('error', 'Please enter your car model name (e.g. Toyota Hilux).');
+          if (nameInput) nameInput.focus();
+          return;
+        }
+
         // Generate 3D snapshot from canvas
         const snapshot = carStudio3D ? carStudio3D.getSnapshot(0.82) : '';
         const modelPayload = JSON.stringify({
@@ -3610,7 +3615,7 @@ if (!empty($_SESSION['auth_user'])) {
           paintColor: carStudioConfig.paintColor,
           wheelStyle: carStudioConfig.wheelStyle,
           detail: carStudioConfig.detail,
-          label: customName || getCarDisplayLabel(JSON.stringify(carStudioConfig)),
+          label: customName || 'Standard Vehicle',
           snapshot: snapshot
         });
 
@@ -4212,7 +4217,8 @@ if (!empty($_SESSION['auth_user'])) {
                 const driverName = r.driver_profile?.name || 'Community Driver';
                 const car = r.cars || {};
                 const plate = car.license_plate || 'Unlinked Vehicle';
-                const model = car.model ? ` (${car.model})` : '';
+                const carModelName = getCarDisplayLabel(car.model);
+                const model = carModelName ? ` (${carModelName})` : '';
                 const createdStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
                 return `
                   <div class="dash-lot-req-card" id="owner-req-card-${r.id}">
@@ -4262,7 +4268,8 @@ if (!empty($_SESSION['auth_user'])) {
                 const driverName = r.driver_profile?.name || 'Community Driver';
                 const car = r.cars || {};
                 const plate = car.license_plate || 'Unlinked Vehicle';
-                const model = car.model ? ` (${car.model})` : '';
+                const carModelName = getCarDisplayLabel(car.model);
+                const model = carModelName ? ` (${carModelName})` : '';
                 const updatedStr = r.updated_at ? new Date(r.updated_at).toLocaleString() : (r.created_at ? new Date(r.created_at).toLocaleString() : 'Confirmed');
                 return `
                   <div class="dash-lot-booking-card" id="owner-booking-card-${r.id}">
@@ -4658,7 +4665,8 @@ if (!empty($_SESSION['auth_user'])) {
           const driverName = r.driver_profile?.name || 'Community Driver';
           const car = r.cars || {};
           const plate = car.license_plate || 'Unlinked Vehicle';
-          const model = car.model ? ` (${car.model})` : '';
+          const carModelName = getCarDisplayLabel(car.model);
+          const model = carModelName ? ` (${carModelName})` : '';
           const createdStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
 
           html += `
@@ -4697,7 +4705,8 @@ if (!empty($_SESSION['auth_user'])) {
           const lotName = space.name || 'Emergency Flood Lot';
           const car = r.cars || {};
           const plate = car.license_plate || 'Your Vehicle';
-          const model = car.model ? ` (${car.model})` : '';
+          const carModelName = getCarDisplayLabel(car.model);
+          const model = carModelName ? ` (${carModelName})` : '';
           const createdStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
 
           html += `
@@ -4854,8 +4863,9 @@ if (!empty($_SESSION['auth_user'])) {
             `;
           }
 
+          const displayModel = getCarDisplayLabel(car.model);
           actionButtons += `
-            <button type="button" class="pixel-btn pixel-btn-sm btn-edit-car" data-id="${car.id}" data-plate="${car.license_plate}" data-model="${car.model || ''}" title="Edit vehicle details">
+            <button type="button" class="pixel-btn pixel-btn-sm btn-edit-car" data-id="${car.id}" data-plate="${car.license_plate}" data-model="${escapeHtml(displayModel)}" title="Edit vehicle details">
               Edit
             </button>
             <button type="button" class="pixel-btn pixel-btn-sm pixel-btn-red btn-delete-car" data-id="${car.id}" data-plate="${car.license_plate}" title="Delete vehicle">
@@ -4869,7 +4879,7 @@ if (!empty($_SESSION['auth_user'])) {
                 <div class="dash-car-header">
                   <div class="dash-car-icon">CAR</div>
                   <div style="flex: 1; min-width: 0;">
-                    <h4 class="dash-car-title">${car.model || 'Standard Vehicle'}</h4>
+                    <h4 class="dash-car-title">${escapeHtml(displayModel)}</h4>
                     <span class="dash-car-plate">${car.license_plate}</span>
                   </div>
                   ${hasAssignment 
@@ -4933,7 +4943,8 @@ if (!empty($_SESSION['auth_user'])) {
               const driverName = r.driver_profile?.name || 'Community Driver';
               const car = r.cars || {};
               const plate = car.license_plate || 'Unlinked Vehicle';
-              const model = car.model ? ` (${car.model})` : '';
+              const carModelName = getCarDisplayLabel(car.model);
+              const model = carModelName ? ` (${carModelName})` : '';
               const createdStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'Recently';
               return `
                 <div class="dash-lot-req-card" id="dash-owner-req-${r.id}">
@@ -4975,7 +4986,8 @@ if (!empty($_SESSION['auth_user'])) {
               const driverName = r.driver_profile?.name || 'Community Driver';
               const car = r.cars || {};
               const plate = car.license_plate || 'Unlinked Vehicle';
-              const model = car.model ? ` (${car.model})` : '';
+              const carModelName = getCarDisplayLabel(car.model);
+              const model = carModelName ? ` (${carModelName})` : '';
               const updatedStr = r.updated_at ? new Date(r.updated_at).toLocaleString() : (r.created_at ? new Date(r.created_at).toLocaleString() : 'Confirmed');
               return `
                 <div class="dash-lot-booking-card" id="dash-owner-booking-${r.id}">
@@ -5119,7 +5131,7 @@ if (!empty($_SESSION['auth_user'])) {
 
             rowsHtml += `
               <tr>
-                <td><strong>${car.model || 'Standard'}</strong></td>
+                <td><strong>${escapeHtml(getCarDisplayLabel(car.model))}</strong></td>
                 <td><span class="dash-car-plate" style="font-size: 0.75rem;">${car.license_plate}</span></td>
                 <td><strong>${lotName}</strong></td>
                 <td><span style="font-family: monospace; font-size: 0.8rem;">${spotCoords}</span></td>
@@ -5146,7 +5158,7 @@ if (!empty($_SESSION['auth_user'])) {
             // Unassigned vehicle row
             rowsHtml += `
               <tr style="background: #fafafa;">
-                <td><strong>${car.model || 'Standard'}</strong></td>
+                <td><strong>${escapeHtml(getCarDisplayLabel(car.model))}</strong></td>
                 <td><span class="dash-car-plate" style="font-size: 0.75rem;">${car.license_plate}</span></td>
                 <td style="color: #94a3b8; font-style: italic;">None</td>
                 <td style="color: #94a3b8; font-style: italic;">-</td>
@@ -5169,12 +5181,12 @@ if (!empty($_SESSION['auth_user'])) {
           const car = r.cars || {};
           const lotName = space.name || 'Flood Safe Parking Lot';
           const plate = car.license_plate || 'Unlinked';
-          const model = car.model || 'Vehicle';
+          const model = getCarDisplayLabel(car.model);
           const dateStr = r.created_at ? new Date(r.created_at).toLocaleString() : '-';
 
           rowsHtml += `
             <tr style="opacity: 0.65; background: #fff5f5;">
-              <td>${model}</td>
+              <td>${escapeHtml(model)}</td>
               <td><span class="dash-car-plate" style="font-size: 0.75rem;">${plate}</span></td>
               <td>${lotName}</td>
               <td>-</td>
@@ -5208,7 +5220,7 @@ if (!empty($_SESSION['auth_user'])) {
           if (modalCarTitleText) modalCarTitleText.textContent = 'Edit Vehicle Details';
           if (carModalIdInput) carModalIdInput.value = car.id;
           if (carModalPlateInput) carModalPlateInput.value = car.license_plate || '';
-          if (carModalModelInput) carModalModelInput.value = car.model || '';
+          if (carModalModelInput) carModalModelInput.value = getCarDisplayLabel(car.model);
         } else {
           if (modalCarTitleText) modalCarTitleText.textContent = 'Register New Vehicle';
           if (carModalIdInput) carModalIdInput.value = '';
@@ -5420,7 +5432,7 @@ if (!empty($_SESSION['auth_user'])) {
               opt.value = c.id;
 
               // Format: Make/Model — License Plate (e.g. "Toyota Yaris — ABC-1234")
-              const modelPart = c.model && c.model.trim() ? c.model.trim() : 'Standard Vehicle';
+              const modelPart = getCarDisplayLabel(c.model);
               const platePart = c.license_plate && c.license_plate.trim() ? c.license_plate.trim() : 'No Plate';
               opt.textContent = `${modelPart} — ${platePart}${isAssigned ? ' [Active Request / Parked]' : ''}`;
 
