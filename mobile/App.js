@@ -61,44 +61,56 @@ function getInitialUrl() {
 
 export default function App() {
   const webViewRef = useRef(null);
-  const [currentUrl, setCurrentUrl] = useState(getInitialUrl());
+  const initialUrl = getInitialUrl();
+  const [currentUrl, setCurrentUrl] = useState(initialUrl);
+  const [mainServerUrl, setMainServerUrl] = useState(initialUrl);
   const [customInput, setCustomInput] = useState('');
   const [canGoBack, setCanGoBack] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showConfig, setShowConfig] = useState(false);
 
-  const handleOpenPrivacyPolicy = async () => {
+  const isViewingPrivacy = currentUrl.includes('/privacy') || currentUrl.includes('privacy-policy.html');
+
+  const handleBackToApp = () => {
+    setHasError(false);
+    setErrorMessage('');
+    if (canGoBack && webViewRef.current) {
+      webViewRef.current.goBack();
+    } else {
+      setCurrentUrl(mainServerUrl || getInitialUrl());
+    }
+  };
+
+  const handleOpenPrivacyPolicy = () => {
+    if (isViewingPrivacy) {
+      handleBackToApp();
+      return;
+    }
+
     let targetUrl = PUBLIC_PRIVACY_POLICY_URL;
-    if (!targetUrl) {
+    if (mainServerUrl && !mainServerUrl.includes('github.io')) {
       try {
-        const parsed = new URL(currentUrl);
+        const parsed = new URL(mainServerUrl);
         targetUrl = `${parsed.protocol}//${parsed.host}/privacy/`;
       } catch {
-        const base = currentUrl.split('/#')[0].split('#')[0].replace(/\/+$/, '');
-        targetUrl = `${base}/privacy/`;
+        targetUrl = PUBLIC_PRIVACY_POLICY_URL;
       }
     }
 
-    try {
-      const supported = await Linking.canOpenURL(targetUrl);
-      if (supported) {
-        await Linking.openURL(targetUrl);
-      } else if (webViewRef.current) {
-        setCurrentUrl(targetUrl);
-      }
-    } catch (err) {
-      console.warn('Could not open external privacy policy URL:', err);
-      if (webViewRef.current) {
-        setCurrentUrl(targetUrl);
-      }
-    }
+    setHasError(false);
+    setErrorMessage('');
+    setCurrentUrl(targetUrl);
   };
 
   // Handle Android physical back button
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     const onBackPress = () => {
+      if (isViewingPrivacy) {
+        handleBackToApp();
+        return true;
+      }
       if (canGoBack && webViewRef.current) {
         webViewRef.current.goBack();
         return true;
@@ -107,7 +119,7 @@ export default function App() {
     };
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => subscription.remove();
-  }, [canGoBack]);
+  }, [canGoBack, isViewingPrivacy, mainServerUrl]);
 
   const handleReload = () => {
     setHasError(false);
@@ -120,6 +132,7 @@ export default function App() {
   const handleSwitchUrl = (newUrl) => {
     setHasError(false);
     setErrorMessage('');
+    setMainServerUrl(newUrl);
     setCurrentUrl(newUrl);
   };
 
@@ -145,12 +158,21 @@ export default function App() {
         <View style={styles.webHeader}>
           <Text style={styles.webTitle}>🚗 JodRod (Desktop Mode)</Text>
           <View style={styles.webActions}>
-            <TouchableOpacity
-              style={styles.webPrivacyBtn}
-              onPress={handleOpenPrivacyPolicy}
-            >
-              <Text style={styles.webPrivacyBtnText}>Privacy Policy 🛡️</Text>
-            </TouchableOpacity>
+            {isViewingPrivacy ? (
+              <TouchableOpacity
+                style={styles.webBackBtn}
+                onPress={handleBackToApp}
+              >
+                <Text style={styles.webBackBtnText}>← Back to JodRod</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.webPrivacyBtn}
+                onPress={handleOpenPrivacyPolicy}
+              >
+                <Text style={styles.webPrivacyBtnText}>Privacy Policy 🛡️</Text>
+              </TouchableOpacity>
+            )}
             <Text style={styles.webUrlText}>{currentUrl}</Text>
             <TouchableOpacity
               style={styles.openBrowserBtn}
@@ -185,13 +207,23 @@ export default function App() {
           <Text style={styles.topBarChevron}>{showConfig ? '▲' : '▼'}</Text>
         </TouchableOpacity>
         <View style={styles.topBarRight}>
-          <TouchableOpacity
-            style={styles.privacyPillBtn}
-            onPress={handleOpenPrivacyPolicy}
-            accessibilityLabel="Privacy Policy"
-          >
-            <Text style={styles.privacyPillText}>Privacy</Text>
-          </TouchableOpacity>
+          {isViewingPrivacy ? (
+            <TouchableOpacity
+              style={styles.backToAppPillBtn}
+              onPress={handleBackToApp}
+              accessibilityLabel="Back to JodRod"
+            >
+              <Text style={styles.backToAppPillText}>← Back to App</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.privacyPillBtn}
+              onPress={handleOpenPrivacyPolicy}
+              accessibilityLabel="Privacy Policy"
+            >
+              <Text style={styles.privacyPillText}>Privacy</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity style={styles.reloadMiniBtn} onPress={handleReload}>
             <Text style={styles.reloadMiniText}>🔄</Text>
           </TouchableOpacity>
@@ -342,12 +374,51 @@ export default function App() {
           )}
           onNavigationStateChange={(navState) => {
             setCanGoBack(navState.canGoBack);
+            if (navState.url) {
+              if (
+                (navState.url.includes('/privacy') || navState.url.includes('privacy-policy.html')) &&
+                !currentUrl.includes('/privacy') &&
+                !currentUrl.includes('privacy-policy.html')
+              ) {
+                setCurrentUrl(navState.url);
+              }
+            }
           }}
           onShouldStartLoadWithRequest={(request) => {
-            if (request.url && (request.url.includes('/privacy') || request.url.includes('privacy-policy.html'))) {
-              Linking.openURL(request.url).catch(() => {});
+            const url = request.url;
+            if (!url) return true;
+
+            // If user taps "Back to App", logo, or index.php in the privacy page
+            if (
+              url.includes('index.php') ||
+              url.endsWith('/JodRod/') ||
+              url.includes('/#map') ||
+              url.includes('/#') ||
+              url === 'http://127.0.0.1:8088/' ||
+              url.includes(':8088/#')
+            ) {
+              handleBackToApp();
               return false;
             }
+
+            // Allow viewing privacy page directly within the in-app WebView
+            if (url.includes('/privacy') || url.includes('privacy-policy.html')) {
+              return true;
+            }
+
+            // External third-party links (OpenStreetMap, Supabase, Cloudflare) open in external browser
+            if (
+              url.startsWith('http') &&
+              !url.includes(CURRENT_MAC_IP) &&
+              !url.includes(LOCALHOST_IP) &&
+              !url.includes(HOTSPOT_IP) &&
+              !url.includes(HOME_WIFI_IP) &&
+              !url.includes('github.io/JodRod')
+            ) {
+              Linking.openURL(url).catch(() => {});
+              return false;
+            }
+
             return true;
           }}
           onError={(syntheticEvent) => {
@@ -634,6 +705,28 @@ const styles = StyleSheet.create({
   privacyPillText: {
     color: '#38bdf8',
     fontSize: 11,
+    fontWeight: '700',
+  },
+  backToAppPillBtn: {
+    backgroundColor: '#0284c7',
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+    borderRadius: 4,
+  },
+  backToAppPillText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  webBackBtn: {
+    backgroundColor: '#0284c7',
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  webBackBtnText: {
+    color: '#ffffff',
+    fontSize: 12,
     fontWeight: '700',
   },
   webPrivacyBtn: {

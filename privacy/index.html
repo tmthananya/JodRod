@@ -398,7 +398,7 @@
   <!-- Top Sticky Navigation Bar -->
   <header class="header">
     <div class="header-inner">
-      <a href="../index.php" class="header-brand" title="Return to JodRod">
+      <a href="../" class="header-brand" id="header-brand-link" onclick="return returnToJodRod(event)" title="Return to JodRod">
         <span class="header-brand-icon">🚗</span>
         <div>
           <span class="header-brand-title">JODROD</span>
@@ -413,9 +413,9 @@
           <button type="button" class="lang-btn" id="btn-lang-en" onclick="switchLanguage('en')">🇬🇧 English</button>
         </div>
 
-        <a href="../index.php" class="header-back-btn">
+        <a href="../" class="header-back-btn" id="header-back-btn" onclick="return returnToJodRod(event)">
           <span>&larr;</span>
-          <span>กลับหน้าแอป</span>
+          <span id="back-btn-text">กลับหน้าแอป</span>
         </a>
       </div>
     </div>
@@ -949,6 +949,48 @@
   </footer>
 
   <script>
+    function returnToJodRod(e) {
+      if (e) {
+        e.preventDefault();
+      }
+
+      // 1. If history exists and we can go back
+      if (window.history.length > 1) {
+        window.history.back();
+        // Fallback after brief timeout if history.back did not change the page
+        setTimeout(() => {
+          fallbackReturn();
+        }, 300);
+        return false;
+      }
+
+      fallbackReturn();
+      return false;
+    }
+
+    function fallbackReturn() {
+      // 2. If opened in a popup/new tab via window.open
+      if (window.opener && !window.opener.closed) {
+        try {
+          window.opener.focus();
+          window.close();
+          return;
+        } catch (_) {}
+      }
+
+      // 3. If running on local server (PHP server port 8088 or localhost)
+      const isLocal = window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' || 
+                      window.location.port === '8088';
+      if (isLocal) {
+        window.location.href = '../index.php#map';
+        return;
+      }
+
+      // 4. Default to root portal (../)
+      window.location.href = '../';
+    }
+
     function switchLanguage(lang) {
       const thContent = document.getElementById('content-th');
       const enContent = document.getElementById('content-en');
@@ -956,6 +998,7 @@
       const enBtn = document.getElementById('btn-lang-en');
       const heroBadge = document.getElementById('hero-badge');
       const heroTitle = document.getElementById('hero-title');
+      const backBtnText = document.getElementById('back-btn-text');
 
       if (lang === 'en') {
         thContent.classList.remove('active');
@@ -964,6 +1007,7 @@
         enBtn.classList.add('active');
         heroBadge.textContent = 'Official Policy';
         heroTitle.textContent = 'Privacy Policy';
+        if (backBtnText) backBtnText.textContent = 'Back to App';
         document.documentElement.lang = 'en';
       } else {
         enContent.classList.remove('active');
@@ -972,6 +1016,7 @@
         thBtn.classList.add('active');
         heroBadge.textContent = 'นโยบายทางการ / Official Policy';
         heroTitle.textContent = 'นโยบายความเป็นส่วนตัว (Privacy Policy)';
+        if (backBtnText) backBtnText.textContent = 'กลับหน้าแอป';
         document.documentElement.lang = 'th';
       }
     }
