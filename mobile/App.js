@@ -389,14 +389,14 @@ export default function App() {
             if (!url) return true;
 
             // If user taps "Back to App", logo, or index.php in the privacy page
-            if (
+            if (isViewingPrivacy && (
               url.includes('index.php') ||
               url.endsWith('/JodRod/') ||
               url.includes('/#map') ||
               url.includes('/#') ||
               url === 'http://127.0.0.1:8088/' ||
               url.includes(':8088/#')
-            ) {
+            )) {
               handleBackToApp();
               return false;
             }
@@ -413,7 +413,8 @@ export default function App() {
               !url.includes(LOCALHOST_IP) &&
               !url.includes(HOTSPOT_IP) &&
               !url.includes(HOME_WIFI_IP) &&
-              !url.includes('github.io/JodRod')
+              !url.includes('github.io/JodRod') &&
+              (!mainServerUrl || !url.startsWith(mainServerUrl.split('#')[0]))
             ) {
               Linking.openURL(url).catch(() => {});
               return false;
