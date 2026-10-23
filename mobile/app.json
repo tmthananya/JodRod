@@ -13,6 +13,7 @@
     },
     "android": {
       "package": "com.tmthananya.jodrod",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#0e3150",
         "foregroundImage": "./assets/android-icon-foreground.png",

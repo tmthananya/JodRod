@@ -25,6 +25,9 @@ const LOCALHOST_IP = '127.0.0.1';
 const HOTSPOT_IP = '172.20.10.3';
 const HOME_WIFI_IP = '192.168.0.247';
 
+// Public Official Portal
+export const OFFICIAL_PORTAL_URL = 'https://tmthananya.github.io/JodRod/';
+
 /**
  * PUBLIC_PRIVACY_POLICY_URL:
  * Publicly accessible HTTPS URL for Google Play Console submission.
@@ -36,7 +39,8 @@ export const PUBLIC_PRIVACY_POLICY_URL = process.env.EXPO_PUBLIC_PRIVACY_POLICY_
 /**
  * Automatically determine the best initial URL based on platform & environment:
  * - Desktop Web: http://127.0.0.1:8088/#map (or current host)
- * - Mobile Expo Go: dynamically detects Metro server IP from bundle scriptURL
+ * - Mobile Expo Go (Dev): dynamically detects Metro server IP from bundle scriptURL (port 8088)
+ * - Mobile Standalone Release (.aab for Google Play): defaults to OFFICIAL_PORTAL_URL (HTTPS)
  */
 function getInitialUrl() {
   if (Platform.OS === 'web') {
@@ -46,7 +50,7 @@ function getInitialUrl() {
     return `http://${LOCALHOST_IP}:${APP_PORT}${APP_ROUTE}`;
   }
 
-  // On Mobile (iOS / Android), extract host IP where Metro bundled the app from
+  // On Mobile in Expo Go / Development mode, extract host IP where Metro bundled the app from
   const scriptURL = NativeModules?.SourceCode?.scriptURL;
   if (scriptURL) {
     const match = scriptURL.match(/^https?:\/\/([^:/]+)/);
@@ -55,8 +59,14 @@ function getInitialUrl() {
     }
   }
 
-  // Fallback to active Mac IP
-  return `http://${CURRENT_MAC_IP}:${APP_PORT}${APP_ROUTE}`;
+  // In development without scriptURL, fallback to active Mac IP
+  if (__DEV__) {
+    return `http://${CURRENT_MAC_IP}:${APP_PORT}${APP_ROUTE}`;
+  }
+
+  // In Standalone Production (Google Play / Release build), default to official live HTTPS portal
+  // so Google reviewers and users worldwide load the app seamlessly without "Cannot Connect"
+  return OFFICIAL_PORTAL_URL;
 }
 
 export default function App() {
@@ -236,6 +246,16 @@ export default function App() {
           <Text style={styles.configTitle}>Select or Enter Server IP:</Text>
           <View style={styles.presetRow}>
             <TouchableOpacity
+              style={[styles.presetChip, (currentUrl === OFFICIAL_PORTAL_URL || currentUrl.includes('github.io')) && styles.presetChipActive]}
+              onPress={() => {
+                handleSwitchUrl(OFFICIAL_PORTAL_URL);
+                setShowConfig(false);
+              }}
+            >
+              <Text style={styles.presetChipText}>🌐 Live Portal (Online)</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
               style={[styles.presetChip, currentUrl.includes(CURRENT_MAC_IP) && styles.presetChipActive]}
               onPress={() => {
                 handleSwitchUrl(`http://${CURRENT_MAC_IP}:${APP_PORT}${APP_ROUTE}`);
@@ -345,6 +365,13 @@ export default function App() {
               </TouchableOpacity>
             </View>
           </View>
+
+          <TouchableOpacity
+            style={[styles.retryButton, { backgroundColor: '#0284c7', marginBottom: 10 }]}
+            onPress={() => handleSwitchUrl(OFFICIAL_PORTAL_URL)}
+          >
+            <Text style={styles.retryButtonText}>🌐 Switch to Live Portal</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity style={styles.retryButton} onPress={handleReload}>
             <Text style={styles.retryButtonText}>🔄 Retry Connection</Text>
