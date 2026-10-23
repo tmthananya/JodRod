@@ -160,11 +160,11 @@ async function main() {
       path: '/'
     });
 
-    // 1. Phone Screenshot 1: Interactive Map (1080 x 2400)
+    // 1. Phone Screenshot 1: Interactive Map (1080 x 1920 - Exact 9:16)
     await captureScreen(client, {
       route: '#map',
       width: 1080,
-      height: 2400,
+      height: 1920,
       isMobile: true,
       filename: 'screenshot-1-map.png',
       waitMs: 4000,
@@ -175,11 +175,11 @@ async function main() {
       `
     });
 
-    // 2. Phone Screenshot 2: My Parking Lots (1080 x 2400)
+    // 2. Phone Screenshot 2: My Parking Lots (1080 x 1920 - Exact 9:16)
     await captureScreen(client, {
       route: '#my-spaces',
       width: 1080,
-      height: 2400,
+      height: 1920,
       isMobile: true,
       filename: 'screenshot-2-parking-lots.png',
       waitMs: 3500,
@@ -189,11 +189,11 @@ async function main() {
       `
     });
 
-    // 3. Phone Screenshot 3: 3D Vehicles (1080 x 2400)
+    // 3. Phone Screenshot 3: 3D Vehicles (1080 x 1920 - Exact 9:16)
     await captureScreen(client, {
       route: '#vehicles',
       width: 1080,
-      height: 2400,
+      height: 1920,
       isMobile: true,
       filename: 'screenshot-3-vehicles.png',
       waitMs: 4000,
@@ -203,11 +203,11 @@ async function main() {
       `
     });
 
-    // 4. Phone Screenshot 4: Profile & Points (1080 x 2400)
+    // 4. Phone Screenshot 4: Profile & Points (1080 x 1920 - Exact 9:16)
     await captureScreen(client, {
       route: '#profile',
       width: 1080,
-      height: 2400,
+      height: 1920,
       isMobile: true,
       filename: 'screenshot-4-profile.png',
       waitMs: 3500,
