@@ -206,16 +206,23 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
 
-      {/* Top Quick Bar (Tap to change IP) */}
+      {/* Top Header */}
       <View style={styles.topBar}>
-        <TouchableOpacity
-          style={styles.topBarInfo}
-          onPress={() => setShowConfig(!showConfig)}
-        >
-          <Text style={styles.topBarLabel}>Server:</Text>
-          <Text style={styles.topBarUrl} numberOfLines={1}>{currentUrl}</Text>
-          <Text style={styles.topBarChevron}>{showConfig ? '▲' : '▼'}</Text>
-        </TouchableOpacity>
+        {__DEV__ ? (
+          <TouchableOpacity
+            style={styles.topBarInfo}
+            onPress={() => setShowConfig(!showConfig)}
+          >
+            <Text style={styles.topBarLabel}>Server:</Text>
+            <Text style={styles.topBarUrl} numberOfLines={1}>{currentUrl}</Text>
+            <Text style={styles.topBarChevron}>{showConfig ? '▲' : '▼'}</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.topBarBrand}>
+            <Text style={styles.topBarTitle}>🚗 JODROD</Text>
+            <Text style={styles.topBarTagline}>• Flood Parking</Text>
+          </View>
+        )}
         <View style={styles.topBarRight}>
           {isViewingPrivacy ? (
             <TouchableOpacity
@@ -223,7 +230,7 @@ export default function App() {
               onPress={handleBackToApp}
               accessibilityLabel="Back to JodRod"
             >
-              <Text style={styles.backToAppPillText}>← Back to App</Text>
+              <Text style={styles.backToAppPillText}>← Back to Map</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -231,7 +238,7 @@ export default function App() {
               onPress={handleOpenPrivacyPolicy}
               accessibilityLabel="Privacy Policy"
             >
-              <Text style={styles.privacyPillText}>Privacy</Text>
+              <Text style={styles.privacyPillText}>🛡️ Privacy</Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.reloadMiniBtn} onPress={handleReload}>
@@ -240,8 +247,8 @@ export default function App() {
         </View>
       </View>
 
-      {/* Collapsible IP Switcher */}
-      {showConfig && (
+      {/* Collapsible IP Switcher (Only visible in Development) */}
+      {__DEV__ && showConfig && (
         <View style={styles.configDrawer}>
           <Text style={styles.configTitle}>Select or Enter Server IP:</Text>
           <View style={styles.presetRow}>
@@ -328,47 +335,17 @@ export default function App() {
             <Text style={styles.urlText}>{currentUrl}</Text>
           </Text>
 
-          <View style={styles.helpBox}>
-            <Text style={styles.helpHeader}>Quick Connection Tips:</Text>
-            <Text style={styles.helpText}>
-              • Make sure your phone & Mac are on the <Text style={styles.helpBold}>same Wi-Fi</Text>.{'\n'}
-              • Your desktop URL is <Text style={styles.helpBold}>http://{LOCALHOST_IP}:{APP_PORT}{APP_ROUTE}</Text>.{'\n'}
-              • For your phone, tap <Text style={styles.helpBold}>{CURRENT_MAC_IP}:{APP_PORT}</Text> below.{'\n'}
-              • PHP server is running on port {APP_PORT}.
-            </Text>
-          </View>
-
           {errorMessage ? (
             <Text style={styles.errorDetail}>{errorMessage}</Text>
           ) : null}
 
-          <View style={styles.presetBox}>
-            <Text style={styles.presetTitle}>Tap to Switch Server:</Text>
-            <View style={styles.presetGrid}>
-              <TouchableOpacity
-                style={styles.errorPresetBtn}
-                onPress={() => handleSwitchUrl(`http://${CURRENT_MAC_IP}:${APP_PORT}${APP_ROUTE}`)}
-              >
-                <Text style={styles.errorPresetBtnText}>Phone on Wi-Fi ({CURRENT_MAC_IP}:{APP_PORT})</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.errorPresetBtn}
-                onPress={() => handleSwitchUrl(`http://${LOCALHOST_IP}:${APP_PORT}${APP_ROUTE}`)}
-              >
-                <Text style={styles.errorPresetBtnText}>Desktop Local ({LOCALHOST_IP}:{APP_PORT})</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.errorPresetBtn}
-                onPress={() => handleSwitchUrl(`http://${HOTSPOT_IP}:${APP_PORT}${APP_ROUTE}`)}
-              >
-                <Text style={styles.errorPresetBtnText}>Hotspot ({HOTSPOT_IP}:{APP_PORT})</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
           <TouchableOpacity
             style={[styles.retryButton, { backgroundColor: '#0284c7', marginBottom: 10 }]}
-            onPress={() => handleSwitchUrl(OFFICIAL_PORTAL_URL)}
+            onPress={() => {
+              setHasError(false);
+              setErrorMessage('');
+              setCurrentUrl(OFFICIAL_PORTAL_URL);
+            }}
           >
             <Text style={styles.retryButtonText}>🌐 Switch to Live Portal</Text>
           </TouchableOpacity>
@@ -376,6 +353,26 @@ export default function App() {
           <TouchableOpacity style={styles.retryButton} onPress={handleReload}>
             <Text style={styles.retryButtonText}>🔄 Retry Connection</Text>
           </TouchableOpacity>
+
+          {__DEV__ && (
+            <View style={styles.presetBox}>
+              <Text style={styles.presetTitle}>Dev Server Presets:</Text>
+              <View style={styles.presetGrid}>
+                <TouchableOpacity
+                  style={styles.errorPresetBtn}
+                  onPress={() => handleSwitchUrl(`http://${CURRENT_MAC_IP}:${APP_PORT}${APP_ROUTE}`)}
+                >
+                  <Text style={styles.errorPresetBtnText}>Phone on Wi-Fi ({CURRENT_MAC_IP}:{APP_PORT})</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.errorPresetBtn}
+                  onPress={() => handleSwitchUrl(`http://${LOCALHOST_IP}:${APP_PORT}${APP_ROUTE}`)}
+                >
+                  <Text style={styles.errorPresetBtnText}>Desktop Local ({LOCALHOST_IP}:{APP_PORT})</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           <TouchableOpacity style={styles.errorPrivacyBtn} onPress={handleOpenPrivacyPolicy}>
             <Text style={styles.errorPrivacyBtnText}>🛡️ View Privacy Policy</Text>
@@ -415,14 +412,18 @@ export default function App() {
             const url = request.url;
             if (!url) return true;
 
+            // In standalone production, prevent any localhost or port 8088 links from breaking the WebView
+            if (!__DEV__ && (url.includes(':8088') || url.includes('127.0.0.1') || url.includes(CURRENT_MAC_IP))) {
+              return false;
+            }
+
             // If user taps "Back to App", logo, or index.php in the privacy page
             if (isViewingPrivacy && (
               url.includes('index.php') ||
               url.endsWith('/JodRod/') ||
               url.includes('/#map') ||
               url.includes('/#') ||
-              url === 'http://127.0.0.1:8088/' ||
-              url.includes(':8088/#')
+              url.includes(':8088')
             )) {
               handleBackToApp();
               return false;
@@ -433,14 +434,13 @@ export default function App() {
               return true;
             }
 
-            // External third-party links (OpenStreetMap, Supabase, Cloudflare) open in external browser
+            // External third-party links open in external browser (exclude OSM tiles, CDN, Supabase, internal hashes)
             if (
               url.startsWith('http') &&
-              !url.includes(CURRENT_MAC_IP) &&
-              !url.includes(LOCALHOST_IP) &&
-              !url.includes(HOTSPOT_IP) &&
-              !url.includes(HOME_WIFI_IP) &&
               !url.includes('github.io/JodRod') &&
+              !url.includes('tile.openstreetmap.org') &&
+              !url.includes('unpkg.com') &&
+              !url.includes('supabase.co') &&
               (!mainServerUrl || !url.startsWith(mainServerUrl.split('#')[0]))
             ) {
               Linking.openURL(url).catch(() => {});
@@ -522,6 +522,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  topBarBrand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  topBarTitle: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  topBarTagline: {
+    color: '#38bdf8',
+    fontSize: 11,
+    fontWeight: '600',
   },
   topBarLabel: {
     color: '#64748b',

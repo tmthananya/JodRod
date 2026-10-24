@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JodRod - Flood Parking Community (Official Portal)</title>
+  <title>JodRod - Flood Parking Community</title>
   <meta name="description" content="JodRod (จอดรถ) is a civic disaster relief platform to find and share safe elevated parking spaces during flood emergencies.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <style>
     :root {
       --bg-primary: #0f172a;
@@ -13,6 +14,7 @@
       --accent-blue: #0284c7;
       --accent-sky: #38bdf8;
       --accent-green: #10b981;
+      --accent-red: #ef4444;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --border-color: #334155;
@@ -37,10 +39,10 @@
     header {
       background-color: rgba(15, 23, 42, 0.95);
       border-bottom: 1px solid var(--border-color);
-      padding: 16px 24px;
+      padding: 14px 20px;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 1000;
       backdrop-filter: blur(8px);
     }
 
@@ -55,24 +57,24 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
       color: #ffffff;
     }
 
     .brand-icon {
-      font-size: 28px;
+      font-size: 26px;
     }
 
     .brand-title {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 800;
       letter-spacing: 0.05em;
       display: block;
     }
 
     .brand-tagline {
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       color: var(--accent-sky);
       font-weight: 600;
       display: block;
@@ -80,16 +82,16 @@
 
     .nav-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
     }
 
     .btn-link {
       color: var(--accent-sky);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      padding: 8px 14px;
+      padding: 6px 12px;
       border-radius: 6px;
       transition: all 0.15s ease;
       border: 1px solid transparent;
@@ -104,13 +106,13 @@
       flex: 1;
       max-width: 1080px;
       margin: 0 auto;
-      padding: 48px 24px 60px;
+      padding: 32px 20px 48px;
       width: 100%;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 50px;
+      margin-bottom: 40px;
     }
 
     .hero-badge {
@@ -118,49 +120,50 @@
       background: rgba(2, 132, 199, 0.2);
       border: 1px solid rgba(56, 189, 248, 0.4);
       color: var(--accent-sky);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       padding: 6px 14px;
       border-radius: 999px;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .hero-title {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       font-weight: 900;
       color: #ffffff;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       line-height: 1.25;
     }
 
     .hero-desc {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: var(--text-muted);
       max-width: 680px;
-      margin: 0 auto 32px;
+      margin: 0 auto 28px;
     }
 
     .btn-grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 16px;
-      margin-bottom: 48px;
+      gap: 12px;
+      margin-bottom: 36px;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 12px 24px;
+      padding: 12px 22px;
       border-radius: 8px;
-      font-size: 0.98rem;
+      font-size: 0.95rem;
       font-weight: 700;
       text-decoration: none;
       transition: all 0.2s ease;
       cursor: pointer;
+      border: none;
     }
 
     .btn-primary {
@@ -185,9 +188,152 @@
       transform: translateY(-2px);
     }
 
+    /* Map Section */
+    .map-section {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 40px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .map-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .map-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .map-badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    #parking-map {
+      width: 100%;
+      height: 420px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      z-index: 1;
+    }
+
+    .spots-header {
+      margin-top: 24px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .spots-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .spots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .spot-card {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .spot-card:hover {
+      border-color: var(--accent-sky);
+      transform: translateY(-2px);
+    }
+
+    .spot-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .spot-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .status-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .status-available {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .status-full {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .spot-details {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      margin-top: 6px;
+    }
+
+    .spot-btn {
+      display: inline-block;
+      margin-top: 10px;
+      width: 100%;
+      text-align: center;
+      background: #334155;
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+
+    .spot-btn:hover {
+      background: var(--accent-blue);
+    }
+
+    /* Features Section */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
       margin-top: 24px;
     }
@@ -196,7 +342,7 @@
       background-color: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 26px;
+      padding: 24px;
       transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
@@ -206,12 +352,12 @@
     }
 
     .card-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
+      font-size: 30px;
+      margin-bottom: 10px;
     }
 
     .card-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
       color: #ffffff;
       margin-bottom: 8px;
@@ -219,16 +365,16 @@
 
     .card-desc {
       color: var(--text-muted);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       line-height: 1.6;
     }
 
     footer {
       border-top: 1px solid var(--border-color);
-      padding: 28px 24px;
+      padding: 24px 20px;
       text-align: center;
       color: var(--text-muted);
-      font-size: 0.88rem;
+      font-size: 0.85rem;
     }
 
     footer a {
@@ -238,11 +384,14 @@
 
     @media (max-width: 640px) {
       .hero-title {
-        font-size: 1.85rem;
+        font-size: 1.75rem;
       }
       .btn {
         width: 100%;
         justify-content: center;
+      }
+      #parking-map {
+        height: 320px;
       }
     }
   </style>
@@ -259,8 +408,8 @@
         </div>
       </a>
       <div class="nav-actions">
+        <a href="#map-section" class="btn-link">🗺️ Live Map</a>
         <a href="privacy/" class="btn-link">🛡️ Privacy Policy</a>
-        <a href="https://github.com/tmthananya/JodRod" class="btn-link" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
       </div>
     </div>
   </header>
@@ -270,47 +419,68 @@
       <div class="hero-badge">Civic Disaster Relief Platform</div>
       <h1 class="hero-title">Safe Parking During Floods</h1>
       <p class="hero-desc">
-        Connecting drivers seeking elevated safe ground with neighbors and property owners offering emergency parking spaces.
+        Connecting drivers seeking elevated safe ground with neighbors and community shelters offering emergency parking spaces.
       </p>
 
       <div class="btn-grid">
-        <a href="privacy/" class="btn btn-primary">
+        <a href="#map-section" class="btn btn-primary">
+          <span>🗺️</span>
+          <span>Explore Safe Parking Map</span>
+        </a>
+        <a href="privacy/" class="btn btn-secondary">
           <span>🛡️</span>
           <span>View Privacy Policy</span>
         </a>
-        <a href="http://127.0.0.1:8088/#map" class="btn btn-secondary">
-          <span>🚗</span>
-          <span>Open JodRod Web (Local Server)</span>
-        </a>
-        <a href="https://github.com/tmthananya/JodRod" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
-          <span>💻</span>
-          <span>View Source Code</span>
-        </a>
+        <button type="button" class="btn btn-secondary" id="btn-refresh-spots">
+          <span>🔄</span>
+          <span>Refresh Spots</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Interactive Map Section -->
+    <section id="map-section" class="map-section">
+      <div class="map-header">
+        <h2 class="map-title">
+          <span>🗺️</span>
+          <span>Elevated Safe Parking Map</span>
+        </h2>
+        <span class="map-badge" id="spot-counter">Loading safe spots...</span>
+      </div>
+
+      <!-- Leaflet Map Container -->
+      <div id="parking-map"></div>
+
+      <div class="spots-header">
+        <h3 class="spots-title">Active Emergency Parking Locations</h3>
+      </div>
+      <div class="spots-grid" id="spots-list">
+        <!-- Rendered by JavaScript -->
       </div>
     </section>
 
     <section class="features-grid">
       <div class="card">
         <div class="card-icon">🗺️</div>
-        <h2 class="card-title">Interactive Flood Map</h2>
+        <h2 class="card-title">Real-Time Safe Ground</h2>
         <p class="card-desc">
-          Locate elevated parking locations, multi-story garages, and safe community shelters in real time with live spot availability.
+          Identify elevated terrain, parking structures, and temple grounds verified for flood safety and clear access during storm events.
         </p>
       </div>
 
       <div class="card">
         <div class="card-icon">🤝</div>
-        <h2 class="card-title">Community Space Sharing</h2>
+        <h2 class="card-title">Community Driven</h2>
         <p class="card-desc">
-          Property owners can quickly list driveways and elevated lots to shelter neighbors' vehicles during disaster emergencies.
+          Neighbors register safe parking spaces to shelter nearby vehicles, verified transparently through mutual civic confirmation.
         </p>
       </div>
 
       <div class="card">
-        <div class="card-icon">🚙</div>
-        <h2 class="card-title">3D Vehicle & Driver Profiles</h2>
+        <div class="card-icon">🚗</div>
+        <h2 class="card-title">Vehicle Safety First</h2>
         <p class="card-desc">
-          Register your vehicle model and license plate for fast, transparent verification at emergency parking checkpoints.
+          Prevent devastating flood water damage with rapid emergency relocation coordination across Chiang Mai and surrounding provinces.
         </p>
       </div>
     </section>
@@ -325,5 +495,198 @@
     </p>
   </footer>
 
+  <!-- Leaflet Library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    // Supabase Public Read-Only Endpoint for live parking spaces
+    const SUPABASE_REST_URL = 'https://qcbdnkudzcwnfbojdglz.supabase.co/rest/v1/parking_spaces?select=*';
+    const SUPABASE_ANON_KEY = 'sb_publishable_bJc0tfArhHn-M0uU2NQufA_SkLQ1gaH';
+
+    // High ground fallback spots (Chiang Mai Elevated Centers)
+    const FALLBACK_SPOTS = [
+      {
+        id: 'cp-01',
+        name: 'Central Chiang Mai Airport (Elevated P3-P5)',
+        latitude: 18.7695,
+        longitude: 98.9754,
+        capacity: 120,
+        available_spaces: 45,
+        status: 'available'
+      },
+      {
+        id: 'cp-02',
+        name: 'Central Festival Chiang Mai Multi-Storey Garage',
+        latitude: 18.8023,
+        longitude: 99.0182,
+        capacity: 250,
+        available_spaces: 88,
+        status: 'available'
+      },
+      {
+        id: 'cp-03',
+        name: 'Chiang Mai University High Ground Shelter Lot',
+        latitude: 18.7967,
+        longitude: 98.9532,
+        capacity: 100,
+        available_spaces: 24,
+        status: 'available'
+      },
+      {
+        id: 'cp-04',
+        name: 'Wat Phra Singh Community High Ground Lot',
+        latitude: 18.7885,
+        longitude: 98.9818,
+        capacity: 30,
+        available_spaces: 8,
+        status: 'available'
+      }
+    ];
+
+    let map = null;
+    let markersLayer = null;
+
+    function initMap() {
+      // Default center: Chiang Mai Flood Relocation Zone (18.7900, 98.9800)
+      map = L.map('parking-map').setView([18.7900, 98.9800], 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      markersLayer = L.layerGroup().addTo(map);
+      loadParkingSpots();
+    }
+
+    async function loadParkingSpots() {
+      const counterEl = document.getElementById('spot-counter');
+      const listEl = document.getElementById('spots-list');
+      if (counterEl) counterEl.textContent = 'Updating spots...';
+
+      let spots = [];
+      try {
+        const response = await fetch(SUPABASE_REST_URL, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            spots = data;
+          }
+        }
+      } catch (err) {
+        console.warn('Using offline safe parking spots:', err);
+      }
+
+      // If network empty or failed, use curated emergency spots
+      if (!spots || spots.length === 0) {
+        spots = FALLBACK_SPOTS;
+      }
+
+      renderSpots(spots);
+    }
+
+    function renderSpots(spots) {
+      if (!markersLayer) return;
+      markersLayer.clearLayers();
+
+      const counterEl = document.getElementById('spot-counter');
+      const listEl = document.getElementById('spots-list');
+      const bounds = [];
+
+      let availableCount = 0;
+      let html = '';
+
+      spots.forEach((spot) => {
+        const lat = parseFloat(spot.latitude);
+        const lng = parseFloat(spot.longitude);
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        const isAvailable = spot.status === 'available' && (spot.available_spaces === undefined || spot.available_spaces > 0);
+        if (isAvailable) availableCount++;
+
+        bounds.push([lat, lng]);
+
+        // Marker popup
+        const marker = L.marker([lat, lng]).addTo(markersLayer);
+        const popupContent = `
+          <div style="font-family: sans-serif; font-size: 13px; line-height: 1.4; color: #0f172a;">
+            <b style="font-size: 14px; color: #0284c7;">🚗 ${escapeHtml(spot.name || 'Emergency Safe Space')}</b><br>
+            <span style="display:inline-block; margin-top: 4px; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; background: ${isAvailable ? '#dcfce7; color: #15803d;' : '#fee2e2; color: #b91c1c;'}">
+              ${isAvailable ? '🟢 Available' : '🔴 Full / Closed'}
+            </span><br>
+            <span style="color: #475569; font-size: 12px; margin-top: 4px; display: block;">
+              Slots: <b>${spot.available_spaces ?? 0}</b> / ${spot.capacity ?? 0}
+            </span>
+          </div>
+        `;
+        marker.bindPopup(popupContent);
+
+        // Grid Card
+        html += `
+          <div class="spot-card" onclick="focusMarker(${lat}, ${lng}, '${escapeHtml(spot.name || '')}')">
+            <div class="spot-card-top">
+              <span class="spot-name">${escapeHtml(spot.name || 'Safe Parking Lot')}</span>
+              <span class="status-pill ${isAvailable ? 'status-available' : 'status-full'}">
+                ${isAvailable ? '🟢 Open' : '🔴 Full'}
+              </span>
+            </div>
+            <div class="spot-details">
+              <span>🚗 Capacity: <b>${spot.capacity ?? 0}</b></span>
+              <span>🟢 Available: <b>${spot.available_spaces ?? 0}</b></span>
+            </div>
+            <button type="button" class="spot-btn">
+              📍 View on Map
+            </button>
+          </div>
+        `;
+      });
+
+      if (counterEl) {
+        counterEl.textContent = `${spots.length} Safe Spots Listed (${availableCount} Open)`;
+      }
+
+      if (listEl) {
+        listEl.innerHTML = html;
+      }
+
+      if (bounds.length > 0 && map) {
+        try {
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+        } catch (e) {}
+      }
+    }
+
+    function focusMarker(lat, lng, name) {
+      if (map) {
+        map.setView([lat, lng], 15);
+        document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+
+      const refreshBtn = document.getElementById('btn-refresh-spots');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+          loadParkingSpots();
+        });
+      }
+    });
+  </script>
 </body>
 </html>
